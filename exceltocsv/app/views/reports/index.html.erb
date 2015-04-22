@@ -1,2 +1,10 @@
-<h1>Upload CSV Files</h1>
+<div class="container">
+	<div class="jumbotron" align="center">
+		<h1>Upload CSV Files</h1>
+	</div>
 
+	<%= form_tag import_reports_path, multipart:true do %>
+		<%= file_field_tag :file %>
+		<%= submit_tag "Upload" %>
+	<% end %>
+</div>
