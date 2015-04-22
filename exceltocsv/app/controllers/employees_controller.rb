@@ -23,7 +23,7 @@ class EmployeesController < ApplicationController
   end
 
   def update
-    @employee = Employee.find(params[:id])    
+    @employee = Employee.find(params[:id])
 
     if @employee.update(employee_params)
       redirect_to employees_path, notice: "SUCCESS:Update successful!"

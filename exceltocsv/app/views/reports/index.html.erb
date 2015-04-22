@@ -3,8 +3,42 @@
 		<h1>Upload CSV Files</h1>
 	</div>
 
-	<%= form_tag import_reports_path, multipart:true do %>
-		<%= file_field_tag :file %>
+	<%= form_tag import_reports_path, multipart:true, html: {class: "form-horizontal"}  do %>
+		<%= label_tag(:biometrics, "Biometrics CSV: ", class: "col-md-2 control-label")%>
+			<%= file_field_tag(:biometrics, class: "btn btn-default") %>
+		<%= label_tag(:falco, "Falco CSV: ", class: "col-md-2 control-label")%>
+			<%= file_field_tag(:falco, class: "btn btn-default") %>
 		<%= submit_tag "Upload" %>
 	<% end %>
+
+	<table id = "table_id">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Date</th>
+				<th>Time In</th>
+				<th>Time Out</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%@attendances.each do |attendance|%>
+				<tr>
+					<td><%= attendance.name%></td>
+					<td><%= attendance.attendance_date.to_datetime.strftime('%m/%d/%Y')%></td>
+					<td><%= attendance.time_in.to_datetime.strftime('%H:%M:%S')%></td>
+					<%if attendance.time_out.nil? == false%>
+						<td><%= attendance.time_out.to_datetime.strftime('%H:%M:%S')%></td>
+					<%else%>
+						<td><%= attendance.time_out%></td>
+					<%end%>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
 </div>
+
+<script>
+  $(function(){
+    $("#table_id").dataTable();
+  })
+</script>
