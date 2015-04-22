@@ -9,6 +9,7 @@ class EmployeesController < ApplicationController
 
   def create
     @employee = Employee.new(employee_params)
+    @employee.status = "Active"
 
     if @employee.save
       redirect_to employees_path, notice: "SUCCESS:New Employee Created!"
@@ -22,7 +23,7 @@ class EmployeesController < ApplicationController
   end
 
   def update
-    @employee = Employee.find(params[:id])
+    @employee = Employee.find(params[:id])    
 
     if @employee.update(employee_params)
       redirect_to employees_path, notice: "SUCCESS:Update successful!"
@@ -37,8 +38,32 @@ class EmployeesController < ApplicationController
     redirect_to employees_path
   end
 
+  # def change_status
+  #   @employee = Employee.find(params[:id])
+
+  #   if @employee.status == 'Active'
+  #     @employee.status = 'Inactive'
+  #     redirect_to employees_path, notice: "SUCCESS:#{@employee.last_name}, #{employee.first_name} has been deactivated!"
+  #   elsif @employee.status == 'Inactive'
+  #     @employee.status = 'Active'
+  #     redirect_to employees_path, notice: "SUCCESS:#{@employee.last_name}, #{employee.first_name} has been activated!"
+  #   else
+  #     redirect_to employees_path, notice: "FAILED:Changing of status has failed!"
+  #   end
+  # end
+
+  # def deactivate
+  #   @employee = Employee.find(params[:id])
+  #   @employee.status = 'Inactive'
+  # end
+
+  # def activate
+  #   @employee = Employee.find(params[:id])
+  #   @employee.status = 'Active'
+  # end
+
   private
   def employee_params
-    params.require(:employee).permit(:id, :first_name, :last_name, :department)
+    params.require(:employee).permit(:id, :first_name, :last_name, :department, :status)
   end
 end

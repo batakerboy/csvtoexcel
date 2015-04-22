@@ -1,0 +1,55 @@
+<%= render 'noticeAlert'%>
+
+<div class = "container">
+	<div class = "row">
+		<div class = "col-md-6">
+			<h1>iRipple Employees</h1>
+		</div>
+		<div class = "col-md-6">
+			<%= link_to 'Create New Employees', new_employee_path, class: "btn btn-primary pull-right", data: {toggle: "modal", target: "#add"}%>
+		</div>
+	</div>
+
+	<table id = "table_id">
+		<thead>
+			<tr>
+				<th>Last Name</th>
+				<th>First Name</th>
+				<th>Department</th>
+				<th>Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%@employees.each do |employee|%>
+				<tr>
+					<td><%= employee.last_name%></td>
+					<td><%= employee.first_name%></td>
+					<td><%= employee.department%></td>
+					<td><%= employee.status%></td>
+					<td>
+						<%= link_to 'Edit', edit_employee_path(employee), class: "btn btn-xs btn-warning col-md-6", data: {toggle: "modal", target: "#edit"}%>
+						<%# if employee.status == 'Active'%>
+						<%#= link_to 'Deactivate', change_status_path(employee), class: "btn btn-xs btn-danger col-md-6"%>
+						<%# elsif employee.status == 'Inactive'%>
+						<%#= link_to 'Activate', change_status_path(employee), method: :post, class: "btn btn-xs btn-success col-md-6"%>
+						<%#end%>
+						<%= button_to 'Delete', employee_path(employee), method: :delete, onclick: "return confirm('Are you sure you would like to delete the information on #{employee.first_name} #{employee.last_name}?')", class: "btn btn-xs btn-danger col-md-6"%>
+					</td>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
+</div>
+
+<div class = "modal fade" id = "edit" role = "dialog">
+	<div class = "modal-dialog">
+		<div class = "modal-content"></div>
+	</div>
+</div>
+
+<script>
+  $(function(){
+    $("#table_id").dataTable();
+  })
+</script>
