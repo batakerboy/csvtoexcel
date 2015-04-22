@@ -41,12 +41,16 @@ class Report < ActiveRecord::Base
 
 		 	if check_token62 != 'nil]'
 		 		#puts "Displaying value for #{i}: #{token[52]}"
-		 		puts "Employee #{i+1} is inactive"
+		 		#puts "Employee #{i+1} is inactive"
+		 		next
 		 	elsif check_token53 != 'nil'
-				puts "Employee #{i+1} is active"
+		 		name = token[5].split('(').first
+		 		name = name[12..name.length-3]
+				puts "\n #{name} is active"
+				#puts "Date: #{token[25][2..token[25].length-2]} \n\t Time-in: #{token[26][2..token[26].length-2]} Time-out: #{token[27][2..token[27].length-2]}"
+				puts "Date: #{token[25].tr('" ', '')} \n\t Time-in: #{token[26].tr('"', '')} Time-out: #{token[27].tr('"', '')}"
 			elsif check_token33 != 'nil'
-				puts "Row #{i+1}: Succeeding days"
-		 	end
+				puts "Date: #{token[5].tr('" ', '')} \n\t Time-in: #{token[6].tr('"', '')} Time-out: #{token[7].tr('"', '')}"		 	end
 		 	#puts "#{token.length}"
 		 
 		end
