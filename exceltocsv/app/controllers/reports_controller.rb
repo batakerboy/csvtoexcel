@@ -1,7 +1,8 @@
 include FileUtils
-
 class ReportsController < ApplicationController
+  def index
+  end
 
-
-
+  def new
+  end
 end
