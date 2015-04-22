@@ -35,6 +35,4 @@ Rails.application.routes.draw do
   #   end
 
   resources :employees
-    #post 'employees/:id' => 'employee#change_status', as: :change_status
-    #post 'employees/:id/deactivate' => 'employee#deactivate'
 end
