@@ -33,9 +33,24 @@ class Report < ActiveRecord::Base
 		 	# else
 		 	# 	puts "Row no. #{i}: employee inactive"
 		 	# end
-		 	token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
-		 	puts "Displaying value for #{i}: #{row}"
+		 	token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
+		 	
+		 	check_token62 = token[62].squeeze(" ").strip
+		 	check_token53 = token[53].squeeze(" ").strip
+		 	check_token33 = token[33].squeeze(" ").strip
+
+		 	if check_token62 != 'nil]'
+		 		#puts "Displaying value for #{i}: #{token[52]}"
+		 		puts "Employee #{i+1} is inactive"
+		 	elsif check_token53 != 'nil'
+				puts "Employee #{i+1} is active"
+			elsif check_token33 != 'nil'
+				puts "Row #{i+1}: Succeeding days"
+		 	end
+		 	#puts "#{token.length}"
+		 
 		end
+
 
 		# string = 'Mustard Seed,1001 Summit One Office Tower 530 Shaw Blvd. Mandaluyong City,Telephone: 535-7333; Website: mseedsystems.com; Email: sales@mseedsystems.com,TIMESHEET REPORT,"From March 21, 2015 to April 03, 2015",03/24/15,11:02 AM, 2:07 pm,,,,,,,,,,,8,1,8,0,5.92,TOTAL EMPLOYEES:,22,Total Working Days:,14,Total Holidays W/in the Period:,0,Total Hours Required:,96,Mustard Seed Systems Bio-office Time and Attendance,Page -1 of 1,"Report Date: April 06, 2015",,,,,,,,,,,,,,,,,,,,,,,,,,,,,'.to_s
 
