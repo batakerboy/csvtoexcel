@@ -7,8 +7,8 @@ class ReportsController < ApplicationController
 	def new
 	end
 
-  	def import     
-  		Report.import(params[:biometrics],params[:falco])
+  	def import 
+  		Report.import(params[:biometrics], params[:falco])
    		redirect_to root_url, notice: "Products imported."   
-	end 
+	end
 end

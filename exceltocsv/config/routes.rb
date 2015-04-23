@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
-  root 'reports#index'
+  root 'welcome#index'
 
   resources :reports do
-    collection { 
+    collection {
       get :start_parse
       post :import 
     }
