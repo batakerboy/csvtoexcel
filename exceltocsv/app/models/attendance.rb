@@ -36,13 +36,13 @@ class Attendance < ActiveRecord::Base
 			 		@attendance.first_name = @@name.split(", ").last
 			 		newdate = date_biometrics(token[25].tr('" ', ''))
 			 		timein = token[26].tr('"', '')
-			 		if timein[0] == ' '
-			 			timein = timein[1..timein.length]
-			 		end
+			 		# if timein[0] == ' '
+			 		# 	timein = timein[1..timein.length]
+			 		# end
 			 		timeout = token[27].tr('"', '')
-			 		if timeout[0] == ' '
-			 			timeout = timeout[1..timeout.length]
-			 		end
+			 		# if timeout[0] == ' '
+			 		# 	timeout = timeout[1..timeout.length]
+			 		# end
 			 		@attendance.attendance_date = newdate
 			 		# @attendance.time_in = (newdate + " " + timein).to_datetime
 			 		@attendance.time_in = timein.to_time
