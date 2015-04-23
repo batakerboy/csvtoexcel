@@ -40,10 +40,11 @@ class Report < ActiveRecord::Base
 			 		@attendance.name = @@name
 			 		newdate = date_biometrics(token[25].tr('" ', ''))
 			 		@attendance.attendance_date = newdate
-			 		@attendance.time_in = (newdate + " " + (token[26].tr('"', '').to_time.strftime('%H:%M:%S')))
-			 		if token[27].squeeze(" ").strip != 'nil'
-			 			@attendance.time_out = newdate + token[27].tr('"', '').to_time.strftime('%H:%M:%S') 
-			 		else @attendance.time_out = ' '
+			 		@attendance.time_in = (newdate + " " + token[26].tr('"', '').to_datetime)
+			 		newtime_out = token[27].tr('" ', '')
+			 		if newtime_out.length == 3
+			 			@attendance.time_out = ' '
+			 		else @attendance.time_out = (newdate + newtime_out.to_datetime)
 			 		end
 			 		@attendance.save
 				elsif check_token33 != 'nil'
@@ -51,10 +52,11 @@ class Report < ActiveRecord::Base
 			 		@attendance.name = @@name
 			 		newdate = date_biometrics(token[5].tr('" ', ''))
 			 		@attendance.attendance_date = newdate
-			 		@attendance.time_in = newdate + " " + token[6].tr('"', '').to_time.strftime('%H:%M:%S')
-			 		if token[7].squeeze(" ").strip != 'nil'
-			 			@attendance.time_out = newdate + " " + token[7].tr('"', '').to_time.strftime('%H:%M:%S') 
-			 		else @attendance.time_out = ' '
+			 		@attendance.time_in = (newdate + " " + token[6].tr('"', '').to_datetime)
+			 		newtime_out = token[7].tr('" ', '')
+			 		if newtime_out.length == 3
+			 			@attendance.time_out = ' '
+			 		else @attendance.time_out = (newdate + newtime_out.to_datetime)
 			 		end
 			 		@attendance.save
 				end
@@ -79,27 +81,7 @@ class Report < ActiveRecord::Base
 			end
 		end
 	end
-
-	# def attendance_params
-	# 	params.require(:attendance).permit(:name, :attendance_date, :time_in, :time_out)
-	# end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	# def start_parse(fileName = "biometrics.csv")
 	# 	# Sets filepath and searches for files with names starting with biometric_????? and saves the first in filePath na variable

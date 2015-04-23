@@ -4,8 +4,7 @@ class ReportsController < ApplicationController
 		@attendances = Attendance.order(:name)
 		respond_to do |format|
 			format.html
-			# format.csv { send_data @attendances.to_csv }
-			format.xls { send_data @attendances.to_csv(col_sep: "\t") }
+			format.xls { send_data @attendances.to_csv }
 		end
 	end
 
@@ -14,6 +13,6 @@ class ReportsController < ApplicationController
 
   	def import 
   		Report.import(params[:biometrics], params[:falco])
-   		redirect_to root_url, notice: 'Files Imported!' 
+   		redirect_to reports_path, notice: 'Files Imported!' 
 	end
 end
