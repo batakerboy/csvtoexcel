@@ -41,11 +41,11 @@ class Report < ActiveRecord::Base
 			 		@attendance.name = @@name
 			 		newdate = date_biometrics(token[25].tr('" ', ''))
 			 		@attendance.attendance_date = newdate
-			 		@attendance.time_in = (newdate + " " + token[26].tr('"', '').to_datetime)
+			 		@attendance.time_in = (newdate + " " + token[26].tr('"', '')).to_datetime
 			 		newtime_out = token[27].tr('" ', '')
 			 		if newtime_out.length == 3
 			 			@attendance.time_out = ' '
-			 		else @attendance.time_out = (newdate + newtime_out.to_datetime)
+			 		else @attendance.time_out = (newdate + " " + newtime_out).to_datetime
 			 		end
 			 		@attendance.save
 				elsif check_token33 != 'nil'
@@ -53,11 +53,11 @@ class Report < ActiveRecord::Base
 			 		@attendance.name = @@name
 			 		newdate = date_biometrics(token[5].tr('" ', ''))
 			 		@attendance.attendance_date = newdate
-			 		@attendance.time_in = (newdate + " " + token[6].tr('"', '').to_datetime)
+			 		@attendance.time_in = (newdate + " " + token[6].tr('"', '')).to_datetime
 			 		newtime_out = token[7].tr('" ', '')
 			 		if newtime_out.length == 3
 			 			@attendance.time_out = ' '
-			 		else @attendance.time_out = (newdate + newtime_out.to_datetime)
+			 		else @attendance.time_out = (newdate + " " + newtime_out).to_datetime
 			 		end
 			 		@attendance.save
 				end
