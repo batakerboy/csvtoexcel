@@ -4,7 +4,8 @@ require 'pathname'
 # include GeneratParse::Base
 
 class Report < ActiveRecord::Base
-
+	@@name = ' '
+	
 	def self.date_biometrics(date)
 		token = date.split("/")
 		formatted_date = "20" + token[2] + '-' + token[0] + '-' + token[1]
@@ -20,7 +21,7 @@ class Report < ActiveRecord::Base
 	def report_dir
 		Rails.root.join("public", "uploads")
 	end
-	@@name = ' '
+	
 	def self.import(biometrics = nil, falco = nil)
 		if !biometrics.nil?
 			csvFile = CSV.open(biometrics.path, 'r:ISO-8859-1')
@@ -69,18 +70,59 @@ class Report < ActiveRecord::Base
 				next if i == 0
 				next if i == 1
 				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
-				@attendance = Attendance.new
-				@attendance.attendance_date = date_falco(token[0].tr('"[ ', ''))
-				@attendance.name = token[3].tr('"', '')
-				@attendance.time_in = token[5].tr('" ', '').to_time.strftime('%H:%M:%S')
-				if token[6].squeeze(" ").strip != 'nil'
-					@attendance.time_out = token[6].tr('" ', '').to_time.strftime('%H:%M:%S')
-				else @attendance.time_out = ' '
+				date = date_falco(token[0].tr('"[ ', ''))
+				name =  token[3].tr('"', '')[1..token[3].length-1]
+				@attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE attendance_date = '#{date}' AND name = '#{name}'")
+				if @attendance[0].nil?
+					@attendance = Attendance.new
+					@attendance.attendance_date = date
+					@attendance.name = name
+					@attendance.time_in = token[5].tr('" ', '').to_time.strftime('%H:%M:%S')
+					if token[6].squeeze(" ").strip != 'nil'
+						@attendance.time_out = token[6].tr('" ', '').to_time.strftime('%H:%M:%S')
+					else @attendance.time_out = ' '
+					end
+					@attendance.save
+				else
+					time_in = token[5].tr('" ', '').to_time
+						
+					Attendance.update(@attendance[0].id, time_in: time_in) if @attendance[0].time_in > time_in
+				
+					if token[6].squeeze(" ").strip != 'nil'
+						time_out = token[6].tr('" ', '').to_time
+						if @attendance[0].time_out.nil? 
+							Attendance.update(@attendance[0].id, time_out: time_out)
+						elsif @attendance[0].time_out < time_out
+							Attendance.update(@attendance[0].id, time_out: time_out)
+						end
+					end
+						
 				end
-				@attendance.save
 			end
 		end
 	end
+
+	# def new_records_falco
+	# 	csvFile = CSV.open(falco.path, 'r:ISO-8859-1')
+	# 	csvFile.each_with_index do |row, i|
+	# 		next if i == 0
+	# 		next if i == 1
+	# 		token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
+	# 		@attendance = Attendance.new
+	# 		@attendance.attendance_date = date_falco(token[0].tr('"[ ', ''))
+	# 		@attendance.name = token[3].tr('"', '')
+	# 		@attendance.time_in = token[5].tr('" ', '').to_time.strftime('%H:%M:%S')
+	# 		if token[6].squeeze(" ").strip != 'nil'
+	# 			@attendance.time_out = token[6].tr('" ', '').to_time.strftime('%H:%M:%S')
+	# 		else @attendance.time_out = ' '
+	# 		end
+	# 		@attendance.save
+	# 	end
+	# end
+
+	# def self.update_records_falco(falco)
+		
+	# end
 end
 
 	# def start_parse(fileName = "biometrics.csv")

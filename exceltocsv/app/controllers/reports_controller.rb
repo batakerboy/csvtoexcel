@@ -14,5 +14,6 @@ class ReportsController < ApplicationController
   	def import 
   		Report.import(params[:biometrics], params[:falco])
    		redirect_to reports_path, notice: 'Files Imported!' 
+   		#Attendance.destroy_all
 	end
 end
