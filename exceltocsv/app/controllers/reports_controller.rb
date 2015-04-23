@@ -14,6 +14,6 @@ class ReportsController < ApplicationController
 
   	def import 
   		Report.import(params[:biometrics], params[:falco])
-   		redirect_to root_url, notice: "Time-in and Time-out imported."   
+   		redirect_to root_url, notice: 'Files Imported!' 
 	end
 end

@@ -5,14 +5,6 @@ require 'pathname'
 
 class Report < ActiveRecord::Base
 
-	def self.to_csv(options = {})
-		CSV.generate(options) do |csv|
-			all.each do |attendance|
-				csv << attendance.attributes
-			end
-		end
-	end
-
 	def self.date_biometrics(date)
 		token = date.split("/")
 		formatted_date = "20" + token[2] + '-' + token[0] + '-' + token[1]
@@ -87,6 +79,10 @@ class Report < ActiveRecord::Base
 			end
 		end
 	end
+
+	# def attendance_params
+	# 	params.require(:attendance).permit(:name, :attendance_date, :time_in, :time_out)
+	# end
 end
 
 
