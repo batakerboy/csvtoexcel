@@ -32,7 +32,8 @@ class Attendance < ActiveRecord::Base
 			 		@@name = token[5].split('(').first
 			 		@@name = @@name[12..@@name.length-3]
 			 		@attendance = Attendance.new
-			 		@attendance.name = @@name
+			 		@attendance.last_name = @@name.split(", ").first
+			 		@attendance.first_name = @@name.split(", ").last
 			 		newdate = date_biometrics(token[25].tr('" ', ''))
 			 		timein = token[26].tr('"', '')
 			 		if timein[0] == ' '
@@ -53,7 +54,8 @@ class Attendance < ActiveRecord::Base
 			 		@attendance.save
 				elsif check_token33 != 'nil'
 					@attendance = Attendance.new
-			 		@attendance.name = @@name
+			 		@attendance.last_name = @@name.split(", ").first
+			 		@attendance.first_name = @@name.split(", ").last
 			 		newdate = date_biometrics(token[5].tr('" ', ''))
 			 		timein = token[6].tr('" ', '')
 			 		# if timein[0] == ' '
@@ -80,7 +82,7 @@ class Attendance < ActiveRecord::Base
 				puts "========================================================="
 				puts "Time out: String = #{timeout} \t Time = #{timeout.to_time}"
 				puts "========================================================="
-				puts "#{@attendance.name}: Time in: #{@attendance.time_in} \t Time out: #{@attendance.time_out}"
+				puts "#{@attendance.last_name}, #{@attendance.first_name}: Time in: #{@attendance.time_in} \t Time out: #{@attendance.time_out}"
 				puts "========================================================="
 			end
 		end
@@ -92,16 +94,19 @@ class Attendance < ActiveRecord::Base
 				next if i == 1
 				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
 				name =  token[3].tr('"', '')[1..token[3].length-1]
+				last_name = name.split(", ").first
+				first_name = name.split(", ").last
 				date = date_falco(token[0].tr('"[ ', ''))
 				newtime_in = token[5].tr('" ', '')
 				newtime_out = token[6].tr('"] ', '')
 				# newdatein = (date + " " + newtime_in).to_datetime
 				# newdateout = (date + " " + newtime_out).to_datetime
-				@attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE attendance_date = '#{date}' AND name = '#{name}'")
+				@attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE attendance_date = '#{date}' AND last_name = '#{last_name}' AND first_name = '#{first_name}'")
 				if @attendance[0].nil?
 					@attendance = Attendance.new
 					@attendance.attendance_date = date
-					@attendance.name = name
+					@attendance.last_name = last_name
+					@attendance.first_name = first_name
 					# @attendance.time_in = newdatein
 					@attendance.time_in = newtime_in.to_time
 					if newtime_out.length == 3
@@ -118,7 +123,7 @@ class Attendance < ActiveRecord::Base
 					puts "========================================================="
 					puts "Time out: String = #{newtime_out} \t Time = #{newtime_out.to_time}"
 					puts "========================================================="
-					puts "#{@attendance.name}: Time in: #{@attendance.time_in} \t Time out: #{@attendance.time_out}"
+					puts "#{@attendance.last_name}, #{@attendance.first_name}: Time in: #{@attendance.time_in} \t Time out: #{@attendance.time_out}"
 					puts "========================================================="
 				else	
 					Attendance.update(@attendance[0].id, time_in: newtime_in.to_time) if @attendance[0].time_in.strftime('%H:%M:%S') > newtime_in.to_time.strftime('%H:%M:%S')
@@ -136,7 +141,7 @@ class Attendance < ActiveRecord::Base
 					puts "========================================================="
 					puts "Time out: String = #{newtime_out} \t Time = #{newtime_out.to_time}"
 					puts "========================================================="
-					puts "#{@attendance[0].name}: Time in: #{@attendance[0].time_in.to_time} \t Time out: #{@attendance[0].time_out.to_time if !@attendance[0].time_out.nil?}"
+					puts "#{@attendance[0].last_name}, #{@attendance[0].first_name}: Time in: #{@attendance[0].time_in.to_time} \t Time out: #{@attendance[0].time_out.to_time if !@attendance[0].time_out.nil?}"
 					puts "========================================================="
 				end
 			end

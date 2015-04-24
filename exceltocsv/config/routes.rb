@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   resources :reports do
     collection {
       get :start_parse
-      post :import 
+      post :import
+      # post :zip 
     }
   end
 

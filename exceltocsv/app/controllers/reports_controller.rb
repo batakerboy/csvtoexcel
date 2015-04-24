@@ -1,12 +1,19 @@
 include FileUtils
 class ReportsController < ApplicationController
 	def index
-		@attendances = Attendance.order(:name)
+		@attendances = Attendance.all
 		respond_to do |format|
 			format.html
 			format.xls { send_data @attendances.to_csv }
 		end
 	end
+
+	# def zip
+	# 	@names = Attendance.find_by_sql("SELECT name FROM attendances")
+	# 	zipfile.get_output_stream("#{user.name}.csv") { |f| 
+	# 		f.puts(user.to_csv) 
+	# 	}
+	# end
 
 	def new
 	end
