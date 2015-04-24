@@ -38,4 +38,18 @@ ActiveRecord::Schema.define(version: 20150424015621) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "requests", force: :cascade do |t|
+    t.string   "name"
+    t.string   "department"
+    t.date     "date"
+    t.decimal  "ot_hours"
+    t.time     "ut_time"
+    t.decimal  "vacation_leave"
+    t.decimal  "sick_leave"
+    t.decimal  "official_business"
+    t.text     "remarks"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
 end

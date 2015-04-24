@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  department: MyString
+  date: 2015-04-23
+  ot_hours: 9.99
+  ut_time: 2015-04-23 18:14:24
+  vacation_leave: 9.99
+  sick_leave: 9.99
+  official_business: 9.99
+  remarks: MyText
+
+two:
+  name: MyString
+  department: MyString
+  date: 2015-04-23
+  ot_hours: 9.99
+  ut_time: 2015-04-23 18:14:24
+  vacation_leave: 9.99
+  sick_leave: 9.99
+  official_business: 9.99
+  remarks: MyText
