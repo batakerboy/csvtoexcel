@@ -2,6 +2,7 @@ include FileUtils
 class ReportsController < ApplicationController
 	def index
 		@attendances = Attendance.all
+		@requests = Request.all
 		respond_to do |format|
 			format.html
 			format.xls { send_data @attendances.to_csv }
@@ -20,6 +21,7 @@ class ReportsController < ApplicationController
 
   	def import 
   		Attendance.import(params[:biometrics], params[:falco])
+  		Request.import(params[:file])
    		redirect_to reports_path, notice: 'Files Imported!' 
    		#Attendance.destroy_all
 	end

@@ -4,6 +4,8 @@ require 'pathname'
 # include GeneratParse::Base
 
 class Report < ActiveRecord::Base
+	
+end
 
 	# def new_records_falco
 	# 	csvFile = CSV.open(falco.path, 'r:ISO-8859-1')
@@ -65,4 +67,3 @@ class Report < ActiveRecord::Base
 	# 		end
 	# 	end
 	# end
-end
