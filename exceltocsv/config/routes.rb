@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     collection {
       get :start_parse
       post :import
-      # post :zip 
+      get :download_zip 
     }
   end
 
