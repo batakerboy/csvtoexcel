@@ -16,7 +16,8 @@
 				<th>Last Name</th>
 				<th>First Name</th>
 				<th>Department</th>
-				<!-- <th>Status</th> -->
+				<th>Biometrics ID</th>
+				<th>Falco ID</th>
 				<th>Actions</th>
 			</tr>
 		</thead>
@@ -26,7 +27,8 @@
 					<td><%= employee.last_name%></td>
 					<td><%= employee.first_name%></td>
 					<td><%= employee.department%></td>
-					<!-- <td><%= employee.status%></td> -->
+					<td><%= employee.biometrics_id%></td>
+					<td><%= employee.falco_id%></td>
 					<td>
 						<%= link_to 'Edit', edit_employee_path(employee), class: "btn btn-xs btn-warning col-md-6", data: {toggle: "modal", target: "#edit"}%>
 						<%# if employee.status == 'Active'%>
