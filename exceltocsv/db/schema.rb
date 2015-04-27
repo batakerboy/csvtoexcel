@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150427003854) do
+ActiveRecord::Schema.define(version: 20150427045621) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20150427003854) do
     t.string   "last_name"
     t.string   "first_name"
   end
+
+  add_index "attendances", ["last_name", "first_name", "attendance_date"], name: "by_last_name_first_name_and_date"
 
   create_table "employees", force: :cascade do |t|
     t.string   "last_name"
@@ -46,12 +48,12 @@ ActiveRecord::Schema.define(version: 20150427003854) do
     t.time     "ut_time"
     t.decimal  "vacation_leave"
     t.decimal  "sick_leave"
-    t.decimal  "official_business"
     t.text     "remarks"
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
     t.string   "first_name"
     t.string   "last_name"
+    t.string   "official_business"
   end
 
 end

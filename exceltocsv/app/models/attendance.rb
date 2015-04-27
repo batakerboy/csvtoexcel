@@ -102,8 +102,9 @@ class Attendance < ActiveRecord::Base
 						# puts "Date: #{token[0].tr(' ', '').tr('/','-')}\tTime: #{token[1]}\tCard No: #{token[2]}\tName: #{last_name}, #{first_name}"	
 						# puts "==================================="
 						
-						@records_of_attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE last_name = '#{last_name}' AND first_name = '#{first_name}' AND attendance_date = '#{date}'")
-						if @records_of_attendance[0].nil?
+						#@records_of_attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE last_name = '#{last_name}' AND first_name = '#{first_name}' AND attendance_date = '#{date}'")
+						@records_of_attendance = Attendance.where(last_name: last_name, first_name: first_name, attendance_date: date).first
+						if @records_of_attendance.nil?
 							@attendance = Attendance.new
 							@attendance.first_name = first_name
 							@attendance.last_name = last_name
@@ -111,11 +112,11 @@ class Attendance < ActiveRecord::Base
 							@attendance.time_in = token[1].to_time
 							@attendance.save
 						else
-							Attendance.update(@records_of_attendance[0].id, time_in: token[1].to_time) if @records_of_attendance[0].time_in.strftime('%H:%M:%S') > token[1].to_time.strftime('%H:%M:%S')
-							if @records_of_attendance[0].time_out.nil?
-								Attendance.update(@records_of_attendance[0].id, time_out: token[1].to_time)
-							elsif @records_of_attendance[0].time_out.strftime('%H:%M:%S') < token[1].to_time.strftime('%H:%M:%S')
-								Attendance.update(@records_of_attendance[0].id, time_out: token[1].to_time)
+							Attendance.update(@records_of_attendance.id, time_in: token[1].to_time) if @records_of_attendance.time_in.strftime('%H:%M:%S') > token[1].to_time.strftime('%H:%M:%S')
+							if @records_of_attendance.time_out.nil?
+								Attendance.update(@records_of_attendance.id, time_out: token[1].to_time)
+							elsif @records_of_attendance.time_out.strftime('%H:%M:%S') < token[1].to_time.strftime('%H:%M:%S')
+								Attendance.update(@records_of_attendance.id, time_out: token[1].to_time)
 							end 
 						end
 					end
