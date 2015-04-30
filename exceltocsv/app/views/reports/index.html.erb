@@ -18,7 +18,7 @@
 	<table id = "table_id">
 		<thead>
 			<tr>
-				<th>Name</th>
+				<th>Employee ID</th>
 				<th>Date</th>
 				<th>Time In</th>
 				<th>Time Out</th>
@@ -27,7 +27,8 @@
 		<tbody>
 			<%@attendances.each do |attendance|%>
 				<tr>
-					<td><%= "#{attendance.last_name}, #{attendance.first_name}"%></td>
+					<!-- <td><%#= "#{attendance.last_name}, #{attendance.first_name}"%></td> -->
+					<td><%= attendance.employee_id%></td>
 					<td><%= attendance.attendance_date.to_date.strftime('%m/%d/%Y')%></td>
 					<td><%= attendance.time_in.strftime('%H:%M:%S')%></td>
 					<%if attendance.time_out.nil? == false%>

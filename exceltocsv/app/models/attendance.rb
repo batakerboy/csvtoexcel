@@ -4,7 +4,8 @@ require 'pathname'
 class Attendance < ActiveRecord::Base
 	belongs_to :employee
 
-	@@name = ' '
+	# @@name = ' '
+	@@biometrics_id = ' '
 	
 	def self.date_biometrics(date)
 		token = date.split("/")
@@ -31,16 +32,19 @@ class Attendance < ActiveRecord::Base
 			 	if check_token62 != 'nil]'
 			 		next
 			 	elsif check_token53 != 'nil'
-			 		@@name = token[5].split('(').first
-			 		@@name = @@name[12..@@name.length-3]
+			 		# @@name = token[5].split('(').first
+			 		# @@name = @@name[12..@@name.length-3]
+			 		@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
 			 		@attendance = Attendance.new
-			 		@attendance.last_name = @@name.split(", ").first
-			 		@attendance.first_name = @@name.split(", ").last
-			 		
-			 		# newdate = date_biometrics(token[25].tr('" ', ''))
+			 		@employee = Employee.where(biometrics_id: @@biometrics_id).first
+			 		next if @employee.nil?
+			 		@attendance.employee_id = @employee.id
+
+			 		# @attendance.last_name = @@name.split(", ").first
+			 		# @attendance.first_name = @@name.split(", ").last
+
 			 		@attendance.attendance_date = date_biometrics(token[25].tr('" ', ''))
 			 		
-			 		# timein = token[26].tr('"', '')
 			 		@attendance.time_in = token[26].tr('"', '').to_time
 			 		
 			 		timeout = token[27].tr('"', '')
@@ -52,11 +56,16 @@ class Attendance < ActiveRecord::Base
 			 		
 			 		@attendance.save
 				elsif check_token33 != 'nil'
+					next if @employee.nil?
 					@attendance = Attendance.new
-			 		@attendance.last_name = @@name.split(", ").first
-			 		@attendance.first_name = @@name.split(", ").last
-			 		# newdate = date_biometrics(token[5].tr('" ', ''))
-			 		# timein = token[6].tr('" ', '')
+					@attendance.employee_id = @employee.id if !@employee.nil?
+					puts "====================="
+			 		puts @@biometrics_id
+			 		puts @employee.id if !@employee.nil?
+			 		puts "====================="
+			 		# @attendance.last_name = @@name.split(", ").first
+			 		# @attendance.first_name = @@name.split(", ").last
+			 		
 			 		timeout = token[7].tr('" ', '')
 			 		@attendance.attendance_date = date_biometrics(token[5].tr('" ', ''))
 			 		@attendance.time_in = token[6].tr('" ', '').to_time
@@ -68,15 +77,6 @@ class Attendance < ActiveRecord::Base
 			 		end
 			 		@attendance.save
 				end
-				# puts "========================================================="
-				# puts "BIOMETRICS"
-				# puts "========================================================="
-				# puts "Time in: String = #{timein} \t Time = #{timein.to_time}"
-				# puts "========================================================="
-				# puts "Time out: String = #{timeout} \t Time = #{timeout.to_time}"
-				# puts "========================================================="
-				# puts "#{@attendance.last_name}, #{@attendance.first_name}: Time in: #{@attendance.time_in} \t Time out: #{@attendance.time_out}"
-				# puts "========================================================="
 			end
 		end
 
@@ -84,32 +84,39 @@ class Attendance < ActiveRecord::Base
 			textFile = File.open(falco.path, 'r:ISO-8859-1')
 			textFile.each_with_index do |row|
 				token = row.gsub(/\s+/m, ' ').split(" ")
-				unless token.length == 0 || token[2] == 'FFFFFF' || token[2] == 'Access' || token[2] == 'Report'
+				unless token.length == 0 || token[2] == 'FFFFFF' || token[2] == 'Access' || token[2] == 'Report' || token[2].nil?
 					unless token[2].length != 6
-						name = ''
-						t = 3
-						while t < token.length
-							if token[t] == '01'
-								break
-							end
+						# name = ''
+						# t = 3
+						# while t < token.length
+						# 	if token[t] == '01'
+						# 		break
+						# 	end
 
-							name = name << "#{token[t]} "
-							t += 1
-						end
-						last_name = name.split(", ").first.gsub(/^\s+|\s+$/m, '')
-						first_name = name.split(", ").last.gsub(/^\s+|\s+$/m, '')
+						# 	name = name << "#{token[t]} "
+						# 	t += 1
+						# end
+						# last_name = name.split(", ").first.gsub(/^\s+|\s+$/m, '')
+						# first_name = name.split(", ").last.gsub(/^\s+|\s+$/m, '')
+						falco_id = token[2].tr('" ', '')
 						date = date_falco(token[0].tr(' ', ''))
 						
-						# puts "==================================="
-						# puts "Date: #{token[0].tr(' ', '').tr('/','-')}\tTime: #{token[1]}\tCard No: #{token[2]}\tName: #{last_name}, #{first_name}"	
-						# puts "==================================="
-						
-						#@records_of_attendance = Attendance.find_by_sql("SELECT * FROM attendances WHERE last_name = '#{last_name}' AND first_name = '#{first_name}' AND attendance_date = '#{date}'")
-						@records_of_attendance = Attendance.where(last_name: last_name, first_name: first_name, attendance_date: date).first
+						# @records_of_attendance = Attendance.where(last_name: last_name, first_name: first_name, attendance_date: date).first
+						@employee = Employee.where(falco_id: falco_id).first 
+						next if @employee.nil?
+						@records_of_attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first
+						puts "============================================="
+						puts "falco id: '#{falco_id}'"
+						puts "employee_id: '#{@employee.id}'"
+						puts "employee_name: '#{@employee.last_name}', '#{@employee.first_name}'"
+						puts "Date: '#{date}'"
+						puts "records of attendance: #{@records_of_attendance.id}" unless @records_of_attendance.nil?
+						puts "============================================="
 						if @records_of_attendance.nil?
 							@attendance = Attendance.new
-							@attendance.first_name = first_name
-							@attendance.last_name = last_name
+							# @attendance.first_name = first_name
+							# @attendance.last_name = last_name
+							@attendance.employee_id = @employee.id
 							@attendance.attendance_date = date
 							@attendance.time_in = token[1].to_time
 							@attendance.save

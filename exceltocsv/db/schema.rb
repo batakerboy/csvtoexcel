@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150430043245) do
+ActiveRecord::Schema.define(version: 20150430053930) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -19,11 +19,10 @@ ActiveRecord::Schema.define(version: 20150430043245) do
     t.time     "time_out"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
-    t.string   "last_name"
-    t.string   "first_name"
+    t.string   "employee_id"
   end
 
-  add_index "attendances", ["last_name", "first_name", "attendance_date"], name: "by_last_name_first_name_and_date"
+  add_index "attendances", ["attendance_date"], name: "by_last_name_first_name_and_date"
 
   create_table "employees", force: :cascade do |t|
     t.string   "last_name"
