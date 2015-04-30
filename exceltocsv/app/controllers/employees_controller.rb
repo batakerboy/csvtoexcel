@@ -62,6 +62,11 @@ class EmployeesController < ApplicationController
   #   @employee.status = 'Active'
   # end
 
+  def import
+    Employee.import(params[:file])
+    redirect_to employees_path, notice: 'SUCCESS:Files Imported!'
+  end
+
   private
   def employee_params
     params.require(:employee).permit(:id, :first_name, :last_name, :department, :biometrics_id, :falco_id)

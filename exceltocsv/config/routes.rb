@@ -35,5 +35,9 @@ Rails.application.routes.draw do
   #     end
   #   end
 
-  # resources :employees
+  resources :employees do
+    collection {
+      post :import
+    }
+  end
 end

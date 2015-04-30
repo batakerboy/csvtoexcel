@@ -47,7 +47,7 @@
 				<th>Date</th>
 				<th>Day</th>
 				<th>Department</th>
-				<th>Name</th>
+				<th>Employee ID</th>
 				<th>OT Hours</th>
 				<th>UT Time</th>
 				<th>Vacation Leave</th>
@@ -59,10 +59,12 @@
 		<tbody>
 			<%@requests.each do |request|%>
 				<tr>
-					<td><%= request.date.strftime('%m/%d/%Y')%></td>
-					<td><%= request.date.strftime('%A')%></td>
+					<!-- <td><%#= request.date.strftime('%m/%d/%Y')%></td>
+					<td><%#= request.date.strftime('%A')%></td> -->
+					<td><%= request.date%></td>
+					<td><%= request.date%></td>
 					<td><%= request.department%></td>
-					<td><%= "#{request.last_name}, #{request.first_name}"%></td>
+					<td><%= request.employee_id%></td>
 					<td><%= request.ot_hours%></td>
 					
 					<%unless request.ut_time.nil? %>

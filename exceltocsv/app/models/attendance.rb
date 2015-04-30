@@ -2,6 +2,8 @@ require 'csv'
 require 'pathname'
 
 class Attendance < ActiveRecord::Base
+	belongs_to :employee
+
 	@@name = ' '
 	
 	def self.date_biometrics(date)
