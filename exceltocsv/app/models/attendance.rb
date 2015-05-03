@@ -4,7 +4,6 @@ require 'pathname'
 class Attendance < ActiveRecord::Base
 	belongs_to :employee
 
-	# @@name = ' '
 	@@biometrics_id = ' '
 	
 	def self.date_biometrics(date)
@@ -32,19 +31,12 @@ class Attendance < ActiveRecord::Base
 			 	if check_token62 != 'nil]'
 			 		next
 			 	elsif check_token53 != 'nil'
-			 		# @@name = token[5].split('(').first
-			 		# @@name = @@name[12..@@name.length-3]
 			 		@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
 			 		@attendance = Attendance.new
 			 		@employee = Employee.where(biometrics_id: @@biometrics_id).first
 			 		next if @employee.nil?
 			 		@attendance.employee_id = @employee.id
-
-			 		# @attendance.last_name = @@name.split(", ").first
-			 		# @attendance.first_name = @@name.split(", ").last
-
 			 		@attendance.attendance_date = date_biometrics(token[25].tr('" ', ''))
-			 		
 			 		@attendance.time_in = token[26].tr('"', '').to_time
 			 		
 			 		timeout = token[27].tr('"', '')
@@ -62,9 +54,7 @@ class Attendance < ActiveRecord::Base
 					puts "====================="
 			 		puts @@biometrics_id
 			 		puts @employee.id if !@employee.nil?
-			 		puts "====================="
-			 		# @attendance.last_name = @@name.split(", ").first
-			 		# @attendance.first_name = @@name.split(", ").last
+			 		puts "====================="	
 			 		
 			 		timeout = token[7].tr('" ', '')
 			 		@attendance.attendance_date = date_biometrics(token[5].tr('" ', ''))
@@ -86,22 +76,9 @@ class Attendance < ActiveRecord::Base
 				token = row.gsub(/\s+/m, ' ').split(" ")
 				unless token.length == 0 || token[2] == 'FFFFFF' || token[2] == 'Access' || token[2] == 'Report' || token[2].nil?
 					unless token[2].length != 6
-						# name = ''
-						# t = 3
-						# while t < token.length
-						# 	if token[t] == '01'
-						# 		break
-						# 	end
-
-						# 	name = name << "#{token[t]} "
-						# 	t += 1
-						# end
-						# last_name = name.split(", ").first.gsub(/^\s+|\s+$/m, '')
-						# first_name = name.split(", ").last.gsub(/^\s+|\s+$/m, '')
 						falco_id = token[2].tr('" ', '')
 						date = date_falco(token[0].tr(' ', ''))
 						
-						# @records_of_attendance = Attendance.where(last_name: last_name, first_name: first_name, attendance_date: date).first
 						@employee = Employee.where(falco_id: falco_id).first 
 						next if @employee.nil?
 						@records_of_attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first

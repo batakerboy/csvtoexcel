@@ -60,10 +60,8 @@
 		<tbody>
 			<%@requests.each do |request|%>
 				<tr>
-					<!-- <td><%#= request.date.strftime('%m/%d/%Y')%></td>
-					<td><%#= request.date.strftime('%A')%></td> -->
-					<td><%= request.date%></td>
-					<td><%= request.date%></td>
+					<td><%= request.date.strftime('%m/%d/%Y')%></td>
+					<td><%= request.date.strftime('%A')%></td>
 					<td><%= request.department%></td>
 					<td><%= request.employee_id%></td>
 					<td><%= request.ot_hours%></td>
@@ -83,6 +81,77 @@
 		</tbody>
 	</table>
 	<br/><br/><br/>
+	<table id = "table_id3">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Day</th>
+				<th>Last Name</th>
+				<th>First Name</th>
+				<th>Time In</th>
+				<th>Time Out</th>
+				<th>No. of Hours Late</th>
+				<th>No. of OT Hours</th>
+				<th>Official Business</th>
+				<th>VL</th>
+				<th>SL</th>
+				<th>Remarks</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%@employees.each do |employee|%>
+				<%next if employee.falco_id.nil? && employee.biometrics_id.nil?%>
+				<%while @date < @date_end%>
+					<tr>
+						<td><%= @date.strftime('%m/%d/%Y')%></td>
+						<td><%= @date.strftime('%A')%></td>
+						<td><%= employee.last_name%></td>
+						<td><%= employee.first_name%></td>
+
+						<% @attendance = Attendance.where(employee_id: employee.id, attendance_date: @date).first%>
+						<%unless @attendance.nil?%>
+							<td><%= @attendance.time_in.strftime('%H:%M:%S')%></td>
+							<%unless @attendance.time_out.nil?%>
+								<td><%= @attendance.time_out.strftime('%H:%M:%S')%></td>
+							<%else%>
+								<td></td>
+							<%end%>
+							<% @late = ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour) unless @attendance.time_in.nil?%>
+						<%else%>
+							<% @late = nil %>
+							<td></td>
+							<td></td>
+						<%end%>
+
+						<%unless @late.nil? || @late < 0%>
+							<td><%= sprintf '%.2f', @late%></td>
+						<%else%>
+							<td></td>
+						<%end%>
+
+
+						<% @request = Request.where(employee_id: employee.id, date: @date).first%>
+						<%unless @request.nil?%>
+							<td><%= @request.ot_hours%></td>
+							<td><%= @request.official_business%></td>
+							<td><%= @request.vacation_leave%></td>
+							<td><%= @request.sick_leave%></td>
+							<td><%= @request.remarks%></td>
+						<%else%>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						<%end%>
+						<% @date += 1.day%>
+					</tr>
+				<%end%>
+				<%@date = @date_start%>
+			<%end%>
+		</tbody>
+	</table>
+	<br/><br/><br/>
 	<%= link_to 'Download Zipfile', download_zip_reports_path(format: "xls"), class: "btn btn-success"%>
 	<br/><br/><br/>
 </div>
@@ -96,6 +165,11 @@
   $(function(){
     $("#table_id2").dataTable({
     	"aaSorting": [[ 3, "asc" ]]
+    });
+  })
+  $(function(){
+    $("#table_id3").dataTable({
+    	"aaSorting": [[ 2, "asc" ], [ 0, "asc"]]
     });
   })
 </script>
