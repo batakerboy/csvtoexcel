@@ -8,6 +8,10 @@ class ReportsController < ApplicationController
 	def index
 		@attendances = Attendance.all
 		@requests = Request.all
+		@date_start = '2015-03-21'.to_date
+		@date_end = '2015-04-03'.to_date
+		@date ||= @date_start 
+		@employees = Employee.all
 		# respond_to do |format|
 		# 	format.html
 		# 	format.xls { send_data @attendances.to_csv }
