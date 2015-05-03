@@ -60,8 +60,8 @@
 		<tbody>
 			<%@requests.each do |request|%>
 				<tr>
-					<td><%= request.date.strftime('%m/%d/%Y')%></td>
-					<td><%= request.date.strftime('%A')%></td>
+					<td><%= request.date%></td>
+					<td><%= request.date%></td>
 					<td><%= request.department%></td>
 					<td><%= request.employee_id%></td>
 					<td><%= request.ot_hours%></td>
