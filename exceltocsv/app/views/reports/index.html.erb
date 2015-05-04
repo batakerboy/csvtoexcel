@@ -164,7 +164,6 @@
 							<td></td>
 						<%#end%>
 
-
 						<% #@request = Request.where(employee_id: employee.id, date: @date).first%>
 						<%#unless @request.nil?%>
 							<td><%#= @request.ot_hours%></td>
@@ -173,6 +172,7 @@
 							<td><%#= @request.sick_leave%></td>
 							<td><%#= @request.remarks%></td>
 						<%#else%>
+
 							<td></td>
 							<td></td>
 							<td></td>
