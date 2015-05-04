@@ -19,6 +19,7 @@ class ReportsController < ApplicationController
 	end
 
 	def download_zip
+		# File.delete(Rails.root + 'reports.zip')
 		zip = create_zip
 	  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
 	end
@@ -35,46 +36,44 @@ class ReportsController < ApplicationController
 	end
 
 	def to_csv(requests, emp)
+		@@hours_late = 0
+		@@times_late = 0
+		@@hours_ot = 0
+		@@times_vl = 0
+		@@times_sl = 0
 		CSV.generate do |csv|
 			csv << ["iRipple, Inc."]
 			csv << ["Name: #{emp.last_name}, #{emp.first_name}"]
 			csv << ["Department: #{emp.department}"]
-			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
-			requests.each do |req|     
+			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "UT DEPARTURE", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
+			requests.each do |req|
 				@attendance = Attendance.where(employee_id: emp.id, attendance_date: req.date).first
-				    csv << [req.date.strftime('%m-%d-%Y'), 
+				if !@attendance.nil? && !@attendance.time_in.nil? && (@attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time)
+					@@hours_late = @@hours_late + ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
+					@@times_late = @@times_late + 1
+				end
+				if !@req.nil?
+					@@hours_ot = @@hours_ot + req.ot_hours
+					@@times_vl = @@times_vl + req.vacation_leave
+					@@times_sl = @@times_sl + req.sick_leave
+				end
+				    csv << [req.date.strftime('%m-%d-%Y'),
 				    	req.date.strftime('%A'), 
 				    	(@attendance.time_in.to_time.strftime('%H:%M %P') if !@attendance.nil? && !@attendance.time_in.nil?), 
 				    	(@attendance.time_out.to_time.strftime('%H:%M %P') if !@attendance.nil? && !@attendance.time_out.nil?), 
-				    	(((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour).round(2)  if !@attendance.nil? && !@attendance.time_in.nil? && @attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time),
 				    	req.ut_time,
+				    	(((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour).round(2) if !@attendance.nil? && !@attendance.time_in.nil? && @attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time),
 				    	req.ot_hours,
 				    	req.vacation_leave,
 				    	req.sick_leave,
 				    	req.remarks]
-	        end 
+	        end
+	        csv << ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", @@times_late]
+	        csv << ["TOTAL TARDINESS", " ",  " ", " ", " ", @@hours_late.round(2)]
+	        csv << ["TOTAL OT HOURS", " ", " ", " ", " ", " ", @@hours_ot]
+	        csv << ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ", @@times_vl, @@times_sl]
 		end 
 	end
-
-	# def create_zip
-	# 	Zip::File.open('reports.zip', Zip::File::CREATE) { |zipfile|
-	# 	    Attendance.find_by_sql("SELECT DISTINCT last_name, first_name FROM attendances ORDER BY last_name").each do |name|
-	# 	    	@attendances = Attendance.find_by_sql("SELECT * FROM attendances WHERE last_name == '#{name.last_name}' AND first_name == '#{name.first_name}'")
-	# 			zipfile.get_output_stream("#{name.last_name}_#{name.first_name}.xls") { |f| 
-	# 				f.puts(to_csv(@attendances))
-	# 			}
-	# 		end
-	# 	}
-	# end
-
-	# def to_csv(attendances)
-	# 	CSV.generate do |csv|
-	# 		csv << ["Name", "Date", "Time-in", "Time-out"]
-	# 	    attendances.each do |attendance|
-	# 		    csv << ["#{attendance.last_name}, #{attendance.first_name}", attendance.attendance_date.to_date.strftime('%m/%d/%Y'), attendance.time_in.to_time.strftime('%H:%M:%S'), (attendance.time_out.to_time.strftime('%H:%M:%S') if !attendance.time_out.nil?)] 
-	# 	    end
-	# 	end
-	# end
 
   	def import 
   		Attendance.import(params[:biometrics], params[:falco])
