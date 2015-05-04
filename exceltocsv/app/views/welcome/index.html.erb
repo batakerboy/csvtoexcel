@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
 	<div class="jumbotron" align="center">
 		<h1>Accounting and DTR Reports Generation</h1><br>
 			
@@ -10,6 +10,37 @@
 				<li>Once the generation of the report is done, click the Download button to download the excel file</li>
 			</ol>
 			<font color="red"><h3>Note</h3><p>&nbsp;&nbsp;&nbsp;Please do not edit the input files. They should be fresh from the biometrics and falco systems.<p>
-		<%= link_to 'Upload CSV Files', reports_path, class: "btn btn-info"%>
+		<%#= link_to 'Upload CSV Files', reports_path, class: "btn btn-info"%>
 </div>
-	
+	 -->
+
+<div class = "container">
+	<div align = "center" id = "welcomeDiv" class = "animated fadeInRight">
+		<br/><br/><br/><br/><br/><br/>
+		
+		<h1 style = "color: white; font-size: 500%">
+			Falco 
+			<font color = "red">+</font> 
+			Biometrics
+			<font color = "red">+</font>
+			iEMS
+		</h1>
+		
+		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+		
+		<div class = "col-md-3"></div>
+		<%= link_to 'Upload New Falco/Biometrics/iEMS Records', reports_path, class: "btn btn-info col-md-6"%>
+		
+		<br/><br/><br/>
+		
+		<div class = "col-md-3"></div>
+		<%= link_to 'Download Old Reports', root_path, class: "btn btn-warning col-md-6", id: 'Link'%>
+		
+	</div>
+</div>
+
+<script type="text/javascript">
+// 		$('#Link').click(function(e) {
+// 			$('div#welcomeDiv').addClass('animaged fadeInOut');
+// 		});
+// </script>

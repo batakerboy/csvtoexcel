@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>DTR Tool for Ms. Barbs</title>
+  <title>FBI Integration</title>
   	  <%= javascript_include_tag 'jquery-1.11.2.min', 'data-turbolinks-track' => true %>
 	  <%= javascript_include_tag 'jquery.dataTables.min', 'data-turbolinks-track' => true %>
+	  <%= stylesheet_link_tag 'animate', media: 'all', 'data-turbolinks-track' => true %>
   	  <%= stylesheet_link_tag 'jquery.dataTables', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= stylesheet_link_tag 'bootstrap', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= csrf_meta_tags %>
 </head>
-<body>
+<body style = "background-image: url(<%= asset_path 'coffee.jpeg'%>);">
 
 <%= yield %>
 
@@ -17,18 +18,6 @@
 		<div class = "modal-content"></div>
 	</div>
 </div>
-
-<!-- <div class = "modal fade" id = "edit" role = "dialog">
-	<div class = "modal-dialog">
-		<div class = "modal-content"></div>
-	</div>
-</div>
-
-<div class = "modal fade" id = "view" role = "dialog">
-	<div class = "modal-dialog">
-		<div class = "modal-content"></div>
-	</div>
-</div> -->
 
 <%= javascript_include_tag 'bootstrap', 'data-turbolinks-track' => true %>
 </body>
