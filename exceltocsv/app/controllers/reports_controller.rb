@@ -6,12 +6,12 @@ require 'zip'
 class ReportsController < ApplicationController
 
 	def index
-		@attendances = Attendance.all
-		@requests = Request.all
-		@date_start = '2015-03-21'.to_date
-		@date_end = '2015-04-03'.to_date
-		@date ||= @date_start 
-		@employees = Employee.all
+		# @attendances = Attendance.all
+		# @requests = Request.all
+		# @date_start = '2015-03-21'.to_date
+		# @date_end = '2015-04-03'.to_date
+		# @date ||= @date_start 
+		# @employees = Employee.all
 		# respond_to do |format|
 		# 	format.html
 		# 	format.xls { send_data @attendances.to_csv }
@@ -20,8 +20,14 @@ class ReportsController < ApplicationController
 
 	def download_zip
 	  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
-		zip = create_zip
-	  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
+	  	@date_start = params[:date_start]
+	  	@date_end = params[:date_end]
+	  	puts "==============================================="
+	  	puts "#{@date_start}"
+	  	puts "#{@date_end}"
+	  	puts "==============================================="
+		# zip = create_zip
+	 #  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
 	end
 
 	def create_zip
@@ -74,10 +80,25 @@ class ReportsController < ApplicationController
 				    	@req.remarks]
 	        	@date += 1.day
 	        end
-	        csv << ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", @@times_late]
-	        csv << ["TOTAL TARDINESS", " ",  " ", " ", " ", @@hours_late.round(2)]
-	        csv << ["TOTAL OT HOURS", " ", " ", " ", " ", " ", @@hours_ot]
-	        csv << ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ", @@times_vl, @@times_sl]
+	        csv << [" ", " ", " ", " ", "NUMBER OF TIMES TARDY", @@times_late]
+	        csv << [" ", " ",  " ", " ", "TOTAL TARDINESS", @@hours_late.round(2)]
+	        csv << [" ", " ", " ", " ", " ", "TOTAL OT HOURS", @@hours_ot.round(2)]
+	        csv << [" ", " ", " ", " ", " ", " ", "TOTAL LEAVES ACCUMULATED", @@times_vl.round(2), @@times_sl.round(2)]
+	        csv << [" "]
+
+	        @@ot_days = (@@hours_ot/8).to_s.split('.').first
+	        @@ot_hours = (@@hours_ot%8).to_s.split('.').first
+       		@@ot_mins = "#{((((@@hours_ot%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+	       	@@late_days = (@@hours_late/8).to_s.split('.').first
+	       	@@late_hours = (@@hours_late%8).to_s.split('.').first
+       		@@late_mins = "#{((((@@hours_late%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+	        csv << ["ACCUMULATED OT", "#{@@ot_days}.#{@@ot_hours}.#{@@ot_mins}"]
+	        csv << ["LATES", "#{@@late_days}.#{@@late_hours}.#{@@late_mins}"]
+	        csv << ["ACCUMULATED VL", " "]
+	        csv << ["ACCUMULATED SL", " "]
+	        csv << ["VL BALANCE", " "]
+	        csv << ["SL BALANCE", " "]
+	        csv << ["TOTAL", " "]
 		end
 	end
 
