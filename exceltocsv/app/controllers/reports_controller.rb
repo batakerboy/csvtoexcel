@@ -22,23 +22,24 @@ class ReportsController < ApplicationController
 	  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
 	  	@date_start = params[:date_start]
 	  	@date_end = params[:date_end]
-	  	puts "==============================================="
-	  	puts "#{@date_start}"
-	  	puts "#{@date_end}"
-	  	puts "==============================================="
-		# zip = create_zip
-	 #  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
+	  	# puts "==============================================="
+	  	# puts "#{@date_start}"
+	  	# puts "#{@date_end}"
+	  	# puts "==============================================="
+		zip = create_zip
+	  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
 	end
 
 	def create_zip
 		Zip::File.open('reports.zip', Zip::File::CREATE) { |zipfile|
-		    Employee.all.each do |emp|
-		    	next if emp.falco_id.nil? && emp.biometrics_id.nil?
-		    	# @requests = Request.find_by_sql("SELECT * FROM requests WHERE employee_id == '#{emp.id}'")
-				zipfile.get_output_stream("#{emp.last_name}_#{emp.first_name}.xls") { |f| 
-					f.puts(to_csv(emp))
-				}
-			end
+			zipfile.get_output_stream("DTR Summary Sheet.xls") { |summary|
+			    Employee.all.each do |emp|
+			    	next if emp.falco_id.nil? && emp.biometrics_id.nil?
+					zipfile.get_output_stream("#{emp.last_name}_#{emp.first_name}.xls") { |f| 
+						f.puts(to_csv(emp))
+					}
+				end
+			}
 		}
 	end
 
