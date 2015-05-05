@@ -151,8 +151,8 @@ class ReportsController < ApplicationController
 
 				    csv << [req.date.strftime('%m-%d-%Y'),
 				    	req.date.strftime('%A'), 
-				    	(@attendance.time_in.to_time.strftime('%H:%M %P') if !@attendance.nil? && !@attendance.time_in.nil?), 
-				    	(@attendance.time_out.to_time.strftime('%H:%M %P') if !@attendance.nil? && !@attendance.time_out.nil?), 
+				    	(@attendance.time_in.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_in.nil?), 
+				    	(@attendance.time_out.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_out.nil?), 
 				    	req.ut_time,
 				    	(((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour).round(2) if !@attendance.nil? && !@attendance.time_in.nil? && @attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time),
 				    	req.regular_ot,
