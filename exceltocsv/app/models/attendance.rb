@@ -18,9 +18,9 @@ class Attendance < ActiveRecord::Base
 		return formatted_date
 	end
 
-	def self.import(biometrics = nil, falco = nil)
-		if !biometrics.nil?
-			csvFile = CSV.open(biometrics.path, 'r:ISO-8859-1')
+	def self.import(file)
+		if file.to_s.split('/').last == "biometrics.csv"
+			csvFile = CSV.open(file, 'r:ISO-8859-1')
 			csvFile.each_with_index do |row|
 				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
 			 	
@@ -70,8 +70,8 @@ class Attendance < ActiveRecord::Base
 			end
 		end
 
-		if !falco.nil?
-			textFile = File.open(falco.path, 'r:ISO-8859-1')
+		if file.to_s.split('/').last == "falco.txt"
+			textFile = File.open(file, 'r:ISO-8859-1')
 			textFile.each_with_index do |row|
 				token = row.gsub(/\s+/m, ' ').split(" ")
 				unless token.length == 0 || token[2] == 'FFFFFF' || token[2] == 'Access' || token[2] == 'Report' || token[2].nil?
@@ -82,17 +82,9 @@ class Attendance < ActiveRecord::Base
 						@employee = Employee.where(falco_id: falco_id).first 
 						next if @employee.nil?
 						@records_of_attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first
-						puts "============================================="
-						puts "falco id: '#{falco_id}'"
-						puts "employee_id: '#{@employee.id}'"
-						puts "employee_name: '#{@employee.last_name}', '#{@employee.first_name}'"
-						puts "Date: '#{date}'"
-						puts "records of attendance: #{@records_of_attendance.id}" unless @records_of_attendance.nil?
-						puts "============================================="
+						
 						if @records_of_attendance.nil?
 							@attendance = Attendance.new
-							# @attendance.first_name = first_name
-							# @attendance.last_name = last_name
 							@attendance.employee_id = @employee.id
 							@attendance.attendance_date = date
 							@attendance.time_in = token[1].to_time

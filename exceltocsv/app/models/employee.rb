@@ -2,8 +2,8 @@ require 'csv'
 require 'pathname'
 
 class Employee < ActiveRecord::Base
-	has_many :attendance
-	has_many :request
+	has_many :attendances
+	has_many :requests
 
 	def self.import(file=nil)
 		if !file.nil?

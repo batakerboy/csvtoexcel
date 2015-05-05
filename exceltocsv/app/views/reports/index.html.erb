@@ -1,215 +1,118 @@
 <div class="container">
 	<%= render 'noticeAlert'%>
-	<div class = "row" align = "center">
-		<div class = "col-md-12"><h1 style = "color: white; font-size: 700%">Report Generation</h1></div>
+
+	<div class = "row" style = "margin-top:100px;" align = "center">
+		<div class = "col-md-4" style = "height: 400px; border-style: solid; border-bottom-style: none; border-width: 1px">
+			<div class = "col-md-12">
+				<div class = "row"><h1>Step 1</h1></div>
+				<div class = "row"><h3>Upload Biometrics CSV file</h3></div>
+				<div class = "row">
+					<p align = "justify">Lorem ipsum dolor sit amet, ea per bonorum inermis, oratio partem laoreet ei duo. Eu sale gubergren vix, cu splendide quaerendum mel. Qui ei prima causae propriae. Quo te dolorem constituam, mel no iusto efficiantur, alii veniam maiorum et vim.</p>
+				</div>
+			</div>	
+		</div>
+
+		<div class = "col-md-4" style = "height: 400px; border-style: solid; border-bottom-style: none; border-width: 1px">
+			<div class = "col-md-12">
+				<div class = "row"><h1>Step 2</h1></div>
+				<div class = "row"><h3>Upload Falco TXT file</h3></div>
+				<div class = "row">
+					<p align = "justify">Lorem ipsum dolor sit amet, at aperiri epicuri patrioque pri, ea pro maiorum interpretaris. Sed in case delicata voluptatibus, mea referrentur suscipiantur no, iriure sanctus ceteros vim te. Mandamus interpretaris ea usu, eum eu noster gloriatur. Nec aeterno dolorem repudiandae et, ut ipsum noster torquatos pri, solum quando ne duo.</p>
+				</div>
+			</div>
+		</div>
+
+		<div class = "col-md-4" style = "height: 400px; border-style: solid; border-bottom-style: none; border-width: 1px">
+			<div class = "col-md-12">
+				<div class = "row"><h1>Step 3</h1></div>
+				<div class = "row"><h3>Upload iEMS CSV file</h3></div>
+				<div class = "row">
+					<p align = "justify">Lorem ipsum dolor sit amet, enim paulo facete sed ne, adhuc admodum consequat id duo. Eius partem cum ex, augue liber incorrupte quo at. Et veri etiam insolens pri, an mei dolorum legimus appellantur. Adhuc iisque ea ius. Pri moderatius theophrastus id.</p>
+				</div>
+			</div>
+		</div>
 	</div>
 	
+	<%= form_tag import_reports_path, multipart: true do%>
+		<div class = "row" align = "center">
+			<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
+				<div class = "row" id = "biometrics_row"><%= file_field('biometrics', 'report', accept: 'csv')%></div>
+				<div class = "row"><%= submit_tag 'Upload', class: "btn btn-warning", id: "biometrics"%></div>
+			</div>
+			<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
+				<div class = "row" id = "falco_row"><%= file_field('falco', 'report', accept: 'txt')%></div>
+				<div class = "row"><%= submit_tag 'Upload', class: "btn btn-warning", id: "falco"%></div>
+			</div>
+			<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
+				<div class = "row" id = "iEMS_row"><%= file_field('iEMS', 'report', accept: 'csv')%></div>
+				<div class = "row"><%= submit_tag 'Upload', class: "btn btn-warning", id: "iEMS"%></div>
+			</div>
+		</div>
+	<%end%>
+	<div class = "row" align = "center" style = "margin-top:5%">
+		<div class = "col-md-12">
+			<%#= link_to 'Generate Reports', download_zip_reports_path, method: :post, class: "btn btn-lg btn-success", style: "width: 70%"%>
+			<%= form_tag download_zip_reports_path, method: :post do %>
+				<%= submit_tag 'Generate Reports', class: "btn btn-lg btn-success", style: "width: 70%"%>
+			<%end%>
+		</div>
+	</div>
+</div>
 
-	<%= form_tag import_reports_path, multipart:true, html: {class: "form-horizontal"}  do %>
-		<br/><br/><br/><br/>
-		<font color = "white">
-			<%#= label_tag(:biometrics, "Biometrics CSV: ", class: "col-md-2 control-label")%>	
+<script>
+
+ 	// $("#biometrics").click(function(){
+ 	// 	document.getElementById("falco_row").className = "row";
+ 	// 	document.getElementById("falco").className = "btn btn-warning";
+ 	// 	document.getElementById("biometrics_row").className = "hidden";
+ 	// 	document.getElementById("biometrics").className = "hidden"
+ 	// 	// document.getElementById("iEMS_row").className = "row";
+ 	// 	// document.getElementById("iEMS").className = "btn btn-warning";
+ 	// });
+</script>
+<!-- <div class = "row" align = "center">
+		<div class = "col-md-12"><h1 style = "color: white; font-size: 700%">Report Generation</h1></div>
+	</div> -->
+
+<%#= form_tag import_reports_path, multipart:true, html: {class: "form-horizontal"}  do %>
+		<!-- <br/><br/><br/><br/>
+		<font color = "white">	
 			<div class = "row">
 				<div class = "col-md-4" style = "font-size: 200%"><b>Biometrics CSV:</b></div>
-				<div class = "col-md-8"><%= file_field_tag(:biometrics)%></div>
+				<div class = "col-md-8"><%#= file_field_tag(:biometrics)%></div>
 			</div>
 			<br/><br/>
-			<%#= label_tag(:falco, "Falco TXT: ", class: "col-md-2 control-label")%>
 			<div class = "row">
 				<div class = "col-md-4" style = "font-size: 200%"><b>Falco TXT:</b></div>
-				<div class = "col-md-8"><%= file_field_tag(:falco)%></div>
+				<div class = "col-md-8"><%#= file_field_tag(:falco)%></div>
 			</div>
 			<br/><br/>
-			<%#= label_tag(:file, "iEMS CSV: ", class: "col-md-2 control-label")%>
 			<div class = "row">
 				<div class = "col-md-4" style = "font-size: 200%"><b>iEMS CSV:</b></div>
-				<div class = "col-md-8"><%= file_field_tag(:file)%></div>
+				<div class = "col-md-8"><%#= file_field_tag(:file)%></div>
 			</div>
 			<br/><br/>
-			<%= submit_tag "Upload", class: "btn btn-default" %>
+			<%#= submit_tag "Upload", class: "btn btn-default" %>
 
-		</font>
-	<% end %>
-
-	<%= form_tag download_zip_reports_path, html: {class: "form-horizontal"} do %>
-		<br/><br/><br/><br/>
+		</font> -->
+	<%# end %>
+	<%#= form_tag download_zip_reports_path, html: {class: "form-horizontal"} do %>
+		<!-- <br/><br/><br/><br/>
 		<font color = "white">
 			<div class = "row">
 				<div class = "col-md-4" style = "font-size: 200%"><b>Start Date:</b></div>
 				<div class = "col-md-8">
-					<%= date_select(:date_start, order: [:day, :month, :year])%>
+					<%#= date_select(:date_start, order: [:day, :month, :year])%>
 				</div>
 			</div>
 			<br/><br/>
 			<div class = "row">
 				<div class = "col-md-4" style = "font-size: 200%"><b>End Date:</b></div>
 				<div class = "col-md-8">
-					<%= date_select(:date_end, order: [:day, :month, :year])%>
+					<%#= date_select(:date_end, order: [:day, :month, :year])%>
 				</div>
 			</div>
 			<br/><br/>
-			<%= submit_tag "Generate Reports", class: "btn btn-success" %>
-		</font>
-	<% end %>
-	<%#= submit_tag "Generate Reports", class: "btn btn-success" %>
-</div>
-
-<script>
-  // $(function(){
-  //   $("#table_id").dataTable({
-  //   	"aaSorting": [[ 0, "asc" ], [ 1, "asc" ]]
-  //   });
-  // })
-  // $(function(){
-  //   $("#table_id2").dataTable({
-  //   	"aaSorting": [[ 3, "asc" ]]
-  //   });
-  // })
-  // $(function(){
-  //   $("#table_id3").dataTable({
-  //   	"aaSorting": [[ 2, "asc" ], [ 0, "asc"]]
-  //   });
-  // })
-</script>
-
-<!-- <br/><br/><br/>
-	<h1>Attendance</h1>
-	<table id = "table_id">
-		<thead>
-			<tr>
-				<th>Employee ID</th>
-				<th>Date</th>
-				<th>Time In</th>
-				<th>Time Out</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%#@attendances.each do |attendance|%>
-				<tr>
-					<td><%#= attendance.employee_id%></td>
-					<td><%#= attendance.attendance_date.to_date.strftime('%m/%d/%Y')%></td>
-					<td><%#= attendance.time_in.strftime('%H:%M:%S')%></td>
-					<%#if attendance.time_out.nil? == false%>
-						<td><%#= attendance.time_out.strftime('%H:%M:%S')%></td>
-					<%#else%>
-						<td><%#= attendance.time_out%></td>
-					<#%end%>
-				</tr>
-			<%#end%>
-		</tbody>
-	</table>
-	<br/><br/><br/>
-	<h1>Requests</h1>
-	<table id = "table_id2">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Day</th>
-				<th>Department</th>
-				<th>Employee ID</th>
-				<th>OT Hours</th>
-				<th>UT Time</th>
-				<th>Vacation Leave</th>
-				<th>Sick Leave</th>
-				<th>Official Business</th>
-				<th>Remarks</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%#@requests.each do |request|%>
-				<tr>
-					<td><%#= request.date.strftime('%m/%d/%Y')%></td>
-					<td><%#= request.date.strftime('%A')%></td>
-					<td><%#= request.department%></td>
-					<td><%#= request.employee_id%></td>
-					<td><%#= request.ot_hours%></td>
-					
-					<%#unless request.ut_time.nil? %>
-						<td>0</td>
-					<%#else%>
-						<td><%#= request.ut_time.strftime('%H:%M:%S') unless request.ut_time.nil?%></td>
-					<%#end%>
-					
-					<td><%#= request.vacation_leave%></td>
-					<td><%#= request.sick_leave%></td>
-					<td><%#= request.official_business%></td>
-					<td><%#= request.remarks%></td>
-				</tr>
-			<%#end%>
-		</tbody>
-	</table>
-	<br/><br/><br/>
-	<table id = "table_id3">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Day</th>
-				<th>Last Name</th>
-				<th>First Name</th>
-				<th>Time In</th>
-				<th>Time Out</th>
-				<th>No. of Hours Late</th>
-				<th>No. of OT Hours</th>
-				<th>Official Business</th>
-				<th>VL</th>
-				<th>SL</th>
-				<th>Remarks</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%#@employees.each do |employee|%>
-				<%#next if employee.falco_id.nil? && employee.biometrics_id.nil?%>
-				<%#while @date < @date_end%>
-					<tr>
-						<td><%#= @date.strftime('%m/%d/%Y')%></td>
-						<td><%#= @date.strftime('%A')%></td>
-						<td><%#= employee.last_name%></td>
-						<td><%#= employee.first_name%></td>
-
-						<% #@attendance = Attendance.where(employee_id: employee.id, attendance_date: @date).first%>
-						<%#unless @attendance.nil?%>
-							<td><%#= @attendance.time_in.strftime('%H:%M:%S')%></td>
-							<%#unless @attendance.time_out.nil?%>
-								<td><%#= @attendance.time_out.strftime('%H:%M:%S')%></td>
-							<%#else%>
-								<td></td>
-							<%#end%>
-							<%# @late = ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour) unless @attendance.time_in.nil?%>
-						<%#else%>
-							<%# @late = nil %>
-							<td></td>
-							<td></td>
-						<%#end%>
-
-						<%#unless @late.nil? || @late < 0%>
-							<td><%#= sprintf '%.2f', @late%></td>
-						<%#else%>
-							<td></td>
-						<%#end%>
-
-						<% #@request = Request.where(employee_id: employee.id, date: @date).first%>
-						<%#unless @request.nil?%>
-							<td><%#= @request.ot_hours%></td>
-							<td><%#= @request.official_business%></td>
-							<td><%#= @request.vacation_leave%></td>
-							<td><%#= @request.sick_leave%></td>
-							<td><%#= @request.remarks%></td>
-						<%#else%>
-
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-						<%#end%>
-						<%# @date += 1.day%>
-					</tr>
-				<%#end%>
-				<%#@date = @date_start%>
-			<%#end%>
-		</tbody>
-	</table>
-	<br/><br/><br/>
-	<%#= link_to 'Download Zipfile', download_zip_reports_path(format: "xls"), class: "btn btn-success"%>
-	<br/><br/><br/>
-</div> -->
+			<%#= submit_tag "Generate Reports", class: "btn btn-success" %>
+		</font> -->
+	<%# end %>
