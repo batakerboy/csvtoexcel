@@ -30,16 +30,16 @@ class ReportsController < ApplicationController
 		
 		zip = create_zip
 	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
+
 	end
 
 	def create_zip
 		Zip::File.open('reports.zip', Zip::File::CREATE) { |zipfile|
 
-
 			zipfile.get_output_stream("DTR Summary Sheet.xls") { |summary|
 				summary.puts(CSV.generate do |summarycsv| #CREATE DTR SUMMARY
 					summarycsv << ["iRipple, Inc."]
-					summarycsv << [" ", "DTR Summary Sheet for the period March 21, 2015, to April 03, 2015", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT"]
+					summarycsv << [" ", "DTR Summary Sheet for the period \n March 21, 2015, to April 03, 2015", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT"]
 					summarycsv << ["NO.", 
 								   "NAME", 
 								   "FREQUENCY", 
@@ -50,29 +50,36 @@ class ReportsController < ApplicationController
 								   "CREDITS", 
 								   "BALANCE", 
 								   "(TARDINESS + \n LEAVE + \n UNDERTIME)", 
-								   "REGULAR",
-								   "RESTDAY",
-								   "HOLIDAY",
+								   "REGULAR DAY",
+								   "REST DAY OR \n SPECIAL PUBLIC HOLIDAY",
+								   "REST DAY OR \n SPECIAL PUBLIC HOLIDAY EXCESS 8 HRS",
+								   "SPECIAL PUBLIC HOLIDAY \n ON REST DAY",
+								   "SPECIAL PUBLIC HOLIDAY \n ON REST DAY EXCESS 8 HRS",
+								   "REGULAR HOLIDAY",
+								   "REGULAR HOLIDAY \n EXCESS 8 HRS",
+								   "REGULAR HOLIDAY ON REST DAY",
+								   "REGULAR HOLIDAY ON REST DAY \n EXCESS 8 HRS",
 								   "ALLOWANCE",
 								   "TOTAL"]
 	
 				    Employee.find_by_sql("SELECT * FROM employees ORDER BY last_name").each_with_index do |emp, i|
-
 
 				    	next if emp.falco_id.nil? && emp.biometrics_id.nil?
 						zipfile.get_output_stream("Employees/#{emp.last_name}_#{emp.first_name}.xls") { |f| 
 							f.puts(to_csv(emp)) #CREATE XLS PER EMPLOYEE
 						}
 
-
 						summarycsv << [i+1, 
 									"#{emp.last_name},#{emp.first_name}", 
 									"#{@@times_late}", 
 									"#{@@late_days}.#{@@late_hours}.#{@@late_mins}",
-									" ",
+									"#{@@ut_days}.#{@@ut_hours}.#{@@ut_mins}",
 									"#{@@sl_days}.#{@@sl_hours}.0",
 									" ",
 									"#{@@vl_days}.#{@@vl_hours}.0",
+									" ",
+									" ",
+									" ",
 									" ",
 									" ",
 									" ",
@@ -88,15 +95,14 @@ class ReportsController < ApplicationController
 	end
 
 	def to_csv(emp)
+
 		@@hours_late = 0
 		@@times_late = 0
 		@@hours_ot = 0
 		@@times_vl = 0
 		@@times_sl = 0
 		@@ut_total = 0
-		@date_start = '2015-03-21'.to_date
-		@date_end = '2015-04-03'.to_date
-		@date = @date_start 
+
 
 		CSV.generate do |csv|
 			csv << ["iRipple, Inc."]
@@ -118,6 +124,26 @@ class ReportsController < ApplicationController
 				@@times_vl += req.vacation_leave.to_d if !req.vacation_leave.nil?
 				@@times_sl += req.sick_leave.to_d if !req.sick_leave.nil?
 
+
+				#FOR UT COMPUTATION
+				if !@attendance.nil? && !@attendance.time_out.nil? 
+					if !req.ut_time.nil?
+						if @attendance.time_out.to_time.strftime('%H:%M:%S') < req.ut_time.to_time.strftime('%H:%M:%S')
+							@@ut_total += (req.ut_time.to_time.strftime('%H:%M:%S') - @attendance.time_out.to_time.strftime('%H:%M:%S'))
+						end
+					else
+						if req.date.strftime('%A').to_s == "Friday"
+							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '17:30:00'.to_time
+								@@ut_total += '17:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
+							end
+						elsif req.date.strftime('%A').to_s == "Monday" || req.date.strftime('%A').to_s == "Tuesday" || req.date.strftime('%A').to_s == "Wednesday" || req.date.strftime('%A').to_s == "Thursday"
+							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '18:30:00'.to_time
+								@@ut_total += '18:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
+							end
+						end
+					end
+				end
+
 				# if !@attendance.nil? && (@attendance.time_out.strftime('%H:%M:%S').to_time < '6:30:00'.to_time)
 				# 	@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
 				# 	@@times_late += 1
@@ -133,6 +159,7 @@ class ReportsController < ApplicationController
 				    	req.vacation_leave,
 				    	req.sick_leave,
 				    	req.remarks]
+
 	        	# @date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
         	end
 	        # end #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
@@ -146,13 +173,17 @@ class ReportsController < ApplicationController
 	        @@ot_days = (@@hours_ot/8).to_s.split('.').first
 	        @@ot_hours = (@@hours_ot%8).to_s.split('.').first
        		@@ot_mins = "#{((((@@hours_ot%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+
 	       	@@late_days = (@@hours_late/8).to_s.split('.').first
 	       	@@late_hours = (@@hours_late%8).to_s.split('.').first
        		@@late_mins = "#{((((@@hours_late%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+
        		@@vl_days = @@times_vl.to_s.split('.').first
        		@@vl_hours = ((@@times_vl.to_s.split('.').last).to_d * 0.8).to_s.split('.').first
+
        		@@sl_days = @@times_sl.to_s.split('.').first
        		@@sl_hours = ((@@times_sl.to_s.split('.').last).to_d * 0.8).to_s.split('.').first
+
 	        csv << ["ACCUMULATED OT", "#{@@ot_days}.#{@@ot_hours}.#{@@ot_mins}"]
 	        csv << ["LATES", "#{@@late_days}.#{@@late_hours}.#{@@late_mins}"]
 	        csv << ["ACCUMULATED VL", "#{@@vl_days}.#{@@vl_hours}.0"]
@@ -160,6 +191,10 @@ class ReportsController < ApplicationController
 	        csv << ["VL BALANCE", " "]
 	        csv << ["SL BALANCE", " "]
 	        csv << ["TOTAL", " "]
+
+	        @@ut_days = ((@@ut_total/3600)/8).to_s.split('.').first
+	        @@ut_hours = ((@@ut_total/3600)%8).to_s.split('.').first
+       		@@ut_mins = "#{(((((@@ut_total/3600)%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 		end
 	end
 
