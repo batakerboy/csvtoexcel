@@ -39,7 +39,7 @@ class ReportsController < ApplicationController
 			zipfile.get_output_stream("DTR Summary Sheet.xls") { |summary|
 				summary.puts(CSV.generate do |summarycsv| #CREATE DTR SUMMARY
 					summarycsv << ["iRipple, Inc."]
-					summarycsv << [" ", "DTR Summary Sheet for the period \n March 21, 2015, to April 03, 2015", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT"]
+					summarycsv << [" ", "DTR Summary Sheet for the period \n March 21, 2015, to April 03, 2015", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT"]
 					summarycsv << ["NO.", 
 								   "NAME", 
 								   "FREQUENCY", 
@@ -75,19 +75,21 @@ class ReportsController < ApplicationController
 									"#{@@late_days}.#{@@late_hours}.#{@@late_mins}",
 									"#{@@ut_days}.#{@@ut_hours}.#{@@ut_mins}",
 									"#{@@sl_days}.#{@@sl_hours}.0",
-									" ",
+									"#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0",
 									"#{@@vl_days}.#{@@vl_hours}.0",
+									"#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0",
 									" ",
+									"#{@@reg_ot_days}.#{@@reg_ot_hours}.#{@@reg_ot_mins}",
+									"#{@@rest_or_special_ot_first8_days}.#{@@rest_or_special_ot_first8_hours}.#{@@rest_or_special_ot_first8_mins}",
+									("#{@@rest_or_special_ot_excess8_days}.#{@@rest_or_special_ot_excess8_hours}.#{@@rest_or_special_ot_excess8_mins}" if @@rest_or_special_ot_total > 8),
+									"#{@@special_on_rest_ot_first8_days}.#{@@special_on_rest_ot_first8_hours}.#{@@special_on_rest_ot_first8_mins}",
+									("#{@@special_on_rest_ot_excess8_days}.#{@@special_on_rest_ot_excess8_hours}.#{@@special_on_rest_ot_excess8_mins}" if @@special_on_rest_ot_total > 8),
+									"#{@@regular_holiday_ot_first8_days}.#{@@regular_holiday_ot_first8_hours}.#{@@regular_holiday_ot_first8_mins}",
+									("#{@@regular_holiday_ot_excess8_days}.#{@@regular_holiday_ot_excess8_hours}.#{@@regular_holiday_ot_excess8_mins}" if @@regular_holiday_ot_total > 8),
+									"#{@@regular_on_rest_ot_first8_days}.#{@@regular_on_rest_ot_first8_hours}.#{@@regular_on_rest_ot_first8_mins}",
+									("#{@@regular_on_rest_ot_excess8_days}.#{@@regular_on_rest_ot_excess8_hours}.#{@@regular_on_rest_ot_excess8_mins}" if @@regular_on_rest_ot_total > 8),
 									" ",
-									" ",
-									" ",
-									" ",
-									" ",
-									" ",
-									" ",
-									" ",
-									" ",
-									" "]
+									"#{@@total_ot_days}.#{@@total_ot_hours}.#{@@total_ot_mins}"]
 					end
 				end)
 			}
@@ -102,77 +104,109 @@ class ReportsController < ApplicationController
 		@@times_vl = 0
 		@@times_sl = 0
 		@@ut_total = 0
+		@@vl_balance_start = Request.where(employee_id: emp.id).first.vacation_leave_balance
+		@@sl_balance_start = Request.where(employee_id: emp.id).first.sick_leave_balance
 
+		@@vl_balance_start_days = @@vl_balance_start.to_s.split('.').first
+		@@vl_balance_start_hours = (((@@vl_balance_start.to_s.split('.').last).to_i)*0.8).to_i
+
+		@@sl_balance_start_days = @@sl_balance_start.to_s.split('.').first
+		@@sl_balance_start_hours = (((@@sl_balance_start.to_s.split('.').last).to_i)*0.8).to_i
+
+		@@reg_ot_total = 0
+		@@rest_or_special_ot_total = 0
+		@@special_on_rest_ot_total = 0
+		@@regular_holiday_ot_total = 0
+		@@regular_on_rest_ot_total = 0
+
+		@date_start = '2015-03-21'.to_date
+		@date_end = '2015-04-03'.to_date
+		@date = @date_start
 
 		CSV.generate do |csv|
 			csv << ["iRipple, Inc."]
 			csv << ["Name: #{emp.last_name}, #{emp.first_name}"]
 			csv << ["Department: #{emp.department}"]
 			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "UT DEPARTURE", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
-			# while @date < @date_end
-			# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
+			while @date < @date_end
+				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 
-			Request.where(employee_id: emp.id).each do |req|
-				@attendance = Attendance.where(employee_id: emp.id, attendance_date: req.date).first
-
+				# Request.where(employee_id: emp.id).each do |req|
+				@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
+				@req = Request.where(employee_id: emp.id, date: @date).first
 				if !@attendance.nil? && (@attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time)
 					@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
 					@@times_late += 1
 				end
 
-				@@hours_ot += req.regular_ot.to_d if !req.regular_ot.nil?
-				@@times_vl += req.vacation_leave.to_d if !req.vacation_leave.nil?
-				@@times_sl += req.sick_leave.to_d if !req.sick_leave.nil?
+				@@present_othours = 0
+
+				if !@req.nil?
+					if !@req.regular_ot.nil?
+						@@present_othours = @req.regular_ot.to_d
+						@@reg_ot_total += @req.regular_ot.to_d
+					elsif !@req.rest_or_special_ot.nil?
+						@@present_othours = req.rest_or_special_ot.to_d
+						@@rest_or_special_ot_total += req.rest_or_special_ot.to_d
+					elsif !@req.special_on_rest_ot.nil?
+						@@present_othours = req.special_on_rest_ot.to_d
+						@@special_on_rest_ot_total += req.special_on_rest_ot.to_d
+					elsif !@req.regular_holiday_ot.nil?
+						@@present_othours = req.regular_holiday_ot.to_d
+						@@regular_holiday_ot_total += req.regular_holiday_ot.to_d
+					elsif !@req.regular_on_rest_ot.nil?
+						@@present_othours = req.regular_on_rest_ot.to_d
+						@@regular_on_rest_ot_total += req.regular_on_rest_ot.to_d
+					end
+				end
+
+				@@hours_ot += @@present_othours
+				@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
+				@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
 
 
 				#FOR UT COMPUTATION
 				if !@attendance.nil? && !@attendance.time_out.nil? 
-					if !req.ut_time.nil?
-						if @attendance.time_out.to_time.strftime('%H:%M:%S') < req.ut_time.to_time.strftime('%H:%M:%S')
-							@@ut_total += (req.ut_time.to_time.strftime('%H:%M:%S') - @attendance.time_out.to_time.strftime('%H:%M:%S'))
+					if !@req.ut_time.nil?
+						if @attendance.time_out.to_time.strftime('%H:%M:%S') < @req.ut_time.to_time.strftime('%H:%M:%S')
+							@@ut_total += (@req.ut_time.to_time.strftime('%H:%M:%S') - @attendance.time_out.to_time.strftime('%H:%M:%S'))
 						end
 					else
-						if req.date.strftime('%A').to_s == "Friday"
+						if @req.date.strftime('%A').to_s == "Friday"
 							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '17:30:00'.to_time
 								@@ut_total += '17:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
 							end
-						elsif req.date.strftime('%A').to_s == "Monday" || req.date.strftime('%A').to_s == "Tuesday" || req.date.strftime('%A').to_s == "Wednesday" || req.date.strftime('%A').to_s == "Thursday"
+						elsif @req.date.strftime('%A').to_s == "Monday" || @req.date.strftime('%A').to_s == "Tuesday" || @req.date.strftime('%A').to_s == "Wednesday" || @req.date.strftime('%A').to_s == "Thursday"
 							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '18:30:00'.to_time
 								@@ut_total += '18:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
 							end
 						end
 					end
 				end
+				
+			    csv << [@req.date.strftime('%m-%d-%Y'),
+			    	@req.date.strftime('%A'), 
+			    	(@attendance.time_in.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_in.nil?), 
+			    	(@attendance.time_out.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_out.nil?), 
+			    	@req.ut_time,
+			    	(((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour).round(2) if !@attendance.nil? && !@attendance.time_in.nil? && @attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time),
+			    	@@present_othours,
+			    	@req.vacation_leave,
+			    	@req.sick_leave,
+			    	@req.remarks]
 
-				# if !@attendance.nil? && (@attendance.time_out.strftime('%H:%M:%S').to_time < '6:30:00'.to_time)
-				# 	@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
-				# 	@@times_late += 1
-				# end 					FOR UNDERTIME COMPUTATION
-
-				    csv << [req.date.strftime('%m-%d-%Y'),
-				    	req.date.strftime('%A'), 
-				    	(@attendance.time_in.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_in.nil?), 
-				    	(@attendance.time_out.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_out.nil?), 
-				    	req.ut_time,
-				    	(((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour).round(2) if !@attendance.nil? && !@attendance.time_in.nil? && @attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time),
-				    	req.regular_ot,
-				    	req.vacation_leave,
-				    	req.sick_leave,
-				    	req.remarks]
-
-	        	# @date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
+	        	@date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
         	end
-	        # end #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
 
 	        csv << [" ", " ", " ", " ", "NUMBER OF TIMES TARDY", @@times_late]
-	        csv << [" ", " ",  " ", " ", "TOTAL TARDINESS", @@hours_late.to_d.round(2)]
-	        csv << [" ", " ", " ", " ", " ", "TOTAL OT HOURS", @@hours_ot.to_d.round(2)]
-	        csv << [" ", " ", " ", " ", " ", " ", "TOTAL LEAVES ACCUMULATED", @@times_vl.to_d.round(2), @@times_sl.to_d.round(2)]
+	        csv << [" ", " ",  " ", " ", "TOTAL TARDINESS", @@hours_late.to_f.round(2)]
+	        csv << [" ", " ", " ", " ", " ", "TOTAL OT HOURS", @@hours_ot.to_f.round(2)]
+	        csv << [" ", " ", " ", " ", " ", " ", "TOTAL LEAVES ACCUMULATED", @@times_vl.to_f.round(2), @@times_sl.to_d.round(2)]
 	        csv << [" "]
 
-	        @@ot_days = (@@hours_ot/8).to_s.split('.').first
-	        @@ot_hours = (@@hours_ot%8).to_s.split('.').first
-       		@@ot_mins = "#{((((@@hours_ot%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+	        @@total_ot_days = (@@hours_ot/8).to_s.split('.').first
+	        @@total_ot_hours = (@@hours_ot%8).to_s.split('.').first
+       		@@total_ot_mins = "#{((((@@hours_ot%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 
 	       	@@late_days = (@@hours_late/8).to_s.split('.').first
 	       	@@late_hours = (@@hours_late%8).to_s.split('.').first
@@ -184,17 +218,74 @@ class ReportsController < ApplicationController
        		@@sl_days = @@times_sl.to_s.split('.').first
        		@@sl_hours = ((@@times_sl.to_s.split('.').last).to_d * 0.8).to_s.split('.').first
 
-	        csv << ["ACCUMULATED OT", "#{@@ot_days}.#{@@ot_hours}.#{@@ot_mins}"]
+	        csv << ["ACCUMULATED OT", "#{@@total_ot_days}.#{@@total_ot_hours}.#{@@total_ot_mins}"]
 	        csv << ["LATES", "#{@@late_days}.#{@@late_hours}.#{@@late_mins}"]
 	        csv << ["ACCUMULATED VL", "#{@@vl_days}.#{@@vl_hours}.0"]
 	        csv << ["ACCUMULATED SL", "#{@@sl_days}.#{@@sl_hours}.0"]
-	        csv << ["VL BALANCE", " "]
-	        csv << ["SL BALANCE", " "]
+	        csv << ["VL BALANCE", "#{@@vl_balance_start}"]
+	        csv << ["SL BALANCE", "#{@@sl_balance_start}"]
 	        csv << ["TOTAL", " "]
 
 	        @@ut_days = ((@@ut_total/3600)/8).to_s.split('.').first
 	        @@ut_hours = ((@@ut_total/3600)%8).to_s.split('.').first
        		@@ut_mins = "#{(((((@@ut_total/3600)%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+
+       		@@reg_ot_days = (@@reg_ot_total/8).to_s.split('.').first
+	        @@reg_ot_hours = (@@reg_ot_total%8).to_s.split('.').first
+       		@@reg_ot_mins = "#{((((@@reg_ot_total%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+
+       		if @@rest_or_special_ot_total.to_d > 8
+       			@@rest_or_special_ot_excess8_days = ((@@rest_or_special_ot_total.to_d - 8)/8).to_s.split('.').first
+       			@@rest_or_special_ot_excess8_hours = ((@@rest_or_special_ot_total.to_d - 8)%8).to_s.split('.').first
+       			@@rest_or_special_ot_excess8_mins = "#{((((@@rest_or_special_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+       			@@rest_or_special_ot_first8_days = 1
+       			@@rest_or_special_ot_first8_mins = 0
+       			@@rest_or_special_ot_first8_hours = 0
+   			else
+   				@@rest_or_special_ot_first8_days = (@@rest_or_special_ot_total.to_d/8).to_s.split('.').first
+       			@@rest_or_special_ot_first8_mins = (@@rest_or_special_ot_total.to_d%8).to_s.split('.').first
+       			@@rest_or_special_ot_first8_hours = "#{((((@@rest_or_special_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+   			end
+
+   			if @@special_on_rest_ot_total.to_d > 8
+       			@@special_on_rest_ot_excess8_days = ((@@special_on_rest_ot_total.to_d - 8)/8).to_s.split('.').first
+       			@@special_on_rest_ot_excess8_hours = ((@@special_on_rest_ot_total.to_d - 8)%8).to_s.split('.').first
+       			@@special_on_rest_ot_excess8_mins = "#{((((@@special_on_rest_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+       			@@special_on_rest_ot_first8_days = 1
+       			@@special_on_rest_ot_first8_mins = 0
+       			@@special_on_rest_ot_first8_hours = 0
+   			else
+   				@@special_on_rest_ot_first8_days = (@@special_on_rest_ot_total/8).to_s.split('.').first
+       			@@special_on_rest_ot_first8_mins = (@@special_on_rest_ot_total%8).to_s.split('.').first
+       			@@special_on_rest_ot_first8_hours = "#{((((@@special_on_rest_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+   			end
+
+   			if @@regular_holiday_ot_total.to_d > 8
+       			@@regular_holiday_ot_excess8_days = ((@@regular_holiday_ot_total.to_d - 8)/8).to_s.split('.').first
+       			@@regular_holiday_ot_excess8_hours = ((@@regular_holiday_ot_total.to_d - 8)%8).to_s.split('.').first
+       			@@regular_holiday_ot_excess8_mins = "#{((((@@regular_holiday_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+       			@@regular_holiday_ot_first8_days = 1
+       			@@regular_holiday_ot_first8_mins = 0
+       			@@regular_holiday_ot_first8_hours = 0
+   			else
+   				@@regular_holiday_ot_first8_days = (@@regular_holiday_ot_total.to_d/8).to_s.split('.').first
+       			@@regular_holiday_ot_first8_mins = (@@regular_holiday_ot_total.to_d%8).to_s.split('.').first
+       			@@regular_holiday_ot_first8_hours = "#{((((@@regular_holiday_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+   			end
+
+   			if @@regular_on_rest_ot_total.to_d > 8
+       			@@regular_on_rest_ot_excess8_days = ((@@regular_on_rest_ot_total.to_d - 8)/8).to_s.split('.').first
+       			@@regular_on_rest_ot_excess8_hours = ((@@regular_on_rest_ot_total.to_d - 8)%8).to_s.split('.').first
+       			@@regular_on_rest_ot_excess8_mins = "#{((((@@regular_on_rest_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+       			@@regular_on_rest_ot_first8_days = 1
+       			@@regular_on_rest_ot_first8_mins = 0
+       			@@regular_on_rest_ot_first8_hours = 0
+   			else
+   				@@regular_on_rest_ot_first8_days = (@@regular_on_rest_ot_total.to_d/8).to_s.split('.').first
+       			@@regular_on_rest_ot_first8_mins = (@@regular_on_rest_ot_total.to_d%8).to_s.split('.').first
+       			@@regular_on_rest_ot_first8_hours = "#{((((@@regular_on_rest_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
+   			end
+
 		end
 	end
 
@@ -205,7 +296,6 @@ class ReportsController < ApplicationController
 	end
 end
 
-# <<<<<<< Updated upstream
 # 	 #  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
 # 	 #  	# @date_start = params[:date_start]
 # 	 #  	# @date_end = params[:date_end]
@@ -252,4 +342,3 @@ end
 # 	end
 # 	p.serialize 'getting_barred.xlsx'
 # 	  	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
-# =======
