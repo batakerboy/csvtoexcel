@@ -133,9 +133,9 @@ class ReportsController < ApplicationController
 	  	biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
 	  	falco_path = Rails.root.join('public', 'uploads','falco.txt')
 
-		File.delete(biometrics_path) if File.exists?(biometrics_path)
-	 	File.delete(falco_path) if File.exists?(falco_path)
-	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
+	# 	File.delete(biometrics_path) if File.exists?(biometrics_path)
+	#  	File.delete(falco_path) if File.exists?(falco_path)
+	#  	File.delete(iEMS_path) if File.exists?(iEMS_path)
 	end
 
 	def to_csv(emp, date_start, date_end)
@@ -161,6 +161,7 @@ class ReportsController < ApplicationController
 		@@regular_on_rest_ot_total = 0	
 
 		@date = date_start
+		@@cutoff_date = '2015-04-01'.to_date
 
 		CSV.generate do |csv|
 			csv << ["iRipple, Inc."]
@@ -168,8 +169,8 @@ class ReportsController < ApplicationController
 			csv << ["Department: #{emp.department}"]
 			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "UT DEPARTURE", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
 			while @date <= date_end
-				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 
+				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 				# Request.where(employee_id: emp.id).each do |req|
 				@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
 				@req = Request.where(employee_id: emp.id, date: @date).first
@@ -198,12 +199,19 @@ class ReportsController < ApplicationController
 						@@present_othours = @req.regular_on_rest_ot.to_d
 						@@regular_on_rest_ot_total += @req.regular_on_rest_ot.to_d
 					end
+					
+					if @@cutoff_date >= date_start && @@cutoff_date <= date_end
+						if @date < @@cutoff_date
+							@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
+							@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
+						end
+					else
+						@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
+						@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
+					end
 				end
 
 				@@hours_ot += @@present_othours
-				@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
-				@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
-
 
 				#FOR UT COMPUTATION
 				if !@attendance.nil? && !@attendance.time_out.nil? 
@@ -262,8 +270,8 @@ class ReportsController < ApplicationController
 	        csv << ["LATES", "#{@@late_days}.#{@@late_hours}.#{@@late_mins}"]
 	        csv << ["ACCUMULATED VL", "#{@@vl_days}.#{@@vl_hours}.0"]
 	        csv << ["ACCUMULATED SL", "#{@@sl_days}.#{@@sl_hours}.0"]
-	        csv << ["VL BALANCE", "#{@@vl_balance_start}"]
-	        csv << ["SL BALANCE", "#{@@sl_balance_start}"]
+	        csv << ["VL BALANCE", "#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0"]
+	        csv << ["SL BALANCE", "#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0"]
 	        csv << ["TOTAL", " "]
 
 	        @@ut_days = ((@@ut_total/3600)/8).to_s.split('.').first
@@ -325,7 +333,6 @@ class ReportsController < ApplicationController
        			@@regular_on_rest_ot_first8_mins = (@@regular_on_rest_ot_total.to_d%8).to_s.split('.').first
        			@@regular_on_rest_ot_first8_hours = "#{((((@@regular_on_rest_ot_total.to_d%8).round(2)).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
    			end
-
 		end
 	end
 
