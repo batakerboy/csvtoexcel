@@ -12,18 +12,18 @@ class Request < ActiveRecord::Base
 				
 				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
 				
-				next if token[4].length == 0 && token[5].length < 6
+				next if token[5].length == 0 && token[6].length < 6
 				
 				unless employee_id == token[0]
-					unless token[4].length == 0
-						@employee = Employee.where(biometrics_id: token[4]).first
+					unless token[5].length == 0
+						@employee = Employee.where(biometrics_id: token[5]).first
 						unless @employee.nil?
 							@employee.destroy if @employee.id != token[0]
 						end
 					end
 					
-					unless token[5].length < 6
-						@employee = Employee.where(falco_id: token[5]).first
+					unless token[6].length < 6
+						@employee = Employee.where(falco_id: token[6]).first
 						unless @employee.nil?
 							@employee.destroy if @employee.id != token[0]
 						end

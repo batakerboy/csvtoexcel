@@ -27,8 +27,7 @@ class ReportsController < ApplicationController
 
 	def create_zip(date_start=nil, date_end=nil)
 		if date_start.nil? && date_end.nil?
-			iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
-			token = File.open(iEMS_path, &:readline).split(',')
+			token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
 		  	@date_start = token[1].to_date
 		  	@date_end = token[3].to_date
 		 else
@@ -99,6 +98,10 @@ class ReportsController < ApplicationController
 			}
 		}
 
+		iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
+	  	biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
+	  	falco_path = Rails.root.join('public', 'uploads','falco.txt')
+
 		File.delete(biometrics_path) if File.exists?(biometrics_path)
 	 	File.delete(falco_path) if File.exists?(falco_path)
 	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
@@ -155,17 +158,17 @@ class ReportsController < ApplicationController
 						@@present_othours = @req.regular_ot.to_d
 						@@reg_ot_total += @req.regular_ot.to_d
 					elsif !@req.rest_or_special_ot.nil?
-						@@present_othours = req.rest_or_special_ot.to_d
-						@@rest_or_special_ot_total += req.rest_or_special_ot.to_d
+						@@present_othours = @req.rest_or_special_ot.to_d
+						@@rest_or_special_ot_total += @req.rest_or_special_ot.to_d
 					elsif !@req.special_on_rest_ot.nil?
-						@@present_othours = req.special_on_rest_ot.to_d
-						@@special_on_rest_ot_total += req.special_on_rest_ot.to_d
+						@@present_othours = @req.special_on_rest_ot.to_d
+						@@special_on_rest_ot_total += @req.special_on_rest_ot.to_d
 					elsif !@req.regular_holiday_ot.nil?
-						@@present_othours = req.regular_holiday_ot.to_d
-						@@regular_holiday_ot_total += req.regular_holiday_ot.to_d
+						@@present_othours = @req.regular_holiday_ot.to_d
+						@@regular_holiday_ot_total += @req.regular_holiday_ot.to_d
 					elsif !@req.regular_on_rest_ot.nil?
-						@@present_othours = req.regular_on_rest_ot.to_d
-						@@regular_on_rest_ot_total += req.regular_on_rest_ot.to_d
+						@@present_othours = @req.regular_on_rest_ot.to_d
+						@@regular_on_rest_ot_total += @req.regular_on_rest_ot.to_d
 					end
 				end
 

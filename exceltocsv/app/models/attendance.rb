@@ -40,11 +40,13 @@ class Attendance < ActiveRecord::Base
 			 		
 			 		unless @attendance.nil?
 			 			Attendance.update(@attendance.id, time_in: token[26].tr('"', '').to_time) if @attendance.time_in.strftime('%H:%M:%S').to_time > token[26].tr('"', '').to_time
-						if @attendance.time_out.nil?
-							Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
-						elsif @attendance.time_out.strftime('%H:%M:%S').to_time < token[27].tr('"', '').to_time
-							Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
-						end 
+						unless token[27].tr('"', '').nil?
+							if @attendance.time_out.nil?
+								Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
+							elsif @attendance.time_out.strftime('%H:%M:%S').to_time < token[27].tr('"', '').to_time
+								Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
+							end 
+						end
 			 		else
 				 		@attendance = Attendance.new
 				 		@attendance.employee_id = @employee.id
