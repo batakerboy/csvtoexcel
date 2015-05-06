@@ -21,21 +21,22 @@ class ReportsController < ApplicationController
 	end
 
 	def generate_report
-		iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
-	  	biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
-	  	falco_path = Rails.root.join('public', 'uploads','falco.txt')
+		# iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
+	 #  	biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
+	 #  	falco_path = Rails.root.join('public', 'uploads','falco.txt')
 
-	  	Request.import(iEMS_path) if File.exists?(iEMS_path)
-	  	Attendance.import(biometrics_path) if File.exists?(biometrics_path)
-	  	Attendance.import(falco_path) if File.exists?(falco_path)
+	 #  	# Request.import(iEMS_path) if File.exists?(iEMS_path)
+	 #  	# Attendance.import(biometrics_path) if File.exists?(biometrics_path)
+	 #  	# Attendance.import(falco_path) if File.exists?(falco_path)
 
-	  	if :date_start.nil?
-	  		token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
-	  		redirect_to view_all_reports_path(token[1].to_date, token[3].to_date)
-	  	end
+	 #  	# if :date_start.nil?
+	 #  		token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
+	 #  		redirect_to download_zip_reports_path
+	 #  		# (date_start: token[1].to_date, date_end: token[3].to_date)
+	 #  	# end
 	end
-
 	def download_zip
+		# (date_start, date_end)
 	  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
 	  	
 	  	# iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
@@ -47,18 +48,23 @@ class ReportsController < ApplicationController
 	  	# Attendance.import(falco_path) if File.exists?(falco_path)
 		
 		zip = create_zip
+		# (date_start: date_start, date_end: date_end)
 	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: @@filename)
 	end
 
-	def create_zip(date_start=nil, date_end=nil)
-		if date_start.nil? && date_end.nil?
-			token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
+	def create_zip
+		# (date_start=nil, date_end=nil)
+		# if :date_start.nil? && :date_end.nil?
+		# 	token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
+		#   	@date_start = token[1].to_date
+		#   	@date_end = token[3].to_date
+		# else
+		#  	@date_start = :date_start
+		#  	@date_end = :date_end
+		# end
+		token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
 		  	@date_start = token[1].to_date
 		  	@date_end = token[3].to_date
-		 else
-		 	@date_start = date_start
-		 	@date_end = date_end
-		end
 
 	  	@@filename = "DTR for #{@date_start} to #{@date_end}.zip"
 
