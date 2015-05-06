@@ -20,10 +20,6 @@ class ReportsController < ApplicationController
 	  	Request.import(iEMS_path) if File.exists?(iEMS_path)
 	  	Attendance.import(biometrics_path) if File.exists?(biometrics_path)
 	  	Attendance.import(falco_path) if File.exists?(falco_path)
-
-	 	File.delete(biometrics_path) if File.exists?(biometrics_path)
-	 	File.delete(falco_path) if File.exists?(falco_path)
-	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
 		
 		zip = create_zip
 	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: @@filename)
@@ -102,6 +98,10 @@ class ReportsController < ApplicationController
 				end)
 			}
 		}
+
+		File.delete(biometrics_path) if File.exists?(biometrics_path)
+	 	File.delete(falco_path) if File.exists?(falco_path)
+	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
 	end
 
 	def to_csv(emp, date_start, date_end)
