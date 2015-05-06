@@ -131,7 +131,7 @@ class ReportsController < ApplicationController
 	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
 	end
 
-	def initialize_class_var
+	def initialize_class_var(emp)
 		@@hours_late = 0
 		@@times_late = 0
 		@@hours_ot = 0
@@ -154,7 +154,7 @@ class ReportsController < ApplicationController
 		@@regular_on_rest_ot_total = 0		
 	end
 
-	def get_employee_performance
+	def get_employee_performance(emp)
 		@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
 		@req = Request.where(employee_id: emp.id, date: @date).first
 
@@ -210,7 +210,7 @@ class ReportsController < ApplicationController
 	end
 
 	def to_csv(emp, date_start, date_end)
-		initialize_class_var
+		initialize_class_var(emp)
 
 		@date = date_start
 
@@ -223,7 +223,7 @@ class ReportsController < ApplicationController
 				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 
 				# Request.where(employee_id: emp.id).each do |req|
-				get_employee_performance
+				get_employee_performance(emp)
 				
 			    csv << [@req.date.strftime('%m-%d-%Y'),
 			    	@req.date.strftime('%A'), 
