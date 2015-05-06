@@ -138,11 +138,15 @@ class ReportsController < ApplicationController
 
 				# Request.where(employee_id: emp.id).each do |req|
 				@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
+
 				@req = Request.where(employee_id: emp.id, date: @date).first
+
+
 				if !@attendance.nil? && (@attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time)
 					@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
 					@@times_late += 1
 				end
+
 
 				@@present_othours = 0
 
