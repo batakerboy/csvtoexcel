@@ -32,40 +32,61 @@ class Attendance < ActiveRecord::Base
 			 		next
 			 	elsif check_token53 != 'nil'
 			 		@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
-			 		@attendance = Attendance.new
 			 		@employee = Employee.where(biometrics_id: @@biometrics_id).first
-			 		next if @employee.nil?
-			 		@attendance.employee_id = @employee.id
-			 		@attendance.attendance_date = date_biometrics(token[25].tr('" ', ''))
-			 		@attendance.time_in = token[26].tr('"', '').to_time
 			 		
-			 		timeout = token[27].tr('"', '')
-			 		if timeout.length == 3
-			 			@attendance.time_out = ' '
-			 		else 
-			 			@attendance.time_out = timeout.to_time
+			 		next if @employee.nil?
+
+			 		@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[25].tr('" ', ''))).first
+			 		
+			 		unless @attendance.nil?
+			 			Attendance.update(@attendance.id, time_in: token[26].tr('"', '').to_time) if @attendance.time_in.strftime('%H:%M:%S').to_time > token[26].tr('"', '').to_time
+						if @attendance.time_out.nil?
+							Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
+						elsif @attendance.time_out.strftime('%H:%M:%S').to_time < token[27].tr('"', '').to_time
+							Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
+						end 
+			 		else
+				 		@attendance = Attendance.new
+				 		@attendance.employee_id = @employee.id
+				 		@attendance.attendance_date = date_biometrics(token[25].tr('"', ''))
+				 		@attendance.time_in = token[26].tr('"', '').to_time
+			 			
+			 			timeout = token[27].tr('"', '')
+				 		if timeout.length == 3
+				 			@attendance.time_out = ' '
+				 		else 
+				 			@attendance.time_out = timeout.to_time
+				 		end
+			 			@attendance.save
 			 		end
 			 		
-			 		@attendance.save
 				elsif check_token33 != 'nil'
 					next if @employee.nil?
-					@attendance = Attendance.new
-					@attendance.employee_id = @employee.id if !@employee.nil?
-					puts "====================="
-			 		puts @@biometrics_id
-			 		puts @employee.id if !@employee.nil?
-			 		puts "====================="	
-			 		
-			 		timeout = token[7].tr('" ', '')
-			 		@attendance.attendance_date = date_biometrics(token[5].tr('" ', ''))
-			 		@attendance.time_in = token[6].tr('" ', '').to_time
 
-			 		if timeout.nil?
-			 			@attendance.time_out = ' '
-			 		else 
-			 			@attendance.time_out = timeout.to_time
-			 		end
-			 		@attendance.save
+					@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[5].tr('" ', ''))).first
+					
+					unless @attendance.nil?
+						Attendance.update(@attendance.id, time_in: token[6].tr('"', '').to_time) if @attendance.time_in.strftime('%H:%M:%S').to_time > token[6].tr('"', '').to_time
+						if @attendance.time_out.nil?
+							Attendance.update(@attendance.id, time_out: token[7].tr('"', '').to_time)
+						elsif @attendance.time_out.strftime('%H:%M:%S').to_time < token[7].tr('" ', '').to_time
+							Attendance.update(@attendance.id, time_out: token[7].tr('"', '').to_time)
+						end 
+					else
+						@attendance = Attendance.new
+						@attendance.employee_id = @employee.id if !@employee.nil?
+				 		
+				 		@attendance.attendance_date = date_biometrics(token[5].tr('"', ''))
+				 		@attendance.time_in = token[6].tr('"', '').to_time
+
+				 		timeout = token[7].tr('"', '')
+				 		if timeout.nil?
+				 			@attendance.time_out = ' '
+				 		else 
+				 			@attendance.time_out = timeout.to_time
+				 		end
+				 		@attendance.save
+					end
 				end
 			end
 		end
@@ -81,20 +102,20 @@ class Attendance < ActiveRecord::Base
 						
 						@employee = Employee.where(falco_id: falco_id).first 
 						next if @employee.nil?
-						@records_of_attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first
+						@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first
 						
-						if @records_of_attendance.nil?
+						if @attendance.nil?
 							@attendance = Attendance.new
 							@attendance.employee_id = @employee.id
 							@attendance.attendance_date = date
 							@attendance.time_in = token[1].to_time
 							@attendance.save
 						else
-							Attendance.update(@records_of_attendance.id, time_in: token[1].to_time) if @records_of_attendance.time_in.strftime('%H:%M:%S') > token[1].to_time.strftime('%H:%M:%S')
-							if @records_of_attendance.time_out.nil?
-								Attendance.update(@records_of_attendance.id, time_out: token[1].to_time)
-							elsif @records_of_attendance.time_out.strftime('%H:%M:%S') < token[1].to_time.strftime('%H:%M:%S')
-								Attendance.update(@records_of_attendance.id, time_out: token[1].to_time)
+							Attendance.update(@attendance.id, time_in: token[1].to_time) if @attendance.time_in.strftime('%H:%M:%S') > token[1].to_time.strftime('%H:%M:%S')
+							if @attendance.time_out.nil?
+								Attendance.update(@attendance.id, time_out: token[1].to_time)
+							elsif @attendance.time_out.strftime('%H:%M:%S') < token[1].to_time.strftime('%H:%M:%S')
+								Attendance.update(@attendance.id, time_out: token[1].to_time)
 							end 
 						end
 					end

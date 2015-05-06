@@ -21,25 +21,33 @@ class ReportsController < ApplicationController
 	  	Attendance.import(biometrics_path) if File.exists?(biometrics_path)
 	  	Attendance.import(falco_path) if File.exists?(falco_path)
 
-	 	# @date_start = params[:date_start]
-	 	# @date_end = params[:date_end]
-
 	 	File.delete(biometrics_path) if File.exists?(biometrics_path)
 	 	File.delete(falco_path) if File.exists?(falco_path)
 	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
 		
 		zip = create_zip
-	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: 'reports.zip')
-
+	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: @@filename)
 	end
 
-	def create_zip
+	def create_zip(date_start=nil, date_end=nil)
+		if date_start.nil? && date_end.nil?
+			iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
+			token = File.open(iEMS_path, &:readline).split(',')
+		  	@date_start = token[1].to_date
+		  	@date_end = token[3].to_date
+		 else
+		 	@date_start = date_start
+		 	@date_end = date_end
+		end
+
+	  	@@filename = "DTR for #{@date_start} to #{@date_end}.zip"
+
 		Zip::File.open('reports.zip', Zip::File::CREATE) { |zipfile|
 
 			zipfile.get_output_stream("DTR Summary Sheet.xls") { |summary|
 				summary.puts(CSV.generate do |summarycsv| #CREATE DTR SUMMARY
 					summarycsv << ["iRipple, Inc."]
-					summarycsv << [" ", "DTR Summary Sheet for the period \n March 21, 2015, to April 03, 2015", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT"]
+					summarycsv << [" ", "DTR Summary Sheet for the period \n #{@date_start}, to #{@date_end}", "TARDINESS", "TARDINESS", "TARDINESS", "SL", "SL", "VL", "VL", "TOTAL DEDUCTION", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT", "OT"]
 					summarycsv << ["NO.", 
 								   "NAME", 
 								   "FREQUENCY", 
@@ -66,7 +74,7 @@ class ReportsController < ApplicationController
 
 				    	next if emp.falco_id.nil? && emp.biometrics_id.nil?
 						zipfile.get_output_stream("Employees/#{emp.last_name}_#{emp.first_name}.xls") { |f| 
-							f.puts(to_csv(emp)) #CREATE XLS PER EMPLOYEE
+							f.puts(to_csv(emp, @date_start, @date_end)) #CREATE XLS PER EMPLOYEE
 						}
 
 						summarycsv << [i+1, 
@@ -96,8 +104,7 @@ class ReportsController < ApplicationController
 		}
 	end
 
-	def to_csv(emp)
-
+	def to_csv(emp, date_start, date_end)
 		@@hours_late = 0
 		@@times_late = 0
 		@@hours_ot = 0
@@ -119,16 +126,14 @@ class ReportsController < ApplicationController
 		@@regular_holiday_ot_total = 0
 		@@regular_on_rest_ot_total = 0
 
-		@date_start = '2015-03-21'.to_date
-		@date_end = '2015-04-03'.to_date
-		@date = @date_start
+		@date = date_start
 
 		CSV.generate do |csv|
 			csv << ["iRipple, Inc."]
 			csv << ["Name: #{emp.last_name}, #{emp.first_name}"]
 			csv << ["Department: #{emp.department}"]
 			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "UT DEPARTURE", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
-			while @date < @date_end
+			while @date < date_end
 				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 
 				# Request.where(employee_id: emp.id).each do |req|

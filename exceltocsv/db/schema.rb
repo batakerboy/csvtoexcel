@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150505084904) do
+ActiveRecord::Schema.define(version: 20150506021813) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 20150505084904) do
     t.decimal  "special_on_rest_ot"
     t.decimal  "regular_holiday_ot"
     t.decimal  "regular_on_rest_ot"
+    t.string   "offset"
   end
 
   add_index "requests", ["employee_id", "date"], name: "by_employee_and_date_request"
