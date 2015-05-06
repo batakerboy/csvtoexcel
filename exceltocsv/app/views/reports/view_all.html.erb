@@ -1,3 +1,8 @@
 <div class = "container">
-
+	<%@employees.each do |employee|%>
+		<%initialize_class_var(employee)%>
+		<h3><%= employee.last_name%>, <%= employee.first_name%></h3>
+		<h4>Department: <%= employee.department%></h4>
+		
+	<%%>
 </div>
