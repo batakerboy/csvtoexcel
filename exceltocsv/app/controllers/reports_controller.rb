@@ -7,19 +7,43 @@ require 'axlsx'
 class ReportsController < ApplicationController
 
 	def index
-		# @biometrics = true
 	end
 
-	def download_zip
-	  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
-	  	
-	  	iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
+	def view_all(date_start, date_end)
+		Employee.all.each do |employee|
+			date = date_start
+			while date <= date_end
+				get_employee_performance
+				@date += 1.day
+			end
+		end
+	end
+
+	def generate_report
+		iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
 	  	biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
 	  	falco_path = Rails.root.join('public', 'uploads','falco.txt')
 
 	  	Request.import(iEMS_path) if File.exists?(iEMS_path)
 	  	Attendance.import(biometrics_path) if File.exists?(biometrics_path)
 	  	Attendance.import(falco_path) if File.exists?(falco_path)
+
+	  	if :date_start.nil?
+	  		token = File.open(Rails.root.join('public', 'uploads', 'iEMS.csv'), &:readline).split(',')
+	  		redirect_to view_all_reports_path(token[1].to_date, token[3].to_date)
+	  	end
+	end
+
+	def download_zip
+	  	File.delete(Rails.root + 'reports.zip') if File.exists?(Rails.root + 'reports.zip')
+	  	
+	  	# iEMS_path = Rails.root.join('public', 'uploads', 'iEMS.csv')
+	  	# biometrics_path = Rails.root.join('public', 'uploads','biometrics.csv')
+	  	# falco_path = Rails.root.join('public', 'uploads','falco.txt')
+
+	  	# Request.import(iEMS_path) if File.exists?(iEMS_path)
+	  	# Attendance.import(biometrics_path) if File.exists?(biometrics_path)
+	  	# Attendance.import(falco_path) if File.exists?(falco_path)
 		
 		zip = create_zip
 	 	send_file(Rails.root.join('reports.zip'), type: 'application/zip', filename: @@filename)
@@ -107,7 +131,7 @@ class ReportsController < ApplicationController
 	 	File.delete(iEMS_path) if File.exists?(iEMS_path)
 	end
 
-	def to_csv(emp, date_start, date_end)
+	def initialize_class_var
 		@@hours_late = 0
 		@@times_late = 0
 		@@hours_ot = 0
@@ -127,7 +151,66 @@ class ReportsController < ApplicationController
 		@@rest_or_special_ot_total = 0
 		@@special_on_rest_ot_total = 0
 		@@regular_holiday_ot_total = 0
-		@@regular_on_rest_ot_total = 0
+		@@regular_on_rest_ot_total = 0		
+	end
+
+	def get_employee_performance
+		@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
+		@req = Request.where(employee_id: emp.id, date: @date).first
+
+		if !@attendance.nil? && (@attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time)
+			@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
+			@@times_late += 1
+		end
+
+		@@present_othours = 0
+
+		if !@req.nil?
+			if !@req.regular_ot.nil?
+				@@present_othours = @req.regular_ot.to_d
+				@@reg_ot_total += @req.regular_ot.to_d
+			elsif !@req.rest_or_special_ot.nil?
+				@@present_othours = @req.rest_or_special_ot.to_d
+				@@rest_or_special_ot_total += @req.rest_or_special_ot.to_d
+			elsif !@req.special_on_rest_ot.nil?
+				@@present_othours = @req.special_on_rest_ot.to_d
+				@@special_on_rest_ot_total += @req.special_on_rest_ot.to_d
+			elsif !@req.regular_holiday_ot.nil?
+				@@present_othours = @req.regular_holiday_ot.to_d
+				@@regular_holiday_ot_total += @req.regular_holiday_ot.to_d
+			elsif !@req.regular_on_rest_ot.nil?
+				@@present_othours = @req.regular_on_rest_ot.to_d
+				@@regular_on_rest_ot_total += @req.regular_on_rest_ot.to_d
+			end
+		end
+
+		@@hours_ot += @@present_othours
+		@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
+		@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
+
+
+		#FOR UT COMPUTATION
+		if !@attendance.nil? && !@attendance.time_out.nil? 
+			if !@req.ut_time.nil?
+				if @attendance.time_out.to_time.strftime('%H:%M:%S') < @req.ut_time.to_time.strftime('%H:%M:%S')
+					@@ut_total += (@req.ut_time.to_time.strftime('%H:%M:%S') - @attendance.time_out.to_time.strftime('%H:%M:%S'))
+				end
+			else
+				if @req.date.strftime('%A').to_s == "Friday"
+					if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '17:30:00'.to_time
+						@@ut_total += '17:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
+					end
+				elsif @req.date.strftime('%A').to_s == "Monday" || @req.date.strftime('%A').to_s == "Tuesday" || @req.date.strftime('%A').to_s == "Wednesday" || @req.date.strftime('%A').to_s == "Thursday"
+					if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '18:30:00'.to_time
+						@@ut_total += '18:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
+					end
+				end
+			end
+		end
+	end
+
+	def to_csv(emp, date_start, date_end)
+		initialize_class_var
 
 		@date = date_start
 
@@ -136,65 +219,11 @@ class ReportsController < ApplicationController
 			csv << ["Name: #{emp.last_name}, #{emp.first_name}"]
 			csv << ["Department: #{emp.department}"]
 			csv << ["DATE", "DAY", "TIME IN", "TIME OUT", "UT DEPARTURE", "NO OF HRS LATE", "NO OF OT HOURS", "VL", "SL", "REMARKS"]
-			while @date < date_end
+			while @date <= date_end
 				# Request.find_by_sql("SELECT * FROM requests WHERE employee_id = '#{emp.id}' ORDER BY date").each do |req|
 
 				# Request.where(employee_id: emp.id).each do |req|
-				@attendance = Attendance.where(employee_id: emp.id, attendance_date: @date).first
-
-				@req = Request.where(employee_id: emp.id, date: @date).first
-
-
-				if !@attendance.nil? && (@attendance.time_in.strftime('%H:%M:%S').to_time > '08:30:00'.to_time)
-					@@hours_late += ((@attendance.time_in.strftime('%H:%M:%S').to_time - '08:30:00'.to_time)/1.hour)
-					@@times_late += 1
-				end
-
-
-				@@present_othours = 0
-
-				if !@req.nil?
-					if !@req.regular_ot.nil?
-						@@present_othours = @req.regular_ot.to_d
-						@@reg_ot_total += @req.regular_ot.to_d
-					elsif !@req.rest_or_special_ot.nil?
-						@@present_othours = @req.rest_or_special_ot.to_d
-						@@rest_or_special_ot_total += @req.rest_or_special_ot.to_d
-					elsif !@req.special_on_rest_ot.nil?
-						@@present_othours = @req.special_on_rest_ot.to_d
-						@@special_on_rest_ot_total += @req.special_on_rest_ot.to_d
-					elsif !@req.regular_holiday_ot.nil?
-						@@present_othours = @req.regular_holiday_ot.to_d
-						@@regular_holiday_ot_total += @req.regular_holiday_ot.to_d
-					elsif !@req.regular_on_rest_ot.nil?
-						@@present_othours = @req.regular_on_rest_ot.to_d
-						@@regular_on_rest_ot_total += @req.regular_on_rest_ot.to_d
-					end
-				end
-
-				@@hours_ot += @@present_othours
-				@@times_vl += @req.vacation_leave.to_d if !@req.vacation_leave.nil?
-				@@times_sl += @req.sick_leave.to_d if !@req.sick_leave.nil?
-
-
-				#FOR UT COMPUTATION
-				if !@attendance.nil? && !@attendance.time_out.nil? 
-					if !@req.ut_time.nil?
-						if @attendance.time_out.to_time.strftime('%H:%M:%S') < @req.ut_time.to_time.strftime('%H:%M:%S')
-							@@ut_total += (@req.ut_time.to_time.strftime('%H:%M:%S') - @attendance.time_out.to_time.strftime('%H:%M:%S'))
-						end
-					else
-						if @req.date.strftime('%A').to_s == "Friday"
-							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '17:30:00'.to_time
-								@@ut_total += '17:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
-							end
-						elsif @req.date.strftime('%A').to_s == "Monday" || @req.date.strftime('%A').to_s == "Tuesday" || @req.date.strftime('%A').to_s == "Wednesday" || @req.date.strftime('%A').to_s == "Thursday"
-							if @attendance.time_out.to_time.strftime('%H:%M:%S').to_time < '18:30:00'.to_time
-								@@ut_total += '18:30:00'.to_time - @attendance.time_out.to_time.strftime('%H:%M:%S').to_time
-							end
-						end
-					end
-				end
+				get_employee_performance
 				
 			    csv << [@req.date.strftime('%m-%d-%Y'),
 			    	@req.date.strftime('%A'), 
