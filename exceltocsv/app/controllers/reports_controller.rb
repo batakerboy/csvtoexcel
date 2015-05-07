@@ -303,26 +303,32 @@ class ReportsController < ApplicationController
 														    (@attendance.time_out.to_time.strftime('%H:%M:%S') if !@attendance.nil? && !@attendance.time_out.nil?), 
 														    (@@nohrs_ut if @@nohrs_ut != 0),
 														    (@@nohrs_late if @@nohrs_late != 0),
-														    @@present_othours, 
-														    @req.vacation_leave, 
+														    (@@present_othours if @@present_othours != 0),
+														    @req.vacation_leave,
 														    @req.sick_leave,
 														    @req.remarks], style: tabledata
 									rownum += 1
 						        	@date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
 						    	end
 
-						    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", "=COUNT(F5:F#{rownum})"], style: tabledata
+						    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", "=COUNT(F5:F#{rownum-1})", " ", " ", " ", " "], style: tabledata
 						    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+						    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL TARDINESS", "=SUM(F5:F#{rownum-2})"], style: tabledata
+						    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", " ", "=SUM(F5:F#{rownum-2})", " ", " ", " ", " "], style: tabledata
+						    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+						    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["TOTAL OT HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " "], style: tabledata
 						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
+						    	employeedtr_ws.merge_cells "H#{rownum}:J#{rownum}"
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " "], style: tabledata
+						    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
 						    	rownum += 1
 
-						        # csv << [" ", " ", " ", " ", "NUMBER OF TIMES TARDY", @@times_late]
-						        # csv << [" ", " ",  " ", " ", "TOTAL TARDINESS", @@hours_late]
-						        # csv << [" ", " ", " ", " ", " ", "TOTAL OT HOURS", @@hours_ot]
-						        # csv << [" ", " ", " ", " ", " ", " ", "TOTAL LEAVES ACCUMULATED", @@times_vl.to_f, @@times_sl.to_f]
-						        # csv << [" "]
+						    	employeedtr_ws.add_row 
+						    	rownum += 1
 
 						        @@total_ot_days = (@@hours_ot/8).to_s.split('.').first
 						        @@total_ot_hours = (@@hours_ot%8).to_s.split('.').first
@@ -366,14 +372,58 @@ class ReportsController < ApplicationController
 						   		@@total_leave_late_ut_hours = (@@total_leave_late_ut%8).to_s.split('.').first
 						   		@@total_leave_late_ut_mins = "#{(((@@total_leave_late_ut%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 
-						        # csv << ["ACCUMULATED OT", "#{@@total_ot_days}.#{@@total_ot_hours}.#{@@total_ot_mins}"]
-						        # csv << ["LATES", "#{@@late_days}.#{@@late_hours}.#{@@late_mins}"]
-						        # csv << ["ACCUMULATED VL", "#{@@vl_days}.#{@@vl_hours}.0"]
-						        # csv << ["ACCUMULATED SL", "#{@@sl_days}.#{@@sl_hours}.0"]
-						        # csv << ["VL BALANCE", "#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0"]
-						        # csv << ["SL BALANCE", "#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0"]
-						        # csv << ["TOTAL", "#{@@total_leave_late_days}.#{@@total_leave_late_hours}.#{@@total_leave_late_mins}"]
-						        # csv << [@@vl_total, @@sl_total, @@hours_late, @@ut_total]
+						   		employeedtr_ws.add_row ["ACCUMULATED OT", ("=FLOOR(G#{rownum-3}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1,1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						   							    "=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["LATES", ("=FLOOR(F#{rownum-5}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(F#{rownum-5},8),1,1)&"<<'"."'<<"&(MOD(F#{rownum-5},8)-FLOOR(MOD(F#{rownum-5},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["ACCUMULATED VL", ("=FLOOR(H#{rownum-4},1,1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["ACCUMULATED SL", ("=FLOOR(I#{rownum-5},1,1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["VL BALANCE", "#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["SL BALANCE", "#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=K#{rownum-5}+IF(K#{rownum-4}>K#{rownum-2},K#{rownum-4}-K#{rownum-2},0)+IF(K#{rownum-3}>K#{rownum-1},K#{rownum-3}-K#{rownum-1},0)",
+						    							" ", 
+						    							"=M#{rownum-5}+IF(M#{rownum-4}>M#{rownum-2},M#{rownum-4}-M#{rownum-2},0)+IF(M#{rownum-3}>M#{rownum-1},M#{rownum-3}-M#{rownum-1},0)",
+						    							"=N#{rownum-5}+IF(N#{rownum-4}>N#{rownum-2},N#{rownum-4}-N#{rownum-2},0)+IF(N#{rownum-3}>N#{rownum-1},N#{rownum-3}-N#{rownum-1},0)", 
+						    							"=O#{rownum-5}+IF(O#{rownum-4}>O#{rownum-2},O#{rownum-4}-O#{rownum-2},0)+IF(O#{rownum-3}>O#{rownum-1},O#{rownum-3}-O#{rownum-1},0)"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["TOTAL", "=FLOOR(K#{rownum}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(K#{rownum},8),1,1)&"<<'"."'<<"&(MOD(K#{rownum},8)-FLOOR(MOD(K#{rownum},8),1,1))*60", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=O#{rownum-1}/60"], style: tabledata
+						    	rownum += 1
+
+		        				employeedtr_ws.column_info[10].hidden = true
+						        employeedtr_ws.column_info[11].hidden = true
+						        employeedtr_ws.column_info[12].hidden = true
+						        employeedtr_ws.column_info[13].hidden = true
+						        employeedtr_ws.column_info[14].hidden = true
+
 
 								@@reg_ot_days = (@@reg_ot_total/8).to_s.split('.').first
 						        @@reg_ot_hours = (@@reg_ot_total%8).to_s.split('.').first
