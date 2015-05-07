@@ -311,8 +311,11 @@ class ReportsController < ApplicationController
 						        	@date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
 						    	end
 
-						    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", "=SUM(F5:F#{rownum})"]
+						    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", "=COUNT(F5:F#{rownum})"], style: tabledata
 						    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["TOTAL TARDINESS", "=SUM(F5:F#{rownum-2})"], style: tabledata
+						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
 						    	rownum += 1
 
 						        # csv << [" ", " ", " ", " ", "NUMBER OF TIMES TARDY", @@times_late]
