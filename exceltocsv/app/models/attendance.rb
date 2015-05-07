@@ -50,9 +50,14 @@ class Attendance < ActiveRecord::Base
 			 		else
 				 		@attendance = Attendance.new
 				 		@attendance.employee_id = @employee.id
-				 		@attendance.attendance_date = date_biometrics(token[25].tr('"', ''))
+				 		@attendance.attendance_date = date_biometrics(token[25].tr('" ', '')).to_date
 				 		@attendance.time_in = token[26].tr('"', '').to_time
 			 			
+			 			puts "======================="
+						puts "BIOMETRICS"
+						puts "Date: #{@attendance.attendance_date}"
+						puts "======================="
+
 			 			timeout = token[27].tr('"', '')
 				 		if timeout.length == 3
 				 			@attendance.time_out = ' '
@@ -78,9 +83,16 @@ class Attendance < ActiveRecord::Base
 						@attendance = Attendance.new
 						@attendance.employee_id = @employee.id if !@employee.nil?
 				 		
-				 		@attendance.attendance_date = date_biometrics(token[5].tr('"', ''))
+
+				 		@attendance.attendance_date = date_biometrics(token[5].tr('" ', '')).to_date
 				 		@attendance.time_in = token[6].tr('"', '').to_time
 
+						puts "======================="
+						puts "BIOMETRICS"
+						puts "@attendance_date: #{@attendance.attendance_date}"
+						puts "Date: #{date_biometrics(token[5].tr('"', ''))}"
+						puts "======================="
+				 		
 				 		timeout = token[7].tr('"', '')
 				 		if timeout.nil?
 				 			@attendance.time_out = ' '
