@@ -133,7 +133,7 @@ class Employee < ActiveRecord::Base
 	end
 
 	def no_of_hours_late(date)
-		return Employee.format_time(((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2)) unless self.time_in(date).nil? || self.time_in(date).to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || self.offset(date).downcase == 'am' || self.offset(date).length > 2
+		return Employee.format_time(((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2)) unless self.time_in(date).nil? || self.time_in(date).to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || self.offset(date).downcase == 'am' || self.offset(date).length > 2 || self.time_in(date).to_time >= @@half_day_time
 		# return ((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2) unless self.time_in(date).nil? || self.time_in(date).to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday'
 		return 0 
 	end

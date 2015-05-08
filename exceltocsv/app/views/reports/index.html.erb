@@ -41,11 +41,11 @@
 					<td><%= report.date_end.strftime('%B %e, %Y')%></td>
 					<td>
 						<div class = "btn-group" role = "group">
-							<%= link_to 'View Report', report_path(report), class: "btn btn-warning"%>
-							<%= link_to 'Download Report', report_download_zip_path(report), class: "btn btn-success"%>
-							<%#= form_tag report_download_zip_path(report), method: :post do %>
-								<%#= submit_tag 'Download Report', class: "btn btn-success"%>
-							<%#end%>
+							<%#= link_to 'Download Report', report_download_zip_path(report), class: "btn btn-success"%>
+							<%= form_tag report_download_zip_path(report), method: :post do %>
+								<%= link_to 'View Report', report_path(report), class: "btn btn-warning"%>
+								<%= submit_tag 'Download Report', class: "btn btn-success"%>
+							<%end%>
 						</div>
 					</td>
 				</tr>
