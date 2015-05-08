@@ -8,7 +8,7 @@ class Employee < ActiveRecord::Base
 	@@required_time_in = '08:30:00'.to_time
 	@@required_time_out_MH = '18:30:00'.to_time
 	@@required_time_out_F = '17:30:00'.to_time
-	@@half_day_time = '01:30:00'.to_time
+	@@half_day_time = '10:00:00'.to_time
 
 	def time_in(date)
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
@@ -67,7 +67,7 @@ class Employee < ActiveRecord::Base
 		unless @request.sick_leave != 0
 			sl += 0.5 if date.strftime('%A') == 'Friday' && self.no_of_hours_undertime(date) >= 1
 			sl += 0.5 if date.strftime('%A') != 'Friday' && self.no_of_hours_undertime(date) >= 2
-			sl += 0.5 if self.no_of_hours_late(date) >= 1.5	
+			sl += 0.5 if (!self.time_in(date).nil? && self.time_in(date).to_time >= @@half_day_time)	
 		end
 		return sl
 	end
@@ -77,7 +77,7 @@ class Employee < ActiveRecord::Base
 		unless @request.sick_leave != 0
 			return true if date.strftime('%A') == 'Friday' && self.no_of_hours_undertime(date) >= 1
 			return true if date.strftime('%A') != 'Friday' && self.no_of_hours_undertime(date) >= 2
-			return true if self.no_of_hours_late(date) >= 1.5
+			return true if (!self.time_in(date).nil? && self.time_in(date).to_time >= @@half_day_time)
 		end
 		return false
 	end
