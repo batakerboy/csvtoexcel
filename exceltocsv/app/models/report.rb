@@ -33,7 +33,10 @@ class Report < ActiveRecord::Base
 	def create_zip
 	 	report_zip_path = Rails.root.join('public', 'reports', 'reports.zip')
 		
-		Zip::File.open(reports_zip_path, Zip::File::CREATE) { |zipfile|
+		Zip::File.open(report_zip_path, Zip::File::CREATE) { |zipfile|
+			dtr_summary_filename = "DTR Summary for #{self.date_start} - #{self.date_end} cut-off"
+			dtr_summary_path = Rails.root.join('public', 'reports', dtr_summary_filename)
+
 			summarydtr = Axlsx::Package.new
 	 
 			# Required for use with numbers
@@ -69,6 +72,7 @@ class Report < ActiveRecord::Base
 				    Employee.all.order(last_name: :asc).each_with_index do |emp, i|
 				    	employeedtr_filename = "#{emp.last_name},#{emp.first_name}.xlsx"
 				    	dtr_peremployee_path = Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename)
+
 						File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 
 				    	next if emp.falco_id.nil? && emp.biometrics_id.nil?
@@ -101,13 +105,13 @@ class Report < ActiveRecord::Base
 									employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
 														    date.strftime('%A'),
 														    emp.time_in(date),
-														    emp.time_out, 
+														    emp.time_out(date), 
 														    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
 														    emp.no_of_hours_late(date),
 														    emp.ot_for_the_day(date),
 														    emp.vacation_leave(date),
-														    emp.sick_leave,
-														    eml.remarks], style: tabledata
+														    emp.sick_leave(date),
+														    emp.remarks(date)], style: tabledata
 
 									rownum += 1
 						        	date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
@@ -125,7 +129,7 @@ class Report < ActiveRecord::Base
 						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
 						    	employeedtr_ws.merge_cells "H#{rownum}:J#{rownum}"
 						    	rownum += 1
-						    	if @@cut_off_date.mon >= self.date_start.mon && @@cutoff_date.mon <= self.date_end.mon
+						    	if @@cut_off_date.to_date.mon >= self.date_start.to_date.mon && @@cut_off_date.to_date.mon <= self.date_end.to_date.mon
 					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(4+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(4+@@days_over_cutoffdate)})", " "], style: tabledata
 					    		else
 					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " "], style: tabledata
@@ -136,7 +140,165 @@ class Report < ActiveRecord::Base
 						    	employeedtr_ws.add_row 
 						    	rownum += 1
 
-						  #       @@total_ot_days = (@@hours_ot/8).to_s.split('.').first
+						   		employeedtr_ws.add_row ["ACCUMULATED OT", ("=FLOOR(G#{rownum-3}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1,1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						   							    "=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["LATES", ("=FLOOR(F#{rownum-5}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(F#{rownum-5},8),1,1)&"<<'"."'<<"&(MOD(F#{rownum-5},8)-FLOOR(MOD(F#{rownum-5},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["ACCUMULATED VL", ("=FLOOR(H#{rownum-4},1,1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["ACCUMULATED SL", ("=FLOOR(I#{rownum-5},1,1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["VL BALANCE", "#{emp.vacation_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=INT(LEFT(B#{rownum+1},1))", 
+						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
+						   							    "=INT(LEFT(L#{rownum},1))", 
+						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
+						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["SL BALANCE", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=K#{rownum-5}+IF(K#{rownum-4}>K#{rownum-2},K#{rownum-4}-K#{rownum-2},0)+IF(K#{rownum-3}>K#{rownum-1},K#{rownum-3}-K#{rownum-1},0)",
+						    							" ", 
+						    							"=M#{rownum-5}+IF(M#{rownum-4}>M#{rownum-2},M#{rownum-4}-M#{rownum-2},0)+IF(M#{rownum-3}>M#{rownum-1},M#{rownum-3}-M#{rownum-1},0)",
+						    							"=N#{rownum-5}+IF(N#{rownum-4}>N#{rownum-2},N#{rownum-4}-N#{rownum-2},0)+IF(N#{rownum-3}>N#{rownum-1},N#{rownum-3}-N#{rownum-1},0)", 
+						    							"=O#{rownum-5}+IF(O#{rownum-4}>O#{rownum-2},O#{rownum-4}-O#{rownum-2},0)+IF(O#{rownum-3}>O#{rownum-1},O#{rownum-3}-O#{rownum-1},0)"], style: tabledata
+						    	rownum += 1
+						    	employeedtr_ws.add_row ["TOTAL", "=FLOOR(K#{rownum}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(K#{rownum},8),1,1)&"<<'"."'<<"&(MOD(K#{rownum},8)-FLOOR(MOD(K#{rownum},8),1,1))*60", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    							"=O#{rownum-1}/60"], style: tabledata
+						    	rownum += 1
+
+								
+								employeedtr_ws.column_info[10].hidden = true
+						        employeedtr_ws.column_info[11].hidden = true
+						        employeedtr_ws.column_info[12].hidden = true
+						        employeedtr_ws.column_info[13].hidden = true
+						        employeedtr_ws.column_info[14].hidden = true
+
+
+
+							end
+						end
+
+						employeedtr.serialize "#{dtr_peremployee_path}"	
+					
+						summarydtr_ws.add_row [i+1,"#{emp.last_name},#{emp.first_name}",
+				    					   	"#{emp.number_of_times_late(self.date_start, self.date_end)}", 
+			    					   		"#{emp.total_late_to_string(self.date_start, self.date_end)}", 
+				    					    "#{emp.total_undertime_to_string(self.date_start, self.date_end)}",
+				    					    "#{emp.total_sl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.sick_leave_balance_to_string(self.date_start)}",
+				    					    "#{emp.total_vl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.vacation_leave_balance_to_string(self.date_start)}",
+				    					    "=INT(LEFT(D#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(H#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(F#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(I#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(G#{summaryrownum+1},1))",
+				    					    "=J#{summaryrownum+1}+IF(K#{summaryrownum+1}>K#{summaryrownum+1},K#{summaryrownum+1}-M#{summaryrownum+1},0)+IF(L#{summaryrownum+1}>N#{summaryrownum+1},L#{summaryrownum+1}-N#{summaryrownum+1},0)",
+				    					    "=RIGHT(D#{summaryrownum+1},LEN(D#{summaryrownum+1})-2)",
+				    					    "=RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2)",
+				    					    "=RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2)",
+				    					    "=RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2)",
+				    					    "=RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2)",
+				    					    "=INT(LEFT(P#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(Q#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(R#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(S#{summaryrownum+1},1))",
+				    					    "=INT(LEFT(T#{summaryrownum+1},1))",
+				    					    "=P#{summaryrownum+1}+IF(Q#{summaryrownum+1}>S#{summaryrownum+1},Q#{summaryrownum+1}-S#{summaryrownum+1},0)+IF(R#{summaryrownum+1}>T#{summaryrownum+1},R#{summaryrownum+1}-T#{summaryrownum+1},0)",
+				    					    "=RIGHT(P#{summaryrownum+1},LEN(P#{summaryrownum+1})-2)+0",
+				    					    "=RIGHT(Q#{summaryrownum+1},LEN(Q#{summaryrownum+1})-2)+0",
+				    					    "=RIGHT(R#{summaryrownum+1},LEN(R#{summaryrownum+1})-2)+0",
+				    					    "=RIGHT(S#{summaryrownum+1},LEN(S#{summaryrownum+1})-2)+0",
+				    					    "=RIGHT(T#{summaryrownum+1},LEN(T#{summaryrownum+1})-2)+0",
+				    					    "=AA#{summaryrownum+1}+IF(AB#{summaryrownum+1}>AD#{summaryrownum+1},AB#{summaryrownum+1}-AD#{summaryrownum+1},0)+IF(AC#{summaryrownum+1}>AE#{summaryrownum+1},AC#{summaryrownum+1}-AD#{summaryrownum+1},0)",
+				    					    "=J#{summaryrownum+1}*8*60+U#{summaryrownum+1}*60+AA#{summaryrownum+1}",
+				    					    "=K#{summaryrownum+1}*8*60+V#{summaryrownum+1}*60+AB#{summaryrownum+1}",
+				    					    "=L#{summaryrownum+1}*8*60+W#{summaryrownum+1}*60+AC#{summaryrownum+1}",
+				    					    "=M#{summaryrownum+1}*8*60+X#{summaryrownum+1}*60+AD#{summaryrownum+1}",
+				    					    "=N#{summaryrownum+1}*8*60+Y#{summaryrownum+1}*60+AE#{summaryrownum+1}",
+				    					    "=AG#{summaryrownum+1}+IF(AH#{summaryrownum+1}>AJ#{summaryrownum+1},AH#{summaryrownum+1}-AJ#{summaryrownum+1},0)+IF(AI#{summaryrownum+1}>AK#{summaryrownum+1},AI#{summaryrownum+1}-AK#{summaryrownum+1},0)",
+				    					    "=AL#{summaryrownum+1}/60",
+				    					    "#{emp.total_rest_or_special_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_rest_or_special_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_rest_or_special_ot(self.date_start, self.date_end) > 8), 
+				    					    "#{emp.total_special_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_special_on_rest_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_special_on_rest_ot(self.date_start, self.date_end) > 8), 
+				    					    "#{emp.total_regular_holiday_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_regular_holiday_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_regular_holiday_ot(self.date_start, self.date_end) > 8),
+				    					    "#{emp.total_regular_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_regular_on_rest_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_regular_on_rest_ot(self.date_start, self.date_end) > 8),
+				    					    "0", "#{emp.summary_total_with_ut(self.date_start, self.date_end, @@cut_off_date)}"], style: tabledata
+						
+						summaryrownum += 1
+					    summarydtr_ws.column_info[9].hidden = true
+				        summarydtr_ws.column_info[10].hidden = true
+				        summarydtr_ws.column_info[11].hidden = true
+				        summarydtr_ws.column_info[12].hidden = true
+				        summarydtr_ws.column_info[13].hidden = true
+				        summarydtr_ws.column_info[14].hidden = true
+				        summarydtr_ws.column_info[15].hidden = true
+				        summarydtr_ws.column_info[16].hidden = true
+				        summarydtr_ws.column_info[17].hidden = true
+				        summarydtr_ws.column_info[18].hidden = true
+				        summarydtr_ws.column_info[19].hidden = true
+				        summarydtr_ws.column_info[20].hidden = true
+				        summarydtr_ws.column_info[21].hidden = true
+				        summarydtr_ws.column_info[22].hidden = true
+				        summarydtr_ws.column_info[23].hidden = true
+				        summarydtr_ws.column_info[24].hidden = true
+				        summarydtr_ws.column_info[25].hidden = true
+				        summarydtr_ws.column_info[26].hidden = true
+				        summarydtr_ws.column_info[27].hidden = true
+				        summarydtr_ws.column_info[28].hidden = true
+				        summarydtr_ws.column_info[29].hidden = true
+				        summarydtr_ws.column_info[30].hidden = true
+				        summarydtr_ws.column_info[31].hidden = true
+				        summarydtr_ws.column_info[32].hidden = true
+				        summarydtr_ws.column_info[33].hidden = true
+				        summarydtr_ws.column_info[34].hidden = true
+				        summarydtr_ws.column_info[35].hidden = true
+				        summarydtr_ws.column_info[36].hidden = true
+				        summarydtr_ws.column_info[37].hidden = true
+				        summarydtr_ws.column_info[38].hidden = true
+						
+						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
+					end
+				end
+			end
+			summarydtr.serialize "#{dtr_summary_path}"
+			zipfile.add('DTR_Summary.xlsx', dtr_summary_path)
+
+		}
+	end
+end
+				    		
+
+
+
+
+
+
+
+
+
+
+
+
+
+				    		#       @@total_ot_days = (@@hours_ot/8).to_s.split('.').first
 						  #       @@total_ot_hours = (@@hours_ot%8).to_s.split('.').first
 						  #  		@@total_ot_mins = "#{(((@@hours_ot%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 
@@ -178,53 +340,12 @@ class Report < ActiveRecord::Base
 						  #  		@@total_leave_late_ut_hours = (@@total_leave_late_ut%8).to_s.split('.').first
 						  #  		@@total_leave_late_ut_mins = "#{(((@@total_leave_late_ut%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 
-						   		employeedtr_ws.add_row ["ACCUMULATED OT", ("=FLOOR(G#{rownum-3}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1,1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
-						   							    "=INT(LEFT(B#{rownum+1},1))", 
-						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
-						   							    "=INT(LEFT(L#{rownum},1))", 
-						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
-						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["LATES", ("=FLOOR(F#{rownum-5}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(F#{rownum-5},8),1,1)&"<<'"."'<<"&(MOD(F#{rownum-5},8)-FLOOR(MOD(F#{rownum-5},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=INT(LEFT(B#{rownum+1},1))", 
-						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
-						   							    "=INT(LEFT(L#{rownum},1))", 
-						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
-						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED VL", ("=FLOOR(H#{rownum-4},1,1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=INT(LEFT(B#{rownum+1},1))", 
-						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
-						   							    "=INT(LEFT(L#{rownum},1))", 
-						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
-						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED SL", ("=FLOOR(I#{rownum-5},1,1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=INT(LEFT(B#{rownum+1},1))", 
-						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
-						   							    "=INT(LEFT(L#{rownum},1))", 
-						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
-						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["VL BALANCE", "#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0", " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=INT(LEFT(B#{rownum+1},1))", 
-						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
-						   							    "=INT(LEFT(L#{rownum},1))", 
-						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
-						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["SL BALANCE", "#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0", " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=K#{rownum-5}+IF(K#{rownum-4}>K#{rownum-2},K#{rownum-4}-K#{rownum-2},0)+IF(K#{rownum-3}>K#{rownum-1},K#{rownum-3}-K#{rownum-1},0)",
-						    							" ", 
-						    							"=M#{rownum-5}+IF(M#{rownum-4}>M#{rownum-2},M#{rownum-4}-M#{rownum-2},0)+IF(M#{rownum-3}>M#{rownum-1},M#{rownum-3}-M#{rownum-1},0)",
-						    							"=N#{rownum-5}+IF(N#{rownum-4}>N#{rownum-2},N#{rownum-4}-N#{rownum-2},0)+IF(N#{rownum-3}>N#{rownum-1},N#{rownum-3}-N#{rownum-1},0)", 
-						    							"=O#{rownum-5}+IF(O#{rownum-4}>O#{rownum-2},O#{rownum-4}-O#{rownum-2},0)+IF(O#{rownum-3}>O#{rownum-1},O#{rownum-3}-O#{rownum-1},0)"], style: tabledata
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL", "=FLOOR(K#{rownum}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(K#{rownum},8),1,1)&"<<'"."'<<"&(MOD(K#{rownum},8)-FLOOR(MOD(K#{rownum},8),1,1))*60", " ", " ", " ", " ", " ", " ", " ", " ", 
-						    							"=O#{rownum-1}/60"], style: tabledata
-						    	rownum += 1
 
-								# @@reg_ot_days = (@@reg_ot_total/8).to_s.split('.').first
+
+
+
+
+						# @@reg_ot_days = (@@reg_ot_total/8).to_s.split('.').first
 						  #       @@reg_ot_hours = (@@reg_ot_total%8).to_s.split('.').first
 						  #  		@@reg_ot_mins = "#{(((@@reg_ot_total%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 
@@ -266,62 +387,6 @@ class Report < ActiveRecord::Base
 						  #  			@@regular_on_rest_ot_first8_mins = (@@regular_on_rest_ot_total.to_d%8).to_s.split('.').first
 						  #  			@@regular_on_rest_ot_first8_hours = "#{(((@@regular_on_rest_ot_total.to_d%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first}"
 								# end
-								employeedtr_ws.column_info[10].hidden = true
-						        employeedtr_ws.column_info[11].hidden = true
-						        employeedtr_ws.column_info[12].hidden = true
-						        employeedtr_ws.column_info[13].hidden = true
-						        employeedtr_ws.column_info[14].hidden = true
-
-
-
-							end
-						end
-						employeedtr.serialize "#{dtr_peremployee_path}"
-						
-						summarydtr_ws.add_row [i+1,"#{emp.last_name},#{emp.first_name}",
-				    					   	"#{emp.number_of_times_late(self.date_start, self.date_end)}", 
-			    					   		"#{emp.total_late_to_string(self.date_start, self.date_end)}", 
-				    					    "#{emp.total_undertime_to_string(self.date_start, self.date_end)}",
-				    					    "#{emp.total_sl_to_string(self.date_start, self.date_end)}", "#{emp.sick_leave_balance_to_string(self.date_start)}",
-				    					    "#{emp.total_vl_to_string(self.date_start, self.date_end)}", "#{emp.vacation_leave_balance_to_string(self.date_start)}",
-				    					    "=INT(LEFT(D#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(H#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(F#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(I#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(G#{summaryrownum+1},1))",
-				    					    "=J#{summaryrownum+1}+IF(K#{summaryrownum+1}>K#{summaryrownum+1},K#{summaryrownum+1}-M#{summaryrownum+1},0)+IF(L#{summaryrownum+1}>N#{summaryrownum+1},L#{summaryrownum+1}-N#{summaryrownum+1},0)",
-				    					    "=RIGHT(D#{summaryrownum+1},LEN(D#{summaryrownum+1})-2)",
-				    					    "=RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2)",
-				    					    "=RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2)",
-				    					    "=RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2)",
-				    					    "=RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2)",
-				    					    "=INT(LEFT(P#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(Q#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(R#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(S#{summaryrownum+1},1))",
-				    					    "=INT(LEFT(T#{summaryrownum+1},1))",
-				    					    "=P#{summaryrownum+1}+IF(Q#{summaryrownum+1}>S#{summaryrownum+1},Q#{summaryrownum+1}-S#{summaryrownum+1},0)+IF(R#{summaryrownum+1}>T#{summaryrownum+1},R#{summaryrownum+1}-T#{summaryrownum+1},0)",
-				    					    "=RIGHT(P#{summaryrownum+1},LEN(P#{summaryrownum+1})-2)+0",
-				    					    "=RIGHT(Q#{summaryrownum+1},LEN(Q#{summaryrownum+1})-2)+0",
-				    					    "=RIGHT(R#{summaryrownum+1},LEN(R#{summaryrownum+1})-2)+0",
-				    					    "=RIGHT(S#{summaryrownum+1},LEN(S#{summaryrownum+1})-2)+0",
-				    					    "=RIGHT(T#{summaryrownum+1},LEN(T#{summaryrownum+1})-2)+0",
-				    					    "=AA#{summaryrownum+1}+IF(AB#{summaryrownum+1}>AD#{summaryrownum+1},AB#{summaryrownum+1}-AD#{summaryrownum+1},0)+IF(AC#{summaryrownum+1}>AE#{summaryrownum+1},AC#{summaryrownum+1}-AD#{summaryrownum+1},0)",
-				    					    "=J#{summaryrownum+1}*8*60+U#{summaryrownum+1}*60+AA#{summaryrownum+1}",
-				    					    "=K#{summaryrownum+1}*8*60+V#{summaryrownum+1}*60+AB#{summaryrownum+1}",
-				    					    "=L#{summaryrownum+1}*8*60+W#{summaryrownum+1}*60+AC#{summaryrownum+1}",
-				    					    "=M#{summaryrownum+1}*8*60+X#{summaryrownum+1}*60+AD#{summaryrownum+1}",
-				    					    "=N#{summaryrownum+1}*8*60+Y#{summaryrownum+1}*60+AE#{summaryrownum+1}",
-				    					    "=AG#{summaryrownum+1}+IF(AH#{summaryrownum+1}>AJ#{summaryrownum+1},AH#{summaryrownum+1}-AJ#{summaryrownum+1},0)+IF(AI#{summaryrownum+1}>AK#{summaryrownum+1},AI#{summaryrownum+1}-AK#{summaryrownum+1},0)",
-				    					    "=AL#{summaryrownum+1}/60",
-				    					    "=FLOOR(AM#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(AM#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(AM#{summaryrownum+1},8)-FLOOR(MOD(AM#{summaryrownum+1},8),1,1))*60", 
-				    					    "#{@@rest_or_special_ot_first8_days}.#{@@rest_or_special_ot_first8_hours}.#{@@rest_or_special_ot_first8_mins}", ("#{@@rest_or_special_ot_excess8_days}.#{@@rest_or_special_ot_excess8_hours}.#{@@rest_or_special_ot_excess8_mins}" if @@rest_or_special_ot_total > 8), 
-				    					    "#{@@special_on_rest_ot_first8_days}.#{@@special_on_rest_ot_first8_hours}.#{@@special_on_rest_ot_first8_mins}", ("#{@@special_on_rest_ot_excess8_days}.#{@@special_on_rest_ot_excess8_hours}.#{@@special_on_rest_ot_excess8_mins}" if @@special_on_rest_ot_total > 8), 
-				    					    "#{@@regular_holiday_ot_first8_days}.#{@@regular_holiday_ot_first8_hours}.#{@@regular_holiday_ot_first8_mins}", ("#{@@regular_holiday_ot_excess8_days}.#{@@regular_holiday_ot_excess8_hours}.#{@@regular_holiday_ot_excess8_mins}" if @@regular_holiday_ot_total > 8),
-				    					    "#{@@regular_on_rest_ot_first8_days}.#{@@regular_on_rest_ot_first8_hours}.#{@@regular_on_rest_ot_first8_mins}", ("#{@@regular_on_rest_ot_excess8_days}.#{@@regular_on_rest_ot_excess8_hours}.#{@@regular_on_rest_ot_excess8_mins}" if @@regular_on_rest_ot_total > 8),
-				    					    "0", "#{@@total_ot_days}.#{@@total_ot_hours}.#{@@total_ot_mins}"], style: tabledata
-
-
 
 
 
@@ -467,88 +532,6 @@ class Report < ActiveRecord::Base
 				  #   					    "#{@@regular_on_rest_ot_first8_days}.#{@@regular_on_rest_ot_first8_hours}.#{@@regular_on_rest_ot_first8_mins}", ("#{@@regular_on_rest_ot_excess8_days}.#{@@regular_on_rest_ot_excess8_hours}.#{@@regular_on_rest_ot_excess8_mins}" if @@regular_on_rest_ot_total > 8),
 				  #   					    "0", "#{@@total_ot_days}.#{@@total_ot_hours}.#{@@total_ot_mins}"], style: tabledata
 						# else
-						# 	summarydtr_ws.add_row [i+1,"#{emp.last_name},#{emp.first_name}",
-				  #   					   	"#{@@times_late}", 
-			   #  					   		"#{@@late_days}.#{@@late_hours}.#{@@late_mins}", 
-				  #   					    "#{@@ut_days}.#{@@ut_hours}.#{@@ut_mins}",
-				  #   					    "#{@@sl_days}.#{@@sl_hours}.0", "#{@@sl_balance_start_days}.#{@@sl_balance_start_hours}.0",
-				  #   					    "#{@@vl_days}.#{@@vl_hours}.0", "#{@@vl_balance_start_days}.#{@@vl_balance_start_hours}.0",
-				  #   					    "=INT(LEFT(D#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(H#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(F#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(I#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(G#{summaryrownum+1},1))",
-				  #   					    "=J#{summaryrownum+1}+IF(K#{summaryrownum+1}>K#{summaryrownum+1},K#{summaryrownum+1}-M#{summaryrownum+1},0)+IF(L#{summaryrownum+1}>N#{summaryrownum+1},L#{summaryrownum+1}-N#{summaryrownum+1},0)",
-				  #   					    "=RIGHT(D#{summaryrownum+1},LEN(D#{summaryrownum+1})-2)",
-				  #   					    "=RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2)",
-				  #   					    "=RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2)",
-				  #   					    "=RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2)",
-				  #   					    "=RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2)",
-				  #   					    "=INT(LEFT(P#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(Q#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(R#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(S#{summaryrownum+1},1))",
-				  #   					    "=INT(LEFT(T#{summaryrownum+1},1))",
-				  #   					    "=P#{summaryrownum+1}+IF(Q#{summaryrownum+1}>S#{summaryrownum+1},Q#{summaryrownum+1}-S#{summaryrownum+1},0)+IF(R#{summaryrownum+1}>T#{summaryrownum+1},R#{summaryrownum+1}-T#{summaryrownum+1},0)",
-				  #   					    "=RIGHT(P#{summaryrownum+1},LEN(P#{summaryrownum+1})-2)+0",
-				  #   					    "=RIGHT(Q#{summaryrownum+1},LEN(Q#{summaryrownum+1})-2)+0",
-				  #   					    "=RIGHT(R#{summaryrownum+1},LEN(R#{summaryrownum+1})-2)+0",
-				  #   					    "=RIGHT(S#{summaryrownum+1},LEN(S#{summaryrownum+1})-2)+0",
-				  #   					    "=RIGHT(T#{summaryrownum+1},LEN(T#{summaryrownum+1})-2)+0",
-				  #   					    "=AA#{summaryrownum+1}+IF(AB#{summaryrownum+1}>AD#{summaryrownum+1},AB#{summaryrownum+1}-AD#{summaryrownum+1},0)+IF(AC#{summaryrownum+1}>AE#{summaryrownum+1},AC#{summaryrownum+1}-AD#{summaryrownum+1},0)",
-				  #   					    "=J#{summaryrownum+1}*8*60+U#{summaryrownum+1}*60+AA#{summaryrownum+1}",
-				  #   					    "=K#{summaryrownum+1}*8*60+V#{summaryrownum+1}*60+AB#{summaryrownum+1}",
-				  #   					    "=L#{summaryrownum+1}*8*60+W#{summaryrownum+1}*60+AC#{summaryrownum+1}",
-				  #   					    "=M#{summaryrownum+1}*8*60+X#{summaryrownum+1}*60+AD#{summaryrownum+1}",
-				  #   					    "=N#{summaryrownum+1}*8*60+Y#{summaryrownum+1}*60+AE#{summaryrownum+1}",
-				  #   					    "=AG#{summaryrownum+1}+IF(AH#{summaryrownum+1}>AJ#{summaryrownum+1},AH#{summaryrownum+1}-AJ#{summaryrownum+1},0)+IF(AI#{summaryrownum+1}>AK#{summaryrownum+1},AI#{summaryrownum+1}-AK#{summaryrownum+1},0)",
-				  #   					    "=AL#{summaryrownum+1}/60",
-				  #   					    "=FLOOR(AM#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(AM#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(AM#{summaryrownum+1},8)-FLOOR(MOD(AM#{summaryrownum+1},8),1,1))*60", 
-				  #   					    "#{emp.total_rest_or_special_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_rest_or_special_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_rest_or_special_ot > 8), 
-				  #   					    "#{emp.total_special_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_special_on_rest_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_special_on_rest_ot > 8), 
-				  #   					    "#{emp.total_regular_holiday_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_regular_holiday_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_regular_holiday_ot > 8),
-				  #   					    "#{emp.total_regular_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", ("#{emp.total_regular_on_rest_ot_to_string_excess(self.date_start, self.date_end)}" if emp.total_regular_on_rest_ot > 8),
-				  #   					    "0", "#{emp.summary_total_with_ut(self.date_start, self.date_end, @@cut_off_date)}"], style: tabledata
-    		# 			end
-					    summaryrownum += 1
-					    summarydtr_ws.column_info[9].hidden = true
-				        summarydtr_ws.column_info[10].hidden = true
-				        summarydtr_ws.column_info[11].hidden = true
-				        summarydtr_ws.column_info[12].hidden = true
-				        summarydtr_ws.column_info[13].hidden = true
-				        summarydtr_ws.column_info[14].hidden = true
-				        summarydtr_ws.column_info[15].hidden = true
-				        summarydtr_ws.column_info[16].hidden = true
-				        summarydtr_ws.column_info[17].hidden = true
-				        summarydtr_ws.column_info[18].hidden = true
-				        summarydtr_ws.column_info[19].hidden = true
-				        summarydtr_ws.column_info[20].hidden = true
-				        summarydtr_ws.column_info[21].hidden = true
-				        summarydtr_ws.column_info[22].hidden = true
-				        summarydtr_ws.column_info[23].hidden = true
-				        summarydtr_ws.column_info[24].hidden = true
-				        summarydtr_ws.column_info[25].hidden = true
-				        summarydtr_ws.column_info[26].hidden = true
-				        summarydtr_ws.column_info[27].hidden = true
-				        summarydtr_ws.column_info[28].hidden = true
-				        summarydtr_ws.column_info[29].hidden = true
-				        summarydtr_ws.column_info[30].hidden = true
-				        summarydtr_ws.column_info[31].hidden = true
-				        summarydtr_ws.column_info[32].hidden = true
-				        summarydtr_ws.column_info[33].hidden = true
-				        summarydtr_ws.column_info[34].hidden = true
-				        summarydtr_ws.column_info[35].hidden = true
-				        summarydtr_ws.column_info[36].hidden = true
-				        summarydtr_ws.column_info[37].hidden = true
-				        summarydtr_ws.column_info[38].hidden = true
 						
-						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
-					end
-				end
-			end
-			summarydtr.serialize "#{dtr_summary_path}"
-			zipfile.add('DTR_Summary.xlsx', dtr_summary_path)
-
-		}
-	end
-end
+    		# 			end
+					    

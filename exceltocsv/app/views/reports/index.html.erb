@@ -14,7 +14,10 @@
 					<td><%= report.date_start%></td>
 					<td><%= report.date_end%></td>
 					<td><%= link_to 'View Report', report_path(report), class: "btn btn-warning"%></td>
-					<td><%= link_to 'Download Report', report_download_zip_path(report), class: "btn btn-warning"%></td>
+					<td><%= form_tag report_download_zip_path(report), method: :post do %>
+							<%= submit_tag 'Download Report', class: "btn btn-success"%>
+						<%end%>
+					</td>
 				</tr>
 			<%end%>
 		</tbody>
