@@ -8,7 +8,7 @@ class Attendance < ActiveRecord::Base
 	
 	def self.date_biometrics(date)
 		token = date.split("/")
-		formatted_date = "20" + token[2] + '-' + token[0] + '-' + token[1]
+		formatted_date = token[2] + '-' + token[0] + '-' + token[1]
 		return formatted_date
 	end
 

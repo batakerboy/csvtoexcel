@@ -1,0 +1,123 @@
+d<div class = "container">
+	<div class = "row">
+		<div class = "col-md-12">
+			<%= form_tag report_download_zip_path(@report.id), method: :post do %>
+				<%= submit_tag 'Download Report', class: "btn btn-lg btn-success pull-right"%>
+			<%end%>
+		</div>
+	</div>
+	<%@employees.each do |employee|%>
+		<%@date = @report.date_start%>
+		<table class = "table table-striped table-bordered">
+			<h3><%= employee.last_name%>, <%= employee.first_name%></h3>
+			<h4>Department: <%= employee.department%></h4>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Day</th>
+					<th>Time In</th>
+					<th>Time Out</th>
+					<th>UT Departure</th>
+					<th>No. of Hours Late</th>
+					<th>No. of OT Hours</th>
+					<th>Vacation Leave</th>
+					<th>Sick Leave</th>
+					<th>OB Departure</th>
+					<th>OB Time Start</th>
+					<th>OB Time End</th>
+					<th>OB Arrival</th>
+					<th>Offset</th>
+					<th>Remarks</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%while @date <= @report.date_end%>
+					<%if employee.is_halfday?(@date)%>
+						<tr class = "warning">
+					<%else%>
+						<tr>
+					<%end%>
+							<td><%= @date.strftime('%m-%d-%Y')%></td>
+							<td><%= @date.strftime('%A')%></td>
+							<td><%= employee.time_in(@date)%></td>
+							<td><%= employee.time_out(@date)%></td>
+							<td><%#= employee.ut_time(@date).to_time.strftime('%H:%M:%S') unless employee.ut_time(@date).to_time.strftime('%H:%M:%S') == '00:00:00'%><%= employee.no_of_hours_undertime(@date)%></td>
+							<td><%= employee.no_of_hours_late(@date)%></td>
+							<td><%= employee.ot_for_the_day(@date)%></td>
+							<td><%= employee.vacation_leave(@date)%></td>
+							<td><%= employee.sick_leave(@date)%></td>
+							<td><%= employee.ob_departure(@date).strftime('%H:%M:%S') unless employee.ob_departure(@date).nil?%></td>
+							<td><%= employee.ob_time_start(@date).strftime('%H:%M:%S') unless employee.ob_time_start(@date).nil?%></td>
+							<td><%= employee.ob_time_end(@date).strftime('%H:%M:%S') unless employee.ob_time_end(@date).nil?%></td>
+							<td><%= employee.ob_arrival(@date).strftime('%H:%M:%S') unless employee.ob_arrival(@date).nil?%></td>
+							<td><%- employee.offset(@date)%></td>
+							<td><%= employee.remarks(@date)%></td>
+						</tr>
+					<%@date += 1.day%>
+				<%end%>
+				<tr>
+					<td colspan = "3"></td>
+					<td colspan = "2"><b>Number of Times Tardy</b></td>
+					<td><%= employee.number_of_times_late(@report.date_start, @report.date_end)%></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td colspan = "6"></td>
+				</tr>
+				<tr>
+					<td colspan = "3"></td>
+					<td colspan = "2"><b>Total Tardiness</b></td>
+					<td><%= employee.total_late(@report.date_start, @report.date_end)%></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td colspan = "6"></td>
+				</tr>
+				<tr>
+					<td colspan = "4"></td>
+					<td colspan = "2"><b>Total OT Hours</b></td>
+					<td><%= employee.total_ot_hours(@report.date_start, @report.date_end)%></td>
+					<td></td>
+					<td></td>
+					<td colspan = "6"></td>
+				</tr>
+				<tr>
+					<td colspan = "4"></td>
+					<td colspan = "3"><b>Total Leaves Accumulated</b></td>
+					<td><%= employee.total_vl(@report.date_start, @report.date_end, @cut_off_date)%></td>
+					<td><%= employee.total_sl(@report.date_start, @report.date_end, @cut_off_date)%></td>
+					<td colspan = "5"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class = "row">
+			<div class = "col-md-3"><b>ACCUMULATED OT</b></div>
+			<div class = "col-md-2"><%= employee.total_ot_hours_to_string(@report.date_start, @report.date_end)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>LATES</b></div>
+			<div class = "col-md-2"><%= employee.total_late_to_string(@report.date_start, @report.date_end)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>ACCUMULATED VL</b></div>
+			<div class = "col-md-2"><%= employee.total_vl_to_string(@report.date_start, @report.date_end, @cut_off_date)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>ACCUMULATED SL</b></div>
+			<div class = "col-md-2"><%= employee.total_sl_to_string(@report.date_start, @report.date_end, @cut_off_date)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>VL BALANCE</b></div>
+			<div class = "col-md-2"><%= employee.vacation_leave_balance_to_string(@report.date_start)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>SL BALANCE</b></div>
+			<div class = "col-md-2"><%= employee.sick_leave_balance_to_string(@report.date_start)%></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-3"><b>TOTAL</b></div>
+			<div class = "col-md-2"><%= employee.summary_total_to_string(@report.date_start, @report.date_end, @cut_off_date)%></div>
+		</div>
+		<br/><br/><br/>
+	<%end%>
+</div>

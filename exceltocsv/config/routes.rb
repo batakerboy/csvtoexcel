@@ -4,11 +4,11 @@ Rails.application.routes.draw do
   resources :reports do
     collection {
       get   :start_parse
-      get   :view_all
+      post   :view_all
       post  :import
       post  :generate_report
-      post   :download_zip 
     }
+      post   :download_zip 
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
