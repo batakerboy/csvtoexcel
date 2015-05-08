@@ -57,6 +57,14 @@ class ReportsController < ApplicationController
    		redirect_to new_report_path(step: params[:step]), notice:'SUCCESS:File Imported!' 
 	end
 
+	def empty_database
+		Employee.delete_all
+		Request.delete_all
+		Attendance.delete_all
+		Report.delete_all
+		redirect_to root_path
+	end
+
 	private
 	def report_params
 		params.require(:report).permit(:date_start, :date_end)

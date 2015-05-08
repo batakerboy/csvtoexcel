@@ -6,7 +6,8 @@
 	  <%= javascript_include_tag 'jquery.dataTables.min', 'data-turbolinks-track' => true %>
 	  <%= stylesheet_link_tag 'animate', media: 'all', 'data-turbolinks-track' => true %>
   	  <%= stylesheet_link_tag 'jquery.dataTables', media: 'all', 'data-turbolinks-track' => true %>
-	  <%= stylesheet_link_tag 'bootstrap', media: 'all', 'data-turbolinks-track' => true %>
+	  <%#= stylesheet_link_tag 'bootstrap', media: 'all', 'data-turbolinks-track' => true %>
+	  <%= stylesheet_link_tag 'bootstrap-flatly.min', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= csrf_meta_tags %>
 </head>
 <body>
@@ -20,5 +21,33 @@
 </div>
 
 <%= javascript_include_tag 'bootstrap', 'data-turbolinks-track' => true %>
+<script>
+	$("#home").click(function(){
+		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = ('<%= root_path%>');
+			}
+			);
+ 	});
+
+	$("#generate_new_report").click(function(){
+		$("#welcomeDiv").removeClass("animated fadeInRight")
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= new_report_path(step: 1)%>';
+			}
+			);
+ 	});
+ 	$("#archives").click(function(){
+		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = ('<%= reports_path%>');
+			}
+			);
+ 	});
+</script>
+
 </body>
 </html>

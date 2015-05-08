@@ -1,0 +1,19 @@
+<div class = "navbar navbar-inverse navbar-static-top">
+	<div class = "container">
+		<a href="#" class = "navbar-brand">FBI Integration</a>
+
+		<button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+		</button>
+
+		<div class = "collapse navbar-collapse navHeaderCollapse">
+			<ul class = "nav navbar-nav navbar-right">
+				<li class = "active"><%= link_to 'Home', root_path%></li>
+				<li><%= link_to 'New Report', new_report_path(step: 1)%></li>
+				<li><%= link_to 'Archives', reports_path%></li>					
+			</ul>
+		</div>
+	</div>
+</div>

@@ -1,8 +1,34 @@
-<div class = "container" style = "background-color:black;opacity:0.6">
-	<div align = "center" id = "welcomeDiv" class = "animated fadeInRight">
+<div class = "navbar navbar-default navbar-static-top">
+	<div class = "container">
+		<a href="#" class = "navbar-brand">
+			Falco 
+			<font color = "red">+</font> 
+			Biometrics
+			<font color = "red">+</font>
+			iEMS <strong>Integration</strong>
+		</a>
+
+		<button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+		</button>
+
+		<div class = "collapse navbar-collapse navHeaderCollapse">
+			<ul class = "nav navbar-nav navbar-right">
+				<li class = "active"><%= link_to 'Home', root_path, id: "home"%></li>
+				<li><%= link_to 'New Report', new_report_path(step: 1), id: "generate_new_report"%></li>
+				<li><%= link_to 'Archives', reports_path, id: "archives"%></li>					
+			</ul>
+		</div>
+	</div>
+</div>
+
+
+<div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
 		<br/><br/><br/><br/><br/><br/>
 		
-		<h1 style = "color: white; font-size: 500%">
+		<h1 style = "color: black; font-size: 500%">
 			Falco 
 			<font color = "red">+</font> 
 			Biometrics
@@ -10,15 +36,25 @@
 			iEMS
 		</h1>
 		
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		
-		<div class = "col-md-3"></div>
-		<%= link_to 'Upload New Falco/Biometrics/iEMS Records', new_report_path(step: 1), class: "btn btn-info col-md-6"%>
-		
-		<br/><br/><br/>
-		
-		<div class = "col-md-3"></div>
-		<%= link_to 'Download Old Reports', reports_path, class: "btn btn-warning col-md-6", id: 'Link'%>
 		<br/><br/><br/><br/><br/><br/>
-	</div>
+		<div class = "row">
+			<div class = "col-md-3"></div>
+			<%= link_to 'Generate New report', new_report_path(step: 1), id: "generate_new_report", class: "btn btn-lg btn-success col-md-6"%>
+		</div>
+		
+		<br/>
+		
+		<div class = "row">
+			<div class = "col-md-3"></div>
+			<%= link_to 'Go to Archives', reports_path, class: "btn btn-lg btn-info col-md-6", id: 'archives'%>
+		</div>
+		
+		<br/>
+
+		<div class = "row">
+			<div class = "col-md-3"></div>
+			<%= link_to 'Empty Database', empty_database_reports_path, method: :delete, class: "btn btn-lg btn-danger col-md-6"%>
+		</div>
+
+		<br/><br/><br/>
 </div>
