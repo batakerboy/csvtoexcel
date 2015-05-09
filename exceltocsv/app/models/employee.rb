@@ -8,7 +8,7 @@ class Employee < ActiveRecord::Base
 	@@required_time_in = '08:30:00'.to_time
 	@@required_time_out_MH = '18:30:00'.to_time
 	@@required_time_out_F = '17:30:00'.to_time
-	@@half_day_time = '01:30:00'.to_time
+	@@half_day_time = '10:00:00'.to_time
 
 	def time_in(date)
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
@@ -63,11 +63,13 @@ class Employee < ActiveRecord::Base
 
 	def sick_leave(date)
 		@request = Request.where(employee_id: self.id, date: date).first
-		sl = @request.sick_leave
-		unless @request.sick_leave != 0
-			sl += 0.5 if date.strftime('%A') == 'Friday' && self.no_of_hours_undertime(date) >= 1
-			sl += 0.5 if date.strftime('%A') != 'Friday' && self.no_of_hours_undertime(date) >= 2
-			sl += 0.5 if self.no_of_hours_late(date) >= 1.5	
+		sl = 0.0
+		if @request.sick_leave != 0
+			sl = @request.sick_leave
+		else
+			if self.is_halfday?(date)
+				sl = 0.5
+			end
 		end
 		return sl
 	end
@@ -77,7 +79,7 @@ class Employee < ActiveRecord::Base
 		unless @request.sick_leave != 0
 			return true if date.strftime('%A') == 'Friday' && self.no_of_hours_undertime(date) >= 1
 			return true if date.strftime('%A') != 'Friday' && self.no_of_hours_undertime(date) >= 2
-			return true if self.no_of_hours_late(date) >= 1.5
+			return true if self.no_of_hours_late(date) > 1.5
 		end
 		return false
 	end
@@ -118,14 +120,16 @@ class Employee < ActiveRecord::Base
 	end
 
 	def no_of_hours_undertime(date)
-		unless self.time_out(date).nil? || self.offset(date).downcase == 'pm' || self.offset(date).length > 2
-			unless self.ut_time(date).strftime('%H:%M:%S') == '00:00:00'
+		if !self.time_out(date).nil? && self.offset(date).downcase != 'pm'
+			if self.ut_time(date).strftime('%H:%M:%S') != '00:00:00'
 				return Employee.format_time(self.ut_time(date).to_time - self.time_out(date).to_time)if self.time_out(date).to_time < self.ut_time(date).to_time 
 			else
-				if date.strftime('%A') == 'Friday'
-					return Employee.format_time(((@@required_time_out_F - self.time_out(date).to_time)/1.hour).round(2)) unless self.time_out(date).to_time >= @@required_time_out_F
-				elsif date.strftime('%A') != 'Saturday' || date.strftime('%A') != 'Sunday'
-					return Employee.format_time(((@@required_time_out_MH - self.time_out(date).to_time)/1.hour).round(2)) unless self.time_out(date).to_time >= @@required_time_out_MH
+				if date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
+					if date.strftime('%A') == 'Friday'
+						return Employee.format_time(@@required_time_out_F - self.time_out(date).to_time) unless self.time_out(date).to_time >= @@required_time_out_F
+					else
+						return Employee.format_time(@@required_time_out_MH - self.time_out(date).to_time) unless self.time_out(date).to_time >= @@required_time_out_MH
+					end
 				end
 			end
 		end
@@ -133,9 +137,12 @@ class Employee < ActiveRecord::Base
 	end
 
 	def no_of_hours_late(date)
-		return Employee.format_time(((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2)) unless self.time_in(date).nil? || self.time_in(date).to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || self.offset(date).downcase == 'am' || self.offset(date).length > 2 || self.time_in(date).to_time >= @@half_day_time
-		# return ((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2) unless self.time_in(date).nil? || self.time_in(date).to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday'
-		return 0 
+		if date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday' && !self.is_manager && self.offset(date).downcase != 'am'
+			if !self.time_in(date).nil? && self.time_in(date).to_time > @@required_time_in && self.time_in(date).to_time <= @@half_day_time
+				return Employee.format_time(((self.time_in(date).to_time - @@required_time_in)/1.hour).round(2)) 
+			end
+		end
+		return 0
 	end
 
 	def ot_for_the_day(date)
@@ -396,6 +403,14 @@ class Employee < ActiveRecord::Base
 		return "#{value_days}.#{value_hours}.#{value_mins}"
 	end
 
+	def total_rogular_ot_to_string(date_start, date_end)
+		value = total_regular_ot(date_start, date_end)
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
+
 	def total_rest_or_special_ot_to_string_excess(date_start, date_end)
 		value = total_rest_or_special_ot(date_start, date_end)
 		return "0.0.0" if value <= 8
@@ -460,16 +475,24 @@ class Employee < ActiveRecord::Base
 	end
 
 	def self.format_time(to_convert)
-		time = (((to_convert)).to_s.split('.').first).to_d
-		time_min = ((((((to_convert)).round(2)).to_s.split('.').last).to_d)/100) * 60
-		if time_min >= 46
-			time += 1
-		elsif time_min >= 31
-			time += 0.75
-		elsif time_min >= 16
-			time += 0.5
-		elsif time_min >= 1
-			time += 0.25
+		time = to_convert/1.hour
+		
+		if time > 1.75
+			time = 2
+		elsif time > 1.5
+			time = 1.75
+		elsif time > 1.25
+			time = 1.5
+		elsif time > 1
+			time = 1.25
+		elsif time > 0.75
+			time = 1.0
+		elsif time > 0.5
+			time = 0.75
+		elsif time > 0.25
+			time = 0.5
+		else
+			time = 0.25
 		end
 		return time	
 	end
