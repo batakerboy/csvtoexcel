@@ -38,6 +38,10 @@ class ReportsController < ApplicationController
 	  	@report.date_start = token[1].to_date
 	  	@report.date_end = token[3].to_date
 
+	  	File.delete(iEMS_path) if File.exists?(iEMS_path)
+	  	File.delete(biometrics_path) if File.exists?(biometrics_path)
+	  	File.delete(falco_path) if File.exists?(falco_path)
+
 	  	if @report.save
 	  		redirect_to report_path(@report), notice:'SUCCESS:Report Generated'
 	  	else
@@ -54,10 +58,10 @@ class ReportsController < ApplicationController
 
   	def import
   		post = Report.save(params[:biometrics], params[:falco], params[:iEMS])	
-   		redirect_to new_report_path(step: params[:step]), notice:'SUCCESS:File Imported!' 
+   		redirect_to new_report_path(step: params[:step]) 
 	end
 
-	def empty_database
+	def delete_all_records
 		Employee.delete_all
 		Request.delete_all
 		Attendance.delete_all

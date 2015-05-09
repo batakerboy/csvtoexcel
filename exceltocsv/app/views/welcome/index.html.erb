@@ -16,9 +16,9 @@
 
 		<div class = "collapse navbar-collapse navHeaderCollapse">
 			<ul class = "nav navbar-nav navbar-right">
-				<li class = "active"><%= link_to 'Home', root_path, id: "home"%></li>
-				<li><%= link_to 'New Report', new_report_path(step: 1), id: "generate_new_report"%></li>
-				<li><%= link_to 'Archives', reports_path, id: "archives"%></li>					
+				<li class = "active"><%= link_to 'Home', '#', id: "home"%></li>
+				<li><%= link_to 'New Report', '#', id: "generate_new_report"%></li>
+				<li><%= link_to 'Archives', '#', id: "archives"%></li>					
 			</ul>
 		</div>
 	</div>
@@ -39,22 +39,44 @@
 		<br/><br/><br/><br/><br/><br/>
 		<div class = "row">
 			<div class = "col-md-3"></div>
-			<%= link_to 'Generate New report', new_report_path(step: 1), id: "generate_new_report", class: "btn btn-lg btn-success col-md-6"%>
+			<%= link_to 'Generate New report', '#', id: "generate_new_report_button", class: "btn btn-lg btn-success col-md-6"%>
 		</div>
 		
 		<br/>
 		
 		<div class = "row">
 			<div class = "col-md-3"></div>
-			<%= link_to 'Go to Archives', reports_path, class: "btn btn-lg btn-info col-md-6", id: 'archives'%>
+			<%= link_to 'Go to Archives', '#', class: "btn btn-lg btn-info col-md-6", id: 'archives_button'%>
 		</div>
 		
 		<br/>
 
 		<div class = "row">
 			<div class = "col-md-3"></div>
-			<%= link_to 'Empty Database', empty_database_reports_path, method: :delete, class: "btn btn-lg btn-danger col-md-6"%>
+			<%= form_tag delete_all_records_reports_path, method: :post do%>
+			<%= submit_tag 'Delete All Records', class: "btn btn-lg btn-danger col-md-6"%>
+			<%end%>
 		</div>
 
 		<br/><br/><br/>
 </div>
+
+<script>
+	$("#generate_new_report_button").click(function(event){
+		// $("#welcomeDiv").removeClass("animated fadeInRight")
+		// Event.stop(event);
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= new_report_path(step: 1)%>';
+			}
+			);
+ 	});
+ 	$("#archives_button").click(function(event){
+		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= reports_path%>';
+			}
+			);
+ 	});
+</script>

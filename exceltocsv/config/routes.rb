@@ -3,13 +3,13 @@ Rails.application.routes.draw do
 
   resources :reports do
     collection {
-      get   :start_parse
+      # get   :start_parse
       # post   :view_all
       post  :import
-      post  :generate_report
-      delete  :empty_database
+      # post  :generate_report
+      post  :delete_all_records
     }
-      post   :download_zip 
+      get   :download_zip 
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

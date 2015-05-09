@@ -14,36 +14,33 @@
 
 <%= yield %>
 
-<div class = "modal fade" id = "add" role = "dialog">
-	<div class = "modal-dialog">
-		<div class = "modal-content"></div>
-	</div>
-</div>
-
 <%= javascript_include_tag 'bootstrap', 'data-turbolinks-track' => true %>
 <script>
-	$("#home").click(function(){
+	$("#home").click(function(event){
 		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
+		// Event.stop(event);
+		// var href = $(this).attr('<%= root_path%>');
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
-				window.location = ('<%= root_path%>');
+				window.location = '<%= root_path%>';
 			}
 			);
  	});
 
-	$("#generate_new_report").click(function(){
-		$("#welcomeDiv").removeClass("animated fadeInRight")
+	$("#generate_new_report").click(function(event){
+		// $("#welcomeDiv").removeClass("animated fadeInRight")
+		// Event.stop(event);
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
 				window.location = '<%= new_report_path(step: 1)%>';
 			}
 			);
  	});
- 	$("#archives").click(function(){
+ 	$("#archives").click(function(event){
 		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
-				window.location = ('<%= reports_path%>');
+				window.location = '<%= reports_path%>';
 			}
 			);
  	});
