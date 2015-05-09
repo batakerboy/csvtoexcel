@@ -148,6 +148,9 @@ class Report < ActiveRecord::Base
 									rownum += 1
 						        	date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
 						        	if @@cut_off_date.to_date.mon >= self.date_start.to_date.mon && @@cut_off_date.to_date.mon <= self.date_end.to_date.mon
+						        		puts "====================================================================="
+						        		puts "====================================================================="
+						        		puts "====================================================================="
 						        		if date >= @@cut_off_date.to_date
 						        			@@days_over_cutoffdate += 1
 						        		end
