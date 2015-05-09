@@ -63,7 +63,7 @@ class Employee < ActiveRecord::Base
 
 	def sick_leave(date)
 		@request = Request.where(employee_id: self.id, date: date).first
-		sl = 0.0
+		sl = 0
 		if @request.sick_leave != 0
 			sl = @request.sick_leave
 		else
@@ -76,7 +76,7 @@ class Employee < ActiveRecord::Base
 
 	def is_halfday?(date)
 		@request = Request.where(employee_id: self.id, date: date).first
-		unless @request.sick_leave != 0
+		unless @request.sick_leave != 0 || date.strftime('%A') == 'Saturday' || date.strftime('%A').strftime == 'Sunday'
 			return true if date.strftime('%A') == 'Friday' && self.no_of_hours_undertime(date) >= 1
 			return true if date.strftime('%A') != 'Friday' && self.no_of_hours_undertime(date) >= 2
 			return true if self.no_of_hours_late(date) > 1.5
