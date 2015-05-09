@@ -282,7 +282,7 @@ class Report < ActiveRecord::Base
 				    					    "=AL#{summaryrownum+1}+AM#{summaryrownum+1}+IF(AN#{summaryrownum+1}>AP#{summaryrownum+1},AN#{summaryrownum+1}-AP#{summaryrownum+1},0)+IF(AO#{summaryrownum+1}>AQ#{summaryrownum+1},AO#{summaryrownum+1}-AQ#{summaryrownum+1},0)", # AR
 				    					    "=AR#{summaryrownum+1}/60", # AS
 				    					    "=FLOOR(AS#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(AS#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(AS#{summaryrownum+1},8)-FLOOR(MOD(AS#{summaryrownum+1},8),1,1))*60", # AT
-				    					    "#{emp.total_rogular_ot_to_string(self.date_start, self.date_end)}",
+				    					    "#{emp.total_regular_ot_to_string(self.date_start, self.date_end)}",
 				    					    "#{emp.total_rest_or_special_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_rest_or_special_ot_to_string_excess(self.date_start, self.date_end)}", 
 				    					    "#{emp.total_special_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_special_on_rest_ot_to_string_excess(self.date_start, self.date_end)}", 
 				    					    "#{emp.total_regular_holiday_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_regular_holiday_ot_to_string_excess(self.date_start, self.date_end)}",
@@ -303,7 +303,7 @@ class Report < ActiveRecord::Base
 							i += 1
 				        end
 				        i = 55
-				        while i <= 105
+				        while i <= 104
 				        	summarydtr_ws.column_info[i].hidden = true
 				        	i += 1
 				        end
