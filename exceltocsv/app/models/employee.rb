@@ -78,7 +78,16 @@ class Employee < ActiveRecord::Base
 		unless @request.sick_leave != 0 || @request.remarks.strip != ''
 			sl += 0.5 if date.strftime('%A') == 'Friday' && undertime >= 1
 			sl += 0.5 if date.strftime('%A') != 'Friday' && undertime >= 2
-			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time)	
+			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time)
+			
+			# puts "================================================="
+			# puts "if date.strftime('%A') == 'Friday' && undertime >= 1" if date.strftime('%A') == 'Friday' && undertime >= 1
+			# puts "================================================="
+			# puts "if date.strftime('%A') != 'Friday' && undertime >= 2" if date.strftime('%A') != 'Friday' && undertime >= 2
+			# puts "================================================="
+			# puts "if (!time_in.nil? && time_in.to_time >= @@half_day_time)" if (!time_in.nil? && time_in.to_time >= @@half_day_time)
+			# puts "time_in: #{time_in}\nhalf_day_time: #{@@half_day_time}" if (!time_in.nil? && time_in.to_time >= @@half_day_time)
+			# puts "================================================="
 # >>>>>>> Stashed changes
 		end
 		return sl

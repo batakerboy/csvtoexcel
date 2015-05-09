@@ -20,7 +20,7 @@ class ReportsController < ApplicationController
 	  	File.delete(Rails.root.join('public', 'reports','DTRSUMMARY.xlsx')) if File.exists?(Rails.root.join('public', 'reports','DTRSUMMARY.xlsx'))
 
 		zip = @report.create_zip
-	 	send_file(Rails.root.join('public', 'reports', 'reports.zip'), type: 'application/zip', filename: "DTR for #{@report.date_start} to #{@report.date_end}.zip")
+	 	send_file(Rails.root.join('public', 'reports', 'reports.zip'), type: 'application/zip', filename: "DTR for #{@report.date_start.strftime('%B %e, %Y')} to #{@report.date_end.strftime('%B %e, %Y')}.zip")
 	end								
 
 	def create

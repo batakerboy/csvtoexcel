@@ -7,14 +7,14 @@ class Attendance < ActiveRecord::Base
 	@@biometrics_id = ' '
 	
 	def self.date_biometrics(date)
-		token = date.split("/")
-		formatted_date = token[2] + '-' + token[0] + '-' + token[1]
+		token = date.tr('"" ', '').split("/")
+		formatted_date = "20#{token[2]}-#{token[0]}-#{token[1]}"
 		return formatted_date
 	end
 
 	def self.date_falco(date)
-		token = date.split("/")
-		formatted_date = token[0] + '-' + token[1] + '-' + token[2]
+		token = date.tr('"" ', '').split("/")
+		formatted_date = "#{token[0]}-#{token[1]}-#{token[2]}"
 		return formatted_date
 	end
 
@@ -50,12 +50,13 @@ class Attendance < ActiveRecord::Base
 			 		else
 				 		@attendance = Attendance.new
 				 		@attendance.employee_id = @employee.id
-				 		@attendance.attendance_date = date_biometrics(token[25].tr('" ', '')).to_date
+				 		@attendance.attendance_date = date_biometrics(token[25]).to_date
 				 		@attendance.time_in = token[26].tr('"', '').to_time
 			 			
 			 			puts "======================="
 						puts "BIOMETRICS"
 						puts "Date: #{@attendance.attendance_date}"
+						puts "token: #{token[25]}"
 						puts "======================="
 
 			 			timeout = token[27].tr('"', '')
@@ -70,7 +71,7 @@ class Attendance < ActiveRecord::Base
 				elsif check_token33 != 'nil'
 					next if @employee.nil?
 
-					@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[5].tr('" ', ''))).first
+					@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[5])).first
 					
 					unless @attendance.nil?
 						Attendance.update(@attendance.id, time_in: token[6].tr('"', '').to_time) if @attendance.time_in.strftime('%H:%M:%S').to_time > token[6].tr('"', '').to_time
@@ -84,13 +85,14 @@ class Attendance < ActiveRecord::Base
 						@attendance.employee_id = @employee.id if !@employee.nil?
 				 		
 
-				 		@attendance.attendance_date = date_biometrics(token[5].tr('" ', '')).to_date
+				 		@attendance.attendance_date = date_biometrics(token[5]).to_date
 				 		@attendance.time_in = token[6].tr('"', '').to_time
 
 						puts "======================="
 						puts "BIOMETRICS"
 						puts "@attendance_date: #{@attendance.attendance_date}"
-						puts "Date: #{date_biometrics(token[5].tr('"', ''))}"
+						puts "Date: #{date_biometrics(token[5])}"
+						puts "token: #{token[5]}"
 						puts "======================="
 				 		
 				 		timeout = token[7].tr('"', '')
@@ -112,7 +114,7 @@ class Attendance < ActiveRecord::Base
 				unless token.length == 0 || token[2] == 'FFFFFF' || token[2] == 'Access' || token[2] == 'Report' || token[2].nil?
 					unless token[2].length != 6
 						falco_id = token[2].tr('" ', '')
-						date = date_falco(token[0].tr(' ', ''))
+						date = date_falco(token[0])
 						
 						@employee = Employee.where(falco_id: falco_id).first 
 						next if @employee.nil?
