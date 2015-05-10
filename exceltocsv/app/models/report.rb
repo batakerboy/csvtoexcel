@@ -9,7 +9,11 @@ class Report < ActiveRecord::Base
 	@@cut_off_date = '2015-04-01'
 
 	def self.save(biometrics = nil, falco = nil, iEMS = nil)
-		directory = 'public/uploads'
+		# dir = File.dirname("#{Rails.root}/public/uploads/biometrics.csv")
+ 	 	# FileUtils.mkdir_p(dir) unless File.directory?(dir)
+		# directory = 'public/uploads'
+		directory = Rails.root.join('public', 'uploads')
+		Dir.mkdir(directory) unless File.exists?(directory)
 		
 		unless biometrics.nil?
 			name = biometrics['report'].original_filename
@@ -32,6 +36,7 @@ class Report < ActiveRecord::Base
 
 	def create_zip
 	 	report_zip_path = Rails.root.join('public', 'reports', 'reports.zip')
+		Dir.mkdir(report_zip_path) unless File.exists?(report_zip_path)
 		
 		Zip::File.open(report_zip_path, Zip::File::CREATE) { |zipfile|
 			# dtr_summary_filename = "DTR Summary for #{self.date_start} - #{self.date_end} cut-off"

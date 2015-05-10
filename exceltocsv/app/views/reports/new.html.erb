@@ -77,7 +77,7 @@
 				<%end%>
 			</div>
 
-			<div class = "alert alert-info" id = "biometrics_alert">
+			<div class = "alert alert-success" id = "biometrics_alert">
 				<button type = "button" class = "close" data-dismiss = "alert"></button>
 				<strong>Biometrics CSV</strong> has been uploaded
 			</div>
@@ -101,7 +101,7 @@
 					</div>
 				<%end%>
 			</div>
-			<div class = "alert alert-info" id = "falco_alert">
+			<div class = "alert alert-success" id = "falco_alert">
 				<button type = "button" class = "close" data-dismiss = "alert"></button>
 				<b>Falco TXT</b> has been uploaded
 			</div>
@@ -124,7 +124,7 @@
 					</div>
 				<%end%>
 			</div>
-			<div class = "alert alert-info" id = "iEMS_alert">
+			<div class = "alert alert-success" id = "iEMS_alert">
 				<button type = "button" class = "close" data-dismiss = "alert"></button>
 				<b>iEMS CSV</b> has been uploaded
 			</div>
@@ -134,7 +134,7 @@
 	<div align = "center" style = "margin-top:5%" id = "generate_report" class = "hidden">
 		<div class = "col-md-12">
 			<%= form_tag reports_path, method: :post do %>
-				<%= submit_tag 'Generate Reports', style: "width: 50%", class: "btn btn-lg btn-success"%>
+				<%= submit_tag 'Generate Reports', style: "width: 50%", class: "btn btn-lg btn-info"%>
 			<%end%>
 		</div>
 	</div>
