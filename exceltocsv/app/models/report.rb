@@ -148,7 +148,7 @@ class Report < ActiveRecord::Base
 								rownum = 5
 								@@days_over_cutoffdate = 0
 								while date <= self.date_end
-									if emp.remarks(date) != ''
+									if emp.remarks(date) != '' && (emp.no_of_hours_late(date) == 0)
 										employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
 															    date.strftime('%A'),
 															    emp.time_in(date),

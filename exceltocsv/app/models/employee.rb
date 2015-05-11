@@ -177,7 +177,7 @@ class Employee < ActiveRecord::Base
 		offset = self.offset(date).downcase
 		ut_time = self.ut_time(date)
 		undertime = 0
-		unless time_out.nil? || offset == 'pm' || offset.length > 2 || self.remarks(date) != ''
+		unless time_out.nil? || offset == 'pm' || offset.length > 2
 			unless self.ut_time(date).strftime('%H:%M:%S') == '00:00:00'
 				# return Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time
 				undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
@@ -208,7 +208,7 @@ class Employee < ActiveRecord::Base
 # =======
 		time_in = self.time_in(date)
 		offset = self.offset(date).downcase
-		return Employee.format_time(((time_in.to_time - @@required_time_in)/1.hour).round(2)) unless time_in.nil? || time_in.to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in || self.remarks(date) != ''
+		return Employee.format_time(((time_in.to_time - @@required_time_in)/1.hour).round(2)) unless time_in.nil? || time_in.to_time <= @@required_time_in || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
 		return 0 
 # >>>>>>> Stashed changes
 	end
