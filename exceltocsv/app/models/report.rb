@@ -35,8 +35,13 @@ class Report < ActiveRecord::Base
 	end
 
 	def create_zip
+		directory =  Rails.root.join('public', 'reports')
+		Dir.mkdir(directory) unless File.exists?(directory)
+
+		directory =  Rails.root.join('public', 'reports', 'employee dtr')
+		Dir.mkdir(directory) unless File.exists?(directory)
+	 	
 	 	report_zip_path = Rails.root.join('public', 'reports', 'reports.zip')
-		Dir.mkdir(report_zip_path) unless File.exists?(report_zip_path)
 		
 		Zip::File.open(report_zip_path, Zip::File::CREATE) { |zipfile|
 			# dtr_summary_filename = "DTR Summary for #{self.date_start} - #{self.date_end} cut-off"
