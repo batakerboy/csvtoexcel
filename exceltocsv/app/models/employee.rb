@@ -76,10 +76,10 @@ class Employee < ActiveRecord::Base
 		sl = @request.sick_leave
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != ''
-			sl += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' || date.strftime('%A') != 'Sunday')
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0
+			sl += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 			# sl += 0.5 if date.strftime('%A') != 'Friday' && undertime >= 2
-			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' || date.strftime('%A') != 'Sunday')
+			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 			sl = 1 if self.is_absent?(date)
 			# puts "================================================="
 			# puts "if date.strftime('%A') == 'Friday' && undertime >= 1" if date.strftime('%A') == 'Friday' && undertime >= 1
@@ -105,9 +105,9 @@ class Employee < ActiveRecord::Base
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
 		undertime = self.no_of_hours_undertime(date)
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != ''
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0
 			# return true if date.strftime('%A') == 'Friday' && undertime >= 1
-			return true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' || date.strftime('%A') != 'Sunday')
+			return true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 			return true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in)
 # >>>>>>> Stashed changes
 		end
@@ -193,7 +193,7 @@ class Employee < ActiveRecord::Base
 			end
 		end
 		
-		return undertime unless (undertime >= 1 && date.strftime('%A') == 'Friday') || (undertime >= 2 && (date.strftime('%A') != 'Friday' || date.strftime('%A') != 'Saturday' || date.strftime('%A') != 'Sunday'))
+		return undertime unless (undertime >= 1 && date.strftime('%A') == 'Friday') || (undertime >= 2 && (date.strftime('%A') != 'Friday' && date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'))
 		return 0
 	end
 
@@ -469,7 +469,7 @@ class Employee < ActiveRecord::Base
 		value_days = ((value.to_d)/8).to_s.split('.').first
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -480,7 +480,7 @@ class Employee < ActiveRecord::Base
 		value_days = ((value.to_d)/8).to_s.split('.').first
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -493,7 +493,7 @@ class Employee < ActiveRecord::Base
 		value_days = (((value.to_d)-8)/8).to_s.split('.').first
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -506,7 +506,7 @@ class Employee < ActiveRecord::Base
 		value_days = ((value.to_d)/8).to_s.split('.').first
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -519,7 +519,7 @@ class Employee < ActiveRecord::Base
 		value_days = (((value.to_d)-8)/8).to_s.split('.').first
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -532,7 +532,7 @@ class Employee < ActiveRecord::Base
 		value_days = ((value.to_d)/8).to_s.split('.').first
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -545,7 +545,7 @@ class Employee < ActiveRecord::Base
 		value_days = (((value.to_d)-8)/8).to_s.split('.').first
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -558,7 +558,7 @@ class Employee < ActiveRecord::Base
 		value_days = ((value.to_d)/8).to_s.split('.').first
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"
@@ -571,7 +571,7 @@ class Employee < ActiveRecord::Base
 		value_days = (((value.to_d)-8)/8).to_s.split('.').first
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-		if value_mins.to_s.length == 1 && value_mins != 0
+		if value_mins == 3
 			return "#{value_days}.#{value_hours}.#{value_mins}0"
 		end
 		return "#{value_days}.#{value_hours}.#{value_mins}"

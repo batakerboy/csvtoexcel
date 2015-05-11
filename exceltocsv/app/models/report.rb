@@ -302,19 +302,19 @@ class Report < ActiveRecord::Base
 				    					    "#{emp.total_undertime_to_string(self.date_start, self.date_end)}", # F
 				    					    "#{emp.total_sl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.sick_leave_balance_to_string(self.date_start)}", # G H
 				    					    "#{emp.total_vl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.vacation_leave_balance_to_string(self.date_start)}", # I J
-				    					    "=INT(LEFT(E#{summaryrownum+1},1))", # K
-				    					    "=INT(LEFT(F#{summaryrownum+1},1))", # L
-				    					    "=INT(LEFT(I#{summaryrownum+1},1))", # M
-				    					    "=INT(LEFT(G#{summaryrownum+1},1))", # N
-				    					    "=INT(LEFT(J#{summaryrownum+1},1))", # O
-				    					    "=INT(LEFT(H#{summaryrownum+1},1))", # P
-				    					    "=K#{summaryrownum+1}+L#{summaryrownum+1}+IF(M#{summaryrownum+1}>M#{summaryrownum+1},M#{summaryrownum+1}-O#{summaryrownum+1},0)+IF(N#{summaryrownum+1}>P#{summaryrownum+1},N#{summaryrownum+1}-P#{summaryrownum+1},0)", # Q
-				    					    "=RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-2)", # R
-				    					    "=RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2)", # S
-				    					    "=RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2)", # T
-				    					    "=RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2)", # U
-				    					    "=RIGHT(J#{summaryrownum+1},LEN(J#{summaryrownum+1})-2)", # V
-				    					    "=RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2)", # W
+				    					    "=INT(LEFT(E#{summaryrownum+1},2))", # K
+				    					    "=INT(LEFT(F#{summaryrownum+1},2))", # L
+				    					    "=INT(LEFT(I#{summaryrownum+1},2))", # M
+				    					    "=INT(LEFT(G#{summaryrownum+1},2))", # N
+				    					    "=INT(LEFT(J#{summaryrownum+1},2))", # O
+				    					    "=INT(LEFT(H#{summaryrownum+1},2))", # P
+				    					    "=K#{summaryrownum+1}+L#{summaryrownum+1}+IF(M#{summaryrownum+1}>O#{summaryrownum+1},M#{summaryrownum+1}-O#{summaryrownum+1},0)+IF(N#{summaryrownum+1}>P#{summaryrownum+1},N#{summaryrownum+1}-P#{summaryrownum+1},0)", # Q
+				    					    "=IF(LEFT(RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-3),RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-2))", # R
+				    					    "=IF(LEFT(RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-3),RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2))", # S
+				    					    "=IF(LEFT(RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-3),RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2))", # T
+				    					    "=IF(LEFT(RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-3),RIGHT(G#{summaryrownum+1},LEN(G#{summaryrownum+1})-2))", # U
+				    					    "=IF(LEFT(RIGHT(J#{summaryrownum+1},LEN(J#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(J#{summaryrownum+1},LEN(J#{summaryrownum+1})-3),RIGHT(J#{summaryrownum+1},LEN(J#{summaryrownum+1})-2))", # V
+				    					    "=IF(LEFT(RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-3),RIGHT(H#{summaryrownum+1},LEN(H#{summaryrownum+1})-2))", # W
 				    					    "=INT(LEFT(R#{summaryrownum+1},1))", # X
 				    					    "=INT(LEFT(S#{summaryrownum+1},1))", # Y
 				    					    "=INT(LEFT(T#{summaryrownum+1},1))", # Z
