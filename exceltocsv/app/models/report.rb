@@ -128,8 +128,11 @@ class Report < ActiveRecord::Base
 						# define your regular styles
 							styles = employeedtr_wb.styles
 							title = styles.add_style sz: 15, b: true, u: true
-							headers = styles.add_style sz: 11, b: true, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							headers = styles.add_style sz: 11, b: true, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							info = styles.add_style :bg_color => "29A3CC", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							warning = styles.add_style :bg_color => "FFCC66", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							danger = styles.add_style :bg_color => "DF5E5E", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 
 
 							employeedtr_wb.add_worksheet(name: 'EMPLOYEE DTR') do  |employeedtr_ws|
@@ -145,45 +148,87 @@ class Report < ActiveRecord::Base
 								rownum = 5
 								@@days_over_cutoffdate = 0
 								while date <= self.date_end
-									employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
-														    date.strftime('%A'),
-														    emp.time_in(date),
-														    emp.time_out(date), 
-														    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
-														    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
-														    emp.ot_for_the_day(date),
-														    emp.vacation_leave(date),
-														    emp.sick_leave(date),
-														    emp.remarks(date)], style: tabledata
+									if emp.remarks(date) != ''
+										employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+															    date.strftime('%A'),
+															    emp.time_in(date),
+															    emp.time_out(date), 
+															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
+															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
+															    emp.ot_for_the_day(date),
+															    emp.vacation_leave(date),
+															    emp.sick_leave(date),
+															    emp.remarks(date)], style: info
+									elsif emp.is_halfday?(date)
+										employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+															    date.strftime('%A'),
+															    emp.time_in(date),
+															    emp.time_out(date), 
+															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
+															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
+															    emp.ot_for_the_day(date),
+															    emp.vacation_leave(date),
+															    emp.sick_leave(date),
+															    emp.remarks(date)], style: warning
+								    elsif emp.is_absent?(date)
+								    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+															    date.strftime('%A'),
+															    emp.time_in(date),
+															    emp.time_out(date), 
+															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
+															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
+															    emp.ot_for_the_day(date),
+															    emp.vacation_leave(date),
+															    emp.sick_leave(date),
+															    emp.remarks(date)], style: danger
+								    else
+								    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+															    date.strftime('%A'),
+															    emp.time_in(date),
+															    emp.time_out(date), 
+															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),
+															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
+															    emp.ot_for_the_day(date),
+															    emp.vacation_leave(date),
+															    emp.sick_leave(date),
+															    emp.remarks(date)], style: tabledata
+									end
 
 									rownum += 1
 						        	date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
-						        	if @@cut_off_date.to_date.mon >= self.date_start.to_date.mon && @@cut_off_date.to_date.mon <= self.date_end.to_date.mon
-						        		puts "====================================================================="
-						        		puts "====================================================================="
-						        		puts "====================================================================="
-						        		if date >= @@cut_off_date.to_date
+						        	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+						        		if date.to_date >= @@cut_off_date.to_date
 						        			@@days_over_cutoffdate += 1
 						        		end
 						        	end
 						    	end
-
-						    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", "=COUNT(F5:F#{rownum-1})", " ", " ", " ", " "], style: tabledata
-						    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
-						    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", " ", "=SUM(F5:F#{rownum-2})", " ", " ", " ", " "], style: tabledata
-						    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
-						    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
-						    	rownum += 1
+						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+							    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", "=COUNT(F5:F#{rownum-(1+@@days_over_cutoffdate)})", " ", " ", " ", " "], style: tabledata
+							    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+							    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", " ", "=SUM(F5:F#{rownum-(2+@@days_over_cutoffdate)})", " ", " ", " ", " "], style: tabledata
+							    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+							    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
+							    	rownum += 1
+						    	else
+						    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", " ", "=COUNT(F5:F#{rownum-1})", " ", " ", " ", " "], style: tabledata
+							    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+							    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", " ", "=SUM(F5:F#{rownum-2})", " ", " ", " ", " "], style: tabledata
+							    	employeedtr_ws.merge_cells "A#{rownum}:E#{rownum}"
+							    	employeedtr_ws.merge_cells "G#{rownum}:J#{rownum}"
+							    	rownum += 1
+						    	end
 						    	employeedtr_ws.add_row ["TOTAL OT HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " "], style: tabledata
 						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
 						    	employeedtr_ws.merge_cells "H#{rownum}:J#{rownum}"
 						    	rownum += 1
-						    	if @@cut_off_date.to_date.mon >= self.date_start.to_date.mon && @@cut_off_date.to_date.mon <= self.date_end.to_date.mon
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", "@@cut_off_date.to_date.mon >= self.date_start.to_date.mon && @@cut_off_date.to_date.mon <= self.date_end.to_date.mon", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(4+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(4+@@days_over_cutoffdate)})", " "], style: tabledata
+						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date)), " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(4+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(4+@@days_over_cutoffdate)})", " "], style: tabledata
 					    		else
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " "], style: tabledata
+					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date)), " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " "], style: tabledata
 						    	end
 						    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
 						    	rownum += 1
@@ -191,28 +236,28 @@ class Report < ActiveRecord::Base
 						    	employeedtr_ws.add_row 
 						    	rownum += 1
 
-						   		employeedtr_ws.add_row ["ACCUMULATED OT", ("=FLOOR(G#{rownum-3}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1,1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						   		employeedtr_ws.add_row ["ACCUMULATED OT", ("=FLOOR(G#{rownum-3}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
 						   							    "=INT(LEFT(B#{rownum+1},1))", 
 						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
 						   							    "=INT(LEFT(L#{rownum},1))", 
 						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
 						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["LATES", ("=FLOOR(F#{rownum-5}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(F#{rownum-5},8),1,1)&"<<'"."'<<"&(MOD(F#{rownum-5},8)-FLOOR(MOD(F#{rownum-5},8),1,1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    	employeedtr_ws.add_row ["LATES", ("=FLOOR(F#{rownum-5}/8,1)&"<<'"."'<<"&FLOOR(MOD(F#{rownum-5},8),1)&"<<'"."'<<"&(MOD(F#{rownum-5},8)-FLOOR(MOD(F#{rownum-5},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", 
 						    							"=INT(LEFT(B#{rownum+1},1))", 
 						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
 						   							    "=INT(LEFT(L#{rownum},1))", 
 						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
 						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED VL", ("=FLOOR(H#{rownum-4},1,1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    	employeedtr_ws.add_row ["ACCUMULATED VL", ("=FLOOR(H#{rownum-4},1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
 						    							"=INT(LEFT(B#{rownum+1},1))", 
 						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
 						   							    "=INT(LEFT(L#{rownum},1))", 
 						   							    "=RIGHT(L#{rownum},LEN(L#{rownum})-2)+0", 
 						   							    "=K#{rownum}*8*60+M#{rownum}*60+N#{rownum}"], style: tabledata
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED SL", ("=FLOOR(I#{rownum-5},1,1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1,1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
+						    	employeedtr_ws.add_row ["ACCUMULATED SL", ("=FLOOR(I#{rownum-5},1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", 
 						    							"=INT(LEFT(B#{rownum+1},1))", 
 						   							    "=RIGHT(B#{rownum+1},LEN(B#{rownum+1})-2)", 
 						   							    "=INT(LEFT(L#{rownum},1))", 
@@ -233,7 +278,7 @@ class Report < ActiveRecord::Base
 						    							"=N#{rownum-5}+IF(N#{rownum-4}>N#{rownum-2},N#{rownum-4}-N#{rownum-2},0)+IF(N#{rownum-3}>N#{rownum-1},N#{rownum-3}-N#{rownum-1},0)", 
 						    							"=O#{rownum-5}+IF(O#{rownum-4}>O#{rownum-2},O#{rownum-4}-O#{rownum-2},0)+IF(O#{rownum-3}>O#{rownum-1},O#{rownum-3}-O#{rownum-1},0)"], style: tabledata
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL", "=FLOOR(K#{rownum}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(K#{rownum},8),1,1)&"<<'"."'<<"&(MOD(K#{rownum},8)-FLOOR(MOD(K#{rownum},8),1,1))*60", " ", " ", " ", " ", " ", " ", " ", " ", 
+						    	employeedtr_ws.add_row ["TOTAL", "=FLOOR(K#{rownum}/8,1)&"<<'"."'<<"&FLOOR(MOD(K#{rownum},8),1)&"<<'"."'<<"&(MOD(K#{rownum},8)-FLOOR(MOD(K#{rownum},8),1))*60", " ", " ", " ", " ", " ", " ", " ", " ", 
 						    							"=O#{rownum-1}/60"], style: tabledata
 						    	rownum += 1
 
@@ -292,7 +337,7 @@ class Report < ActiveRecord::Base
 				    					    "=P#{summaryrownum+1}*8*60+AC#{summaryrownum+1}*60+AJ#{summaryrownum+1}", # AQ
 				    					    "=AL#{summaryrownum+1}+AM#{summaryrownum+1}+IF(AN#{summaryrownum+1}>AP#{summaryrownum+1},AN#{summaryrownum+1}-AP#{summaryrownum+1},0)+IF(AO#{summaryrownum+1}>AQ#{summaryrownum+1},AO#{summaryrownum+1}-AQ#{summaryrownum+1},0)", # AR
 				    					    "=AR#{summaryrownum+1}/60", # AS
-				    					    "=FLOOR(AS#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(AS#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(AS#{summaryrownum+1},8)-FLOOR(MOD(AS#{summaryrownum+1},8),1,1))*60", # AT
+				    					    "=FLOOR(AS#{summaryrownum+1}/8,1)&"<<'"."'<<"&FLOOR(MOD(AS#{summaryrownum+1},8),1)&"<<'"."'<<"&(MOD(AS#{summaryrownum+1},8)-FLOOR(MOD(AS#{summaryrownum+1},8),1))*60", # AT
 				    					    "#{emp.total_regular_ot_to_string(self.date_start, self.date_end)}",
 				    					    "#{emp.total_rest_or_special_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_rest_or_special_ot_to_string_excess(self.date_start, self.date_end)}", 
 				    					    "#{emp.total_special_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_special_on_rest_ot_to_string_excess(self.date_start, self.date_end)}", 
@@ -304,7 +349,7 @@ class Report < ActiveRecord::Base
 				    					    "=RIGHT(BN#{summaryrownum+1},LEN(BN#{summaryrownum+1})-2)+0", "=RIGHT(BO#{summaryrownum+1},LEN(BO#{summaryrownum+1})-2)+0", "=RIGHT(BP#{summaryrownum+1},LEN(BP#{summaryrownum+1})-2)+0", "=RIGHT(BQ#{summaryrownum+1},LEN(BQ#{summaryrownum+1})-2)+0", "=RIGHT(BR#{summaryrownum+1},LEN(BR#{summaryrownum+1})-2)+0", "=RIGHT(BS#{summaryrownum+1},LEN(BS#{summaryrownum+1})-2)+0", "=RIGHT(BT#{summaryrownum+1},LEN(BT#{summaryrownum+1})-2)+0", "=RIGHT(BU#{summaryrownum+1},LEN(BU#{summaryrownum+1})-2)+0", "=RIGHT(BV#{summaryrownum+1},LEN(BV#{summaryrownum+1})-2)+0", "=SUM(CG#{summaryrownum+1}:CO#{summaryrownum+1})",
 				    					    "=BD#{summaryrownum+1}*8*60+BW#{summaryrownum+1}*60+CG#{summaryrownum+1}", "=BE#{summaryrownum+1}*8*60+BX#{summaryrownum+1}*60+CH#{summaryrownum+1}", "=BF#{summaryrownum+1}*8*60+BY#{summaryrownum+1}*60+CI#{summaryrownum+1}", "=BG#{summaryrownum+1}*8*60+BZ#{summaryrownum+1}*60+CJ#{summaryrownum+1}", "=BH#{summaryrownum+1}*8*60+CA#{summaryrownum+1}*60+CK#{summaryrownum+1}", "=BI#{summaryrownum+1}*8*60+CB#{summaryrownum+1}*60+CL#{summaryrownum+1}", "=BJ#{summaryrownum+1}*8*60+CC#{summaryrownum+1}*60+CM#{summaryrownum+1}", "=BK#{summaryrownum+1}*8*60+CD#{summaryrownum+1}*60+CN#{summaryrownum+1}", "=BL#{summaryrownum+1}*8*60+CE#{summaryrownum+1}*60+CO#{summaryrownum+1}", "=SUM(CQ#{summaryrownum+1}:CY#{summaryrownum+1})",
 				    					    "=CZ#{summaryrownum+1}/60",
-				    					    "0", "=FLOOR(DA#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(DA#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(DA#{summaryrownum+1},8)-FLOOR(MOD(DA#{summaryrownum+1},8),1,1))*60"], style: tabledata
+				    					    "0", "=FLOOR(DA#{summaryrownum+1}/8,1)&"<<'"."'<<"&FLOOR(MOD(DA#{summaryrownum+1},8),1)&"<<'"."'<<"&(MOD(DA#{summaryrownum+1},8)-FLOOR(MOD(DA#{summaryrownum+1},8),1))*60"], style: tabledata
 						
 						summaryrownum += 1
 						summarydtr_ws.column_info[2].hidden = true
