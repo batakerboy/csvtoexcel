@@ -6,12 +6,14 @@ require 'zip'
 require 'axlsx'
 
 class Report < ActiveRecord::Base
+	# attr_accessor :id
 	@@cut_off_date = '2015-04-01'
 
+	# def id
+	# 	return self.id
+	# end
+
 	def self.save(biometrics = nil, falco = nil, iEMS = nil)
-		# dir = File.dirname("#{Rails.root}/public/uploads/biometrics.csv")
- 	 	# FileUtils.mkdir_p(dir) unless File.directory?(dir)
-		# directory = 'public/uploads'
 		directory = Rails.root.join('public', 'uploads')
 		Dir.mkdir(directory) unless File.exists?(directory)
 		
@@ -40,8 +42,10 @@ class Report < ActiveRecord::Base
 
 		directory =  Rails.root.join('public', 'reports', 'employee dtr')
 		Dir.mkdir(directory) unless File.exists?(directory)
-	 	
-	 	report_zip_path = Rails.root.join('public', 'reports', 'reports.zip')
+		
+		Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip")
+
+	 	report_zip_path = Rails.root.join('public', 'reports', self.name)
 		
 		Zip::File.open(report_zip_path, Zip::File::CREATE) { |zipfile|
 			# dtr_summary_filename = "DTR Summary for #{self.date_start} - #{self.date_end} cut-off"
