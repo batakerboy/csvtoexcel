@@ -24,7 +24,7 @@
 	</div>
 </div>
 
-<div class="container" id = "welcomeDiv">
+<div class="hidden" id = "welcomeDiv">
 	<div class = "row" style = "margin-top:100px;" align = "center">
 		<div class = "col-md-4" style = "height: 400px; border-style: solid; border-bottom-style: none; border-width: 1px">
 			<div class = "col-md-12">
@@ -170,13 +170,15 @@
 	var step = getUrlParameter('step')
  	
  	if (step == 1) {
- 		$("#welcomeDiv").addClass('animated fadeInRight')	
+ 		// $("#welcomeDiv").addClass('animated fadeInRight')
+ 		document.getElementById("welcomeDiv").className = 'container animated fadeInRight'	
  		document.getElementById("biometrics").className = 'row'
  		document.getElementById("biometrics_alert").className = 'hidden'
  		document.getElementById("falco_alert").className = 'hidden'
  		document.getElementById("iEMS_alert").className = 'hidden'
  	}
  	else if (step == 2) {
+ 		document.getElementById("welcomeDiv").className = 'container animated'
  		document.getElementById("biometrics").className = 'row animated fadeOut'
  		document.getElementById("biometrics").style.display = 'none'
  		document.getElementById("falco").className = 'row animated fadeIn'
@@ -185,6 +187,7 @@
  		$("#biometrics_alert").addClass(' animated fadeIn')
  	}
  	else if (step == 3) {
+ 		document.getElementById("welcomeDiv").className = 'container animated'
  		document.getElementById("falco").className = 'row animated fadeOut'
  		document.getElementById("falco").style.display = 'none'
  		document.getElementById("iEMS").className = 'row animated fadeIn'
@@ -192,6 +195,7 @@
  		$("#falco_alert").addClass(' animated fadeIn')
  	}
  	else if (step == 4) {
+ 		document.getElementById("welcomeDiv").className = 'container animated'
  		document.getElementById("iEMS").className = 'row animated fadeOut'
  		document.getElementById("iEMS").style.display = 'none'
  		document.getElementById("generate_report").className = 'row animated fadeIn'	
