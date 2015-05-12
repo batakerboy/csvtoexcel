@@ -99,7 +99,7 @@
 							<td><%= employee.ob_time_start(@date).strftime('%H:%M:%S') unless employee.ob_time_start(@date).nil? || (employee.ob_time_start(@date).is_a? Integer)%></td>
 							<td><%= employee.ob_time_end(@date).strftime('%H:%M:%S') unless employee.ob_time_end(@date).nil? || (employee.ob_time_end(@date).is_a? Integer)%></td>
 							<td><%= employee.ob_arrival(@date).strftime('%H:%M:%S') unless employee.ob_arrival(@date).nil? || (employee.ob_arrival(@date).is_a? Integer)%></td>
-							<td><%- employee.offset(@date)%></td>
+							<td><%= employee.offset(@date)%></td>
 							<td><%= employee.remarks(@date)%></td>
 						</tr>
 					<%@date += 1.day%>
