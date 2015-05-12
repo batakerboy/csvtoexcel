@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511084937) do
+ActiveRecord::Schema.define(version: 20150512064011) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -70,5 +70,18 @@ ActiveRecord::Schema.define(version: 20150511084937) do
   end
 
   add_index "requests", ["employee_id", "date"], name: "by_employee_and_date_request"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "username"
+    t.string   "encrypted_password"
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "department"
+    t.string   "salt"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+    t.boolean  "is_admin"
+    t.boolean  "is_active"
+  end
 
 end

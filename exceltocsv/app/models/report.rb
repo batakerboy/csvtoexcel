@@ -6,12 +6,17 @@ require 'zip'
 require 'axlsx'
 
 class Report < ActiveRecord::Base
+	after_save :assign_name
 	# attr_accessor :id
 	@@cut_off_date = '2015-04-01'
 
 	# def id
 	# 	return self.id
 	# end
+
+	def assign_name
+		Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip") if self.name.nil?
+	end
 
 	def self.save(biometrics = nil, falco = nil, iEMS = nil)
 		directory = Rails.root.join('public', 'uploads')
@@ -43,7 +48,7 @@ class Report < ActiveRecord::Base
 		directory =  Rails.root.join('public', 'reports', 'employee dtr')
 		Dir.mkdir(directory) unless File.exists?(directory)
 		
-		Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip")
+		# Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip")
 
 	 	report_zip_path = Rails.root.join('public', 'reports', self.name)
 		
@@ -402,6 +407,7 @@ class Report < ActiveRecord::Base
 													nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
 													14, 9
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
+						# File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 					end
 				end
 			end

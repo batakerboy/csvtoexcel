@@ -18,7 +18,7 @@
 			<ul class = "nav navbar-nav navbar-right">
 				<li><%= link_to 'Home', '#', id: "home"%></li>
 				<li><%= link_to 'New Report', '#', id: "generate_new_report"%></li>
-				<li class = "active"><%= link_to 'Archives', '#', id: "archives"%></li>
+				<li><%= link_to 'Archives', '#', id: "archives"%></li>
 				<%if @current_user.is_admin%>	
 					<li><%= link_to 'Users', '#', id: "users"%></li>
 				<%end%>
@@ -29,31 +29,14 @@
 </div>
 
 <div class = "container animated fadeInRight" id = "welcomeDiv">
-	<h1>DTR Reports</h1>
-	<table class = "table table-striped">
-		<thead>
-			<tr>
-				<th style = "text-align: center">Report Name</th>
-				<th style = "text-align: center">Date From</th>
-				<th style = "text-align: center">Date To</th>
-				<th style = "text-align: center">Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%@reports.each do |report|%>
-				<tr align = "center">
-					<td><%= report.name%></td>
-					<td><%= report.date_start.strftime('%B %e, %Y')%></td>
-					<td><%= report.date_end.strftime('%B %e, %Y')%></td>
-					<td>
-						<div class = "btn-group" role = "group">
-							<%= link_to 'View Report', report_path(report), class: "btn btn-warning"%>
-							<%= link_to 'Dowload Report', report_download_zip_path(report), class: "btn btn-success"%>
-						</div>
-					</td>
-				</tr>
-			<%end%>
-		</tbody>
-	</table>
+	<h1>Create New User</h1>
+	<%= render 'form'%>
 </div>
 
+ <%# if @user.errors.any? %>
+    <!-- <ul>
+    <%# for message_error in @user.errors.full_messages %>
+      <li><%#= message_error %></li>
+    <%# end %>
+    </ul> -->
+  <%# end %>

@@ -1,15 +1,29 @@
 Rails.application.routes.draw do
-  root 'welcome#index'
+  root 'welcome#login'
+
+  get "index", to: "welcome#index"
+  get "login", :to => "welcome#login"
+  get "logout", :to => "welcome#logout"
+  post "login_attempt", to: "welcome#login_attempt"
+  post "setting", :to => "welcome#setting"
 
   resources :reports do
     collection {
-      # get   :start_parse
-      # post   :view_all
       post  :import
-      # post  :generate_report
       post  :delete_all_records
     }
       get   :download_zip 
+  end
+
+  resources :employees do
+    collection {
+      post :import
+    }
+  end
+
+  resources :users do
+    get :activate
+    get :deactivate
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -37,10 +51,4 @@ Rails.application.routes.draw do
   #       get 'sold'
   #     end
   #   end
-
-  resources :employees do
-    collection {
-      post :import
-    }
-  end
 end

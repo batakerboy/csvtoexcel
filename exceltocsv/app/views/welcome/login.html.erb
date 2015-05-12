@@ -1,0 +1,40 @@
+<%# @page_title = "UserAuth | Login"%>
+
+<nav class = "navbar navbar-default navbar-static-top">
+	<div class = "container">
+		<a href="#" class = "navbar-brand">
+			Falco 
+			<font color = "red">+</font> 
+			Biometrics
+			<font color = "red">+</font>
+			iEMS <strong>Integration</strong>
+		</a>s
+
+		<%= form_tag login_attempt_path, class: "navbar-form navbar-right" do%>
+			<div class = "form-group">
+				<%= text_field_tag :username, params[:username], placeholder: "Username", class: "form-control"%>
+				<%= password_field_tag :login_password, params[:login_password], placeholder: "Password", class: "form-control"%>
+			</div>
+			<%= submit_tag 'Log In', id: "login", class: "btn btn-default"%>
+		<%end%>
+	</div>
+</nav>
+
+
+<div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
+	<br/><br/><br/><br/><br/><br/>
+	
+	<h1 style = "color: black; font-size: 500%">
+		Falco 
+		<font color = "red">+</font> 
+		Biometrics
+		<font color = "red">+</font>
+		iEMS
+	</h1>
+</div>
+
+<script>
+	$("#login").click(function(event){
+		$("#welcomeDiv").addClass(" animated fadeOutLeft");
+	});
+</script>

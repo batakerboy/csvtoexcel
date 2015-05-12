@@ -18,7 +18,11 @@
 			<ul class = "nav navbar-nav navbar-right">
 				<li><%= link_to 'Home', '#', id: "home"%></li>
 				<li class = "active"><%= link_to 'New Report', '#', id: "generate_new_report"%></li>
-				<li><%= link_to 'Archives', '#', id: "archives"%></li>					
+				<li><%= link_to 'Archives', '#', id: "archives"%></li>
+				<%if @current_user.is_admin%>	
+					<li><%= link_to 'Users', '#', id: "users"%></li>
+				<%end%>
+				<%= link_to 'Log Out', "#", id: "logout", class: "btn btn-md btn-warning navbar-btn"%>	
 			</ul>
 		</div>
 	</div>
