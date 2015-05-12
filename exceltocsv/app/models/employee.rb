@@ -81,7 +81,7 @@ class Employee < ActiveRecord::Base
 		undertime = self.no_of_hours_undertime(date)
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0
 			return true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
-			return true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in)
+			return true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 		end
 		return false
 	end

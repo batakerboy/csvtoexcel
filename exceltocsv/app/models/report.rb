@@ -233,29 +233,29 @@ class Report < ActiveRecord::Base
 						        	end
 						    	end
 						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-							    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: tabledata
-							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(1+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: tabledata
+							    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    else
-						    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata]
-							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-2})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: tabledata
+						    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 						    	end
 						    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-						    	employeedtr_ws.merge_cells "F#{rownum}:O#{rownum}"
+						    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-						    	employeedtr_ws.merge_cells "F#{rownum}:O#{rownum}"
+						    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
 						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: tabledata
+						    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
-						    	employeedtr_ws.merge_cells "H#{rownum}:O#{rownum}"
+						    	employeedtr_ws.merge_cells "H#{rownum}:P#{rownum}"
 						    	rownum += 1
 						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date)), " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: tabledata
+					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 					    		else
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date)), " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: tabledata
+					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 						    	end
 						    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
-						    	employeedtr_ws.merge_cells "J#{rownum}:O#{rownum}"
+						    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
 						    	rownum += 1
 
 						    	employeedtr_ws.add_row 
@@ -266,7 +266,7 @@ class Report < ActiveRecord::Base
 						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 						   							    "=INT(LEFT(R#{rownum},1))", 
 						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: tabledata
+						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
    							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["LATES", " ", ("=FLOOR(E#{rownum-5}/8,1)&"<<'"."'<<"&FLOOR(MOD(E#{rownum-5},8),1)&"<<'"."'<<"&(MOD(E#{rownum-5},8)-FLOOR(MOD(E#{rownum-5},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -274,7 +274,7 @@ class Report < ActiveRecord::Base
 						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 						   							    "=INT(LEFT(R#{rownum},1))", 
 						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: tabledata
+						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
    							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["ACCUMULATED VL", " ", ("=FLOOR(H#{rownum-4},1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -282,7 +282,7 @@ class Report < ActiveRecord::Base
 						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 						   							    "=INT(LEFT(R#{rownum},1))", 
 						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: tabledata
+						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-5},1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -290,7 +290,7 @@ class Report < ActiveRecord::Base
 						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 						   							    "=INT(LEFT(R#{rownum},1))", 
 						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: tabledata
+						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["VL BALANCE", " ", "#{emp.vacation_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -298,7 +298,7 @@ class Report < ActiveRecord::Base
 						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 						   							    "=INT(LEFT(R#{rownum},1))", 
 						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: tabledata
+						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["SL BALANCE", " ", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -306,11 +306,11 @@ class Report < ActiveRecord::Base
 						    							" ", 
 						    							"=S#{rownum-5}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
 						    							"=T#{rownum-5}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
-						    							"=U#{rownum-5}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: tabledata
+						    							"=U#{rownum-5}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	employeedtr_ws.add_row ["TOTAL", " ", "=FLOOR(Q#{rownum}/8,1)&"<<'"."'<<"&FLOOR(MOD(Q#{rownum},8),1)&"<<'"."'<<"&(MOD(Q#{rownum},8)-FLOOR(MOD(Q#{rownum},8),1))*60", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=U#{rownum-1}/60"], style: tabledata
+						    							"=U#{rownum-1}/60"], style: [totalheader, totalheader, tabledata]
 						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 						    	rownum += 1
 						    	colnum = 16
