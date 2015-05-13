@@ -59,7 +59,7 @@ class ReportsController < ApplicationController
 		@date = @report.date_start
 		@cut_off_date = '2015-04-01'.to_date
 		@empid = params[:get]
-		if @empid.nil? || @empid['employee_id'] == ""
+		if @empid.nil? || @empid['employee_id'] == "All"
 			@employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
 			# @employees = Employee.where(last_name: "Balingit")
 		else
@@ -70,7 +70,7 @@ class ReportsController < ApplicationController
 		# puts "=========================================="
 		# puts "=========================================="
 		# puts "=========================================="
-		# puts "#{@empid['employee_id'] == ""}"
+		# puts "#{@empid['employee_id']}"
 		# puts "=========================================="
 		# puts "=========================================="
 		# puts "=========================================="

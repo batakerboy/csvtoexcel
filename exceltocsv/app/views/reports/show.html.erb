@@ -63,7 +63,15 @@
 			<br>
 
 			<%= form_tag report_path(@report), :method => "get" do %>
-				<%= select("get", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'this.form.submit()', id: "selected_employee", class: "form-control") %>
+			
+			<% 
+				employees_array = Array.new
+				employees_array.push("All")
+				Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| employees_array.push(["#{emp.last_name}, #{emp.first_name}", emp.id ]) }
+			%>
+
+			<%#= options_for_select(employees_array) %>
+				<%= select("get", "employee_id", options_for_select(employees_array), { :include_blank => "Select an employee" }, onchange: 'this.form.submit()', id: "selected_employee", class: "form-control") %>
 				<!-- <%#= select("post", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'myFunction()', id: "selected_employee") %> -->
 				<%#= submit_tag "Select", class: "btn btn-info" %>
 			<% end %>

@@ -40,10 +40,10 @@ class Attendance < ActiveRecord::Base
 			 		
 		 			puts "======================="
 					puts "BIOMETRICS"
-					puts "Date: #{@attendance.time_out}"
-					puts "token: #{token[27]}"
-					puts "token.length: #{token[27].length}"
-					puts "token: #{token[27].tr('"', '').to_time}"
+					# puts "Date: #{@attendance.time_out}"
+					# puts "token: #{token[27]}"
+					# puts "token.length: #{token[27].length}"
+					# puts "token: #{token[27].tr('"', '').to_time}"
 					puts "======================="
 
 			 		unless @attendance.nil?

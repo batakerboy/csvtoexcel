@@ -66,9 +66,9 @@ class Employee < ActiveRecord::Base
 		sl = @request.sick_leave
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0
-			sl += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
-			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
+			sl += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			sl += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')  && (@request.offset.downcase != 'am')
 			sl = 1 if self.is_absent?(date)
 		end
 		return sl
@@ -79,21 +79,22 @@ class Employee < ActiveRecord::Base
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
 		undertime = self.no_of_hours_undertime(date)
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0
-			return true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
-			return true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
+			return true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			return true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 		end
 		return false
 	end
-	
+
 	def is_absent?(date)
 		@request = Request.where(employee_id: self.id, date: date).first
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
 		
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != ''
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || @request.offset.length > 2
 			return true if time_in.nil? && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 		end
+
 		return false
 	end
 
