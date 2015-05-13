@@ -59,12 +59,11 @@ class ReportsController < ApplicationController
 		@date = @report.date_start
 		@cut_off_date = '2015-04-01'.to_date
 		@empid = params[:get]
-
-		if "#{@empid['employee_id']}" == ""
-			@employees = Employee.all.order(last_name: :asc, first_name: :asc)
+		if @empid.nil? || @empid['employee_id'] == ""
+			@employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
 			# @employees = Employee.where(last_name: "Balingit")
 		else
-			@employees = Employee.where(id: "#{@empid['employee_id']}")
+			@employees = Employee.where(id: @empid['employee_id'])
 		end
 		# puts "=========================================="
 		# puts "=========================================="
@@ -77,7 +76,12 @@ class ReportsController < ApplicationController
 		# puts "=========================================="
 		# puts "=========================================="
 		# puts "=========================================="
+
 	end
+
+	# def loading_animation
+	# 	render layout: false
+	# end
 
   	def import
   		post = Report.save(params[:biometrics], params[:falco], params[:iEMS])	

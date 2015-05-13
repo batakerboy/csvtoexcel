@@ -143,12 +143,20 @@
 
 	<div align = "center" style = "margin-top:5%" id = "generate_report" class = "hidden">
 		<div class = "col-md-12">
-			<%= form_tag reports_path, method: :post do %>
-				<%= submit_tag 'Generate Reports', style: "width: 50%", class: "btn btn-lg btn-info"%>
+			<%= form_tag reports_path, method: :post, id: "generate_report_form" do %>
+				<%= submit_tag 'Generate Reports', style: "width: 50%", id: "generate_report_button", class: "btn btn-lg btn-info"%>
 			<%end%>
 		</div>
 	</div>
 </div>
+
+<div id="loader-wrapper" class = "hidden">
+    <div id="loader"></div>
+
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+
 
 <script>
 	$(document).on('change', '.btn-file :file', function() {
@@ -205,4 +213,19 @@
  		document.getElementById("generate_report").className = 'row animated fadeIn'	
  		$("#iEMS_alert").addClass(' animated fadeIn')
  	}
+
+ 	$("#generate_report_button").click(function(){
+ 		document.getElementById("loader-wrapper").className = "animated fadeIn"
+
+ 		$.ajax({
+ 			url: "/reports/create",
+	        type: "POST",
+	        processData: false,
+ 			data: $('generate_report_form').serialize(),
+ 			success: function() {
+				document.getElementById("loader-wrapper").className = "animated fadeOut"
+				$('#body').addClass('loaded');
+			}
+ 		});
+ 	});
 </script>
