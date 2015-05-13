@@ -70,9 +70,9 @@
 			<br>
 
 			<%= form_tag report_path(@report), :method => "get" do %>
-				<%= select("get", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'myFunction()', id: "selected_employee") %>
+				<%= select("get", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'this.form.submit()', id: "selected_employee", class: "form-control") %>
 				<!-- <%#= select("post", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'myFunction()', id: "selected_employee") %> -->
-				<%= submit_tag "Select", class: "btn btn-info" %>
+				<%#= submit_tag "Select", class: "btn btn-info" %>
 			<% end %>
 		</div>
 	</div>
@@ -205,12 +205,15 @@
 	<br/><br/><br/>
 </div>
 
+<div id="loader-wrapper" class = "hidden">
+    <div id="loader"></div>
+
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+
 <script>
-	// $.ajax({
-	// 	url: "/reports/loading_animation",
-	// 	cache: false,
-	// 	success: function(html){
-	// 		$("#loader-wrapper").append(html);
-	// 	}
-	// })
+	$("#selected_employee").change(function(){
+ 		document.getElementById("loader-wrapper").className = "animated fadeIn"
+ 	});
 </script>

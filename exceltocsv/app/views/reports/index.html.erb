@@ -47,8 +47,8 @@
 					<td><%= report.date_end.strftime('%B %e, %Y')%></td>
 					<td>
 						<div class = "btn-group" role = "group">
-							<%= link_to 'View Report', report_path(report), class: "btn btn-warning"%>
-							<%= link_to 'Dowload Report', report_download_zip_path(report), class: "btn btn-success"%>
+							<%= link_to 'View Report', report_path(report), class: "btn btn-warning", id: "view_report_button"%>
+							<%= link_to 'Dowload Report', report_download_zip_path(report), class: "btn btn-success", id: "download_report_button"%>
 						</div>
 					</td>
 				</tr>
@@ -56,4 +56,31 @@
 		</tbody>
 	</table>
 </div>
+
+<div id="loader-wrapper" class = "hidden">
+    <div id="loader"></div>
+
+    <div class="loader-section section-left">
+    	<a href="#" class = "navbar-brand">
+			<font color = "white">
+				Falco 
+				<font color = "red">+</font> 
+				Biometrics
+				<font color = "red">+</font>
+				iEMS <strong>Integration</strong>
+			</font>
+		</a>
+    </div>
+    <div class="loader-section section-right"></div>
+</div>
+
+<script>
+	$("#view_report_button").click(function(){
+		document.getElementById("loader-wrapper").className = "animated fadeIn"
+	});
+
+	$("#download_report_button").click(function(){
+		document.getElementById("loader-wrapper").className = "animated fadeIn"
+	});
+</script>
 
