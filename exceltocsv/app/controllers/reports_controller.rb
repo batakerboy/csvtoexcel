@@ -58,7 +58,25 @@ class ReportsController < ApplicationController
 		# Report.update(@report.id, name: "DTR-#{@report.id} for #{@report.date_start.strftime('%B %e, %Y')} to #{@report.date_end.strftime('%B %e, %Y')}.zip") if @report.name.nil?
 		@date = @report.date_start
 		@cut_off_date = '2015-04-01'.to_date
-		@employees = Employee.all.order(last_name: :asc, first_name: :asc)		
+		@empid = params[:get]
+
+		if "#{@empid['employee_id']}" == ""
+			@employees = Employee.all.order(last_name: :asc, first_name: :asc)
+			# @employees = Employee.where(last_name: "Balingit")
+		else
+			@employees = Employee.where(id: "#{@empid['employee_id']}")
+		end
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "#{@empid['employee_id'] == ""}"
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
+		# puts "=========================================="
 	end
 
   	def import

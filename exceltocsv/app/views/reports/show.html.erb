@@ -31,27 +31,58 @@
 
 <br/><br/><br/>
 <div class = "container animated fadeInRight" id = "welcomeDiv">
-	<h1>DTR for <%= @report.date_start.strftime('%B %e, %Y')%> - <%= @report.date_end.strftime('%B %e, %Y')%></h1>
+	<div class = "col-md-10">
+		<h1>DTR for <%= @report.date_start.strftime('%B %e, %Y')%> - <%= @report.date_end.strftime('%B %e, %Y')%></h1>
 
-	<table class = "table">
-		<h4>Legends</h4>
-		<tr>
-			<td class = "info">&nbsp;</td>
-			<td>Employee has request(s)/remark(s) for that day.<br/><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
-		</tr>
-		<!-- <tr>
-			<td><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
-		</tr> -->
-		<tr>
-			<td class = "warning"></td>
-			<td>Employee is considered half-day because of his time-in or time-out.<br/><b>*May incur two 0.5 in sick leave if employee's time-in is beyond 10:00 AM late and time-out is before 04:30 PM.</b></td>
-		</tr>
-		<tr>
-			<td class = "danger"></td>
-			<td>Employee has no time-in and therefore, considered as absent.</td>
-		</tr>
-	</table>
+		<table class = "table">
+			<h4>Legends</h4>
+			<tr>
+				<td class = "info">&nbsp;</td>
+				<td>Employee has request(s)/remark(s) for that day.<br/><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
+			</tr>
+			<!-- <tr>
+				<td><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
+			</tr> -->
+			<tr>
+				<td class = "warning"></td>
+				<td>Employee is considered half-day because of his time-in or time-out.<br/><b>*May incur two 0.5 in sick leave if employee's time-in is beyond 10:00 AM late and time-out is before 04:30 PM.</b></td>
+			</tr>
+			<tr>
+				<td class = "danger"></td>
+				<td>Employee has no time-in and therefore, considered as absent.</td>
+			</tr>
+		</table>
+	</div>
+	<div class = "col-md-2">
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<%= form_tag report_path(@report), :method => "get" do %>
+			<%= select("get", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'myFunction()', id: "selected_employee") %>
+			<!-- <%#= select("post", "employee_id", Employee.find_by_sql('SELECT * FROM employees ORDER BY last_name').collect {|emp| [ "#{emp.last_name}, #{emp.first_name}", emp.id ] }, { include_blank: true }, onchange: 'myFunction()', id: "selected_employee") %> -->
+			<%= submit_tag "Select", class: "btn btn-info" %>
+		<% end %>
 
+		<script>
+		// function myFunction() {
+		//     var x = document.getElementById("selected_employee").value;
+		//     document.getElementById("demo").innerHTML = "You selected: " + x;
+		//     // document.getElementById("textid").value = x;
+		//     // document.getElementById("hiddenid").value = x;
+		//     var url = $('#toreport').attr('href') + '?empid=' + x;
+		//     $('#toreport').attr('href', url);
+		// }
+		</script>
+		<br>
+		<br>
+		<br>
+		<br>
+	</div>
 	<%@employees.each do |employee|%>
 		<hr>
 		<%@date = @report.date_start%>
@@ -177,5 +208,6 @@
 			<div class = "col-md-2"><%= employee.summary_total_to_string(@report.date_start, @report.date_end, @cut_off_date)%></div>
 		</div> 
 	<%end%>
+	
 	<br/><br/><br/>
 </div>
