@@ -38,9 +38,17 @@ class Attendance < ActiveRecord::Base
 
 			 		@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[25].tr('" ', ''))).first
 			 		
+		 			puts "======================="
+					puts "BIOMETRICS"
+					puts "Date: #{@attendance.time_out}"
+					puts "token: #{token[27]}"
+					puts "token.length: #{token[27].length}"
+					puts "token: #{token[27].tr('"', '').to_time}"
+					puts "======================="
+
 			 		unless @attendance.nil?
 			 			Attendance.update(@attendance.id, time_in: token[26].tr('"', '').to_time) if @attendance.time_in.strftime('%H:%M:%S').to_time > token[26].tr('"', '').to_time
-						unless token[27].tr('"', '').nil?
+						if !token[27].nil? && token[27] != 'nil' && token[27].length != 4
 							if @attendance.time_out.nil?
 								Attendance.update(@attendance.id, time_out: token[27].tr('"', '').to_time)
 							elsif @attendance.time_out.strftime('%H:%M:%S').to_time < token[27].tr('"', '').to_time
@@ -53,11 +61,6 @@ class Attendance < ActiveRecord::Base
 				 		@attendance.attendance_date = date_biometrics(token[25]).to_date
 				 		@attendance.time_in = token[26].tr('"', '').to_time
 			 			
-			 			puts "======================="
-						puts "BIOMETRICS"
-						puts "Date: #{@attendance.attendance_date}"
-						puts "token: #{token[25]}"
-						puts "======================="
 
 			 			timeout = token[27].tr('"', '')
 				 		if timeout.length == 3

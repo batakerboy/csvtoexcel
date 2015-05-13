@@ -47,7 +47,7 @@
 					<td><%= report.date_end.strftime('%B %e, %Y')%></td>
 					<td>
 						<div class = "btn-group" role = "group">
-							<%= link_to 'View Report', report_path(report), class: "btn btn-warning", id: "view_report_button"%>
+							<%= link_to 'View Report', report_path(report), class: "btn btn-warning view_report_button", id: "view_report_button"%>
 							<%= link_to 'Dowload Report', report_download_zip_path(report), class: "btn btn-success", id: "download_report_button"%>
 						</div>
 					</td>
@@ -61,21 +61,31 @@
     <div id="loader"></div>
 
     <div class="loader-section section-left">
-    	<a href="#" class = "navbar-brand">
-			<font color = "white">
-				Falco 
-				<font color = "red">+</font> 
-				Biometrics
-				<font color = "red">+</font>
-				iEMS <strong>Integration</strong>
-			</font>
-		</a>
+    	<div class = "row">
+    		<div class = "col-md-6">
+    			<a href="#" class = "navbar-brand">
+					<font color = "white">
+						Falco 
+						<font color = "red">+</font> 
+						Biometrics
+						<font color = "red">+</font>
+						iEMS <strong>Integration</strong>
+					</font>
+				</a>
+    		</div>
+    		<div class = "col-md-6">
+    			<h1 class = "pull-right"><font color = "white">Load&nbsp;&nbsp;&nbsp;&nbsp;</font></h1>
+    		</div>
+    	</div>		
     </div>
-    <div class="loader-section section-right"></div>
+    
+    <div class="loader-section section-right">
+    	<h1><font color = "white">ing...</font></h1>
+    </div>
 </div>
 
 <script>
-	$("#view_report_button").click(function(){
+	$(".view_report_button").click(function(){
 		document.getElementById("loader-wrapper").className = "animated fadeIn"
 	});
 
