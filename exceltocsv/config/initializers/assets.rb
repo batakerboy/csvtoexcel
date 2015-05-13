@@ -9,6 +9,10 @@ Rails.application.config.assets.precompile += %w( jquery.dataTables.css )
 Rails.application.config.assets.precompile += %w( jquery-1.11.2.min.js )
 Rails.application.config.assets.precompile += %w( jquery.dataTables.min.js )
 Rails.application.config.assets.precompile += %w( bootstrap.js )
+Rails.application.config.assets.precompile += %w( modernizr-2.6.2.min.js )
+Rails.application.config.assets.precompile += %w( main.js )
+Rails.application.config.assets.precompile += %w( main.css )
+Rails.application.config.assets.precompile += %w( normalize.css )
 # Add additional assets to the asset load path
 # Rails.application.config.assets.paths << Emoji.images_path
 

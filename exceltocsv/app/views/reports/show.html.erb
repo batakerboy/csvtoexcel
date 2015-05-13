@@ -1,3 +1,10 @@
+<!-- <div id="loader-wrapper"> -->
+    <!-- <div id="loader"></div>
+
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div> -->
+<!-- </div> -->
+
 <div class = "navbar navbar-default navbar-fixed-top">
 	<div class = "container">
 		<a href="#" class = "navbar-brand">
@@ -39,9 +46,6 @@
 			<td class = "info">&nbsp;</td>
 			<td>Employee has request(s)/remark(s) for that day.<br/><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
 		</tr>
-		<!-- <tr>
-			<td><b>*May incur late/undertime/half-day depending on his or her time-in and time-out.</b></td>
-		</tr> -->
 		<tr>
 			<td class = "warning"></td>
 			<td>Employee is considered half-day because of his time-in or time-out.<br/><b>*May incur two 0.5 in sick leave if employee's time-in is beyond 10:00 AM late and time-out is before 04:30 PM.</b></td>
@@ -179,3 +183,13 @@
 	<%end%>
 	<br/><br/><br/>
 </div>
+
+<script>
+	// $.ajax({
+	// 	url: "/reports/loading_animation",
+	// 	cache: false,
+	// 	success: function(html){
+	// 		$("#loader-wrapper").append(html);
+	// 	}
+	// })
+</script>

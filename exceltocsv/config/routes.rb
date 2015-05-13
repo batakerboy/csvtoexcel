@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     collection {
       post  :import
       post  :delete_all_records
+      get :loading_animation
     }
       get   :download_zip 
   end

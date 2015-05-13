@@ -58,8 +58,13 @@ class ReportsController < ApplicationController
 		# Report.update(@report.id, name: "DTR-#{@report.id} for #{@report.date_start.strftime('%B %e, %Y')} to #{@report.date_end.strftime('%B %e, %Y')}.zip") if @report.name.nil?
 		@date = @report.date_start
 		@cut_off_date = '2015-04-01'.to_date
-		@employees = Employee.all.order(last_name: :asc, first_name: :asc)		
+		@employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
+		# render layout: false		
 	end
+
+	# def loading_animation
+	# 	render layout: false
+	# end
 
   	def import
   		post = Report.save(params[:biometrics], params[:falco], params[:iEMS])	
