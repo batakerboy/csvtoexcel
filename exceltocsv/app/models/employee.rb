@@ -91,7 +91,7 @@ class Employee < ActiveRecord::Base
 		time_in = self.time_in(date)
 		time_out = self.time_out(date)
 		
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != ''
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || self.is_in_holiday?(date)
 			return true if time_in.nil? && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 		end
 		return false
@@ -130,6 +130,14 @@ class Employee < ActiveRecord::Base
 	def remarks(date)
 		@request = Request.where(employee_id: self.id, date: date).first
 		return @request.remarks.strip
+	end
+
+	def is_in_holiday?(date)
+		@request = Request.where(employee_id: self.id, date: date).first
+		token = @request.remarks.split(")::")
+		
+		return true if token.length == 2			
+		return false
 	end
 
 	def no_of_hours_undertime(date)
