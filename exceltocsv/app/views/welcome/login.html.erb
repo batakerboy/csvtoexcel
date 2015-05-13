@@ -10,13 +10,21 @@
 			iEMS <strong>Integration</strong>
 		</a>s
 
-		<%= form_tag login_attempt_path, class: "navbar-form navbar-right" do%>
-			<div class = "form-group">
-				<%= text_field_tag :username, params[:username], placeholder: "Username", class: "form-control"%>
-				<%= password_field_tag :login_password, params[:login_password], placeholder: "Password", class: "form-control"%>
-			</div>
-			<%= submit_tag 'Log In', id: "login", class: "btn btn-default"%>
-		<%end%>
+		<button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+			<span class = "icon-bar"></span>
+		</button>
+
+		<!-- <div class = "collapse navbar-collapse navHeaderCollapse"> -->
+			<%= form_tag login_attempt_path, class: "navbar-form navbar-right" do%>
+				<div class = "form-group">
+					<%= text_field_tag :username, params[:username], placeholder: "Username", class: "form-control"%>
+					<%= password_field_tag :login_password, params[:login_password], placeholder: "Password", class: "form-control"%>
+				</div>
+				<%= submit_tag 'Log In', id: "login", class: "btn btn-default"%>
+			<%end%>
+		<!-- </div> -->
 	</div>
 </nav>
 
