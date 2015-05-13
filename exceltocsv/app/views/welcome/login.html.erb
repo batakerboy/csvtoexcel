@@ -41,7 +41,7 @@
 	</h1>
 </div>
 
-<div id="loader-wrapper" style = "margin-top:5%">
+<div id="loader-wrapper" style = "margin-top:5%" class = "animated fadeIn">
     <div id="loader"></div>
 
     <!-- <div class="loader-section section-left"></div>
@@ -51,5 +51,6 @@
 <script>
 	$("#login").click(function(event){
 		$("#welcomeDiv").addClass(" animated fadeOutLeft");
+		$("#loader-wrapper").addClass(" animated fadeOut");
 	});
 </script>

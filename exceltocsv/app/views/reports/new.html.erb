@@ -82,7 +82,7 @@
 					<%= hidden_field_tag 'step', 2%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8", id: "biometrics_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -201,7 +201,6 @@
 	var step = getUrlParameter('step')
  	
  	if (step == 1) {
- 		// $("#welcomeDiv").addClass('animated fadeInRight')
  		document.getElementById("welcomeDiv").className = 'container animated fadeInRight'	
  		document.getElementById("biometrics").className = 'row'
  		document.getElementById("biometrics_alert").className = 'hidden'

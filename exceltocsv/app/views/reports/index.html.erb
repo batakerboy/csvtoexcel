@@ -48,7 +48,7 @@
 					<td>
 						<div class = "btn-group" role = "group">
 							<%= link_to 'View Report', report_path(report), class: "btn btn-warning view_report_button", id: "view_report_button"%>
-							<%= link_to 'Dowload Report', report_download_zip_path(report), class: "btn btn-success download_report_button", id: "#{report}"%>
+							<%= link_to 'Download Report', report_download_zip_path(report), class: "btn btn-success download_report_button", id: "#{report.id}"%>
 						</div>
 					</td>
 				</tr>
@@ -90,24 +90,35 @@
 	});
 
 	
-	// $(".download_report_button").click(function(){
-	// 	document.getElementById("loader-wrapper").className = "animated fadeIn"
-	// 	$('#body').addClass('loaded');
+	// $(".download_report_button").each(function(){
+	// 	$(this).click(function(){
+	// 		document.getElementById("loader-wrapper").className = "animated fadeIn"
+	// 		$.ajax({
+	//  			url: ("/reports/" + this.id + "/download_zip"),
+	// 	        type: "GET",
+	// 	        processData: false,
+	//  			// data: $('generate_report_form').serialize(),
+	//  			complete: function() {
+	// 				document.getElementById("loader-wrapper").className = "animated fadeOut"
+	// 				$('#body').addClass('loaded');
+	// 			}
+	//  		})	
+	// 	});
 	// });
 
-	$.each($(".download_report_button"), click(function(a, b){
-		document.getElementById("loader-wrapper").className = "animated fadeIn"
-
- 		$.ajax({
- 			url: ("/reports/" + b.id + "/download_zip"),
-	        type: "GET",
-	        // processData: false,
- 			// data: $('generate_report_form').serialize(),
- 			success: function() {
-				document.getElementById("loader-wrapper").className = "animated fadeOut"
-				$('#body').addClass('loaded');
-			}
- 		});
-	}););
+	// $(".download_report_button").each(click(function(a, b){
+	// 	document.getElementById("loader-wrapper").className = "animated fadeIn"
+	// 	alert(b);
+ 		// $.ajax({
+ 		// 	url: ("/reports/" + b.id + "/download_zip"),
+	  //       type: "GET",
+	  //       // processData: false,
+ 		// 	// data: $('generate_report_form').serialize(),
+ 		// 	complete: function() {
+			// 	document.getElementById("loader-wrapper").className = "animated fadeOut"
+			// 	$('#body').addClass('loaded');
+			// }
+ 		// });
+	// }););
 </script>
 
