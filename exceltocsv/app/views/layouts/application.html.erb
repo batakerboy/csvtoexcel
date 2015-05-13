@@ -3,13 +3,13 @@
 <head>
   <title>FBI Integration</title>
   	  <%= javascript_include_tag 'jquery-1.11.2.min', 'data-turbolinks-track' => true %>
-	  <%= javascript_include_tag 'jquery.dataTables.min', 'data-turbolinks-track' => true %>
+	  <%#= javascript_include_tag 'jquery.dataTables.min', 'data-turbolinks-track' => true %>
 	  <%= javascript_include_tag 'modernizr-2.6.2.min', 'data-turbolinks-track' => true%>
-	  <%= javascript_include_tag 'main', 'data-turbolinks-track' => true%>
+	  <%#= javascript_include_tag 'main', 'data-turbolinks-track' => true%>
 	  <%= stylesheet_link_tag 'animate', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= stylesheet_link_tag 'main', media: 'all', 'data-turbolinks-track' => true%>
 	  <%= stylesheet_link_tag 'normalize', media: 'all', 'data-turbolinks-track' => true%>
-  	  <%= stylesheet_link_tag 'jquery.dataTables', media: 'all', 'data-turbolinks-track' => true %>
+  	  <%#= stylesheet_link_tag 'jquery.dataTables', media: 'all', 'data-turbolinks-track' => true %>
 	  <%#= stylesheet_link_tag 'bootstrap', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= stylesheet_link_tag 'bootstrap-flatly.min', media: 'all', 'data-turbolinks-track' => true %>
 	  <%= csrf_meta_tags %>
@@ -49,20 +49,6 @@
 			}
 			);
  	});
- 	// $("#users_activate").click(function(event){
-		// $("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
-		// 	function(){
-		// 		window.location = '<%= users_path%>';
-		// 	}
-		// 	);
- 	// });
- 	// $("#users_deactivate").click(function(event){
-		// $("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
-		// 	function(){
-		// 		window.location = '<%= users_path%>';
-		// 	}
-		// 	);
- 	// });
  	$("#logout").click(function(event){
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
