@@ -385,17 +385,17 @@ class Employee < ActiveRecord::Base
 	def vacation_leave_balance_to_string(date)
 		value = self.vacation_leave_balance(date)
 		value_days = (value.to_d).to_s.split('.').first
-		value_hours = ((value.to_d)*0.8).to_s.split('.').last
+		value_hours = ((value.to_d).to_s.split('.').last).to_d * 0.8
 
-		return "#{value_days}.#{value_hours}.0"
+		return "#{value_days}.#{value_hours}"
 	end
 
 	def sick_leave_balance_to_string(date)
 		value = self.sick_leave_balance(date)
 		value_days = (value.to_d).to_s.split('.').first
-		value_hours = ((value.to_d)*0.8).to_s.split('.').last
+		value_hours = ((value.to_d).to_s.split('.').last).to_d * 0.8
 
-		return "#{value_days}.#{value_hours}.0"
+		return "#{value_days}.#{value_hours}"
 	end
 
 	def summary_total_to_string(date_start, date_end, cut_off_date)
@@ -809,8 +809,7 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
-		return "#{value_days}.#{value_hours}.#{value_mins}0"
+		return "#{value_days}.#{value_hours}.#{value_mins}"
 	end
 
 	def self.leave_to_string(value)
@@ -827,8 +826,7 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
-		return "#{value_days}.#{value_hours}.#{value_mins}0"
+		return "#{value_days}.#{value_hours}.#{value_mins}"
 	end
 
 	def self.value_to_string_excess(value)
@@ -838,7 +836,6 @@ class Employee < ActiveRecord::Base
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
-		return "#{value_days}.#{value_hours}.#{value_mins}0"
+		return "#{value_days}.#{value_hours}.#{value_mins}"
 	end
 end

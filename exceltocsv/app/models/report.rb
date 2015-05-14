@@ -333,9 +333,11 @@ class Report < ActiveRecord::Base
 																 13, 13.5, 13, 11, 11, 11, 26.5
 									
 								    employeedtr_ws.sheet_view.pane do |pane|
-								    	pane.state = :frozen_split
+								    	pane.top_left_cell = "B2"
+								    	pane.state = :frozen
 								    	pane.y_split = 4
 								    	pane.x_split = 2
+								    	pane.active_pane = :bottom_right
 								    end
 								end
 							end
