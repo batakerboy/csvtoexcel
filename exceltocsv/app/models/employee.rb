@@ -809,7 +809,8 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless (value_mins.length == 1 && value_mins != '0')
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 
 	def self.leave_to_string(value)
@@ -826,7 +827,8 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless (value_mins.length == 1 && value_mins != '0')
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 
 	def self.value_to_string_excess(value)
@@ -836,6 +838,7 @@ class Employee < ActiveRecord::Base
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless (value_mins.length == 1 && value_mins != '0')
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 end

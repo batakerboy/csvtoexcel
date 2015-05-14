@@ -119,7 +119,7 @@ h1 {
     #loader-wrapper .loader-section {
         position: fixed;
         top: 0;
-        width: 51%;
+        width: 100%;
         height: 100%;
         background: #222222;
         z-index: 1000;
