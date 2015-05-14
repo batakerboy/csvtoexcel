@@ -578,4 +578,287 @@ class Employee < ActiveRecord::Base
 		end
 	end
 
+	def get_all_information(date )
+		all_info = Hash.new
+
+		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
+		@request = Request.where(employee_id: self.id, date: date).first
+
+		time_in = @attendance.time_in.to_time.strftime('%H:%M:%S') unless @attendance.nil?
+		all_info[:time_in] = time_in
+
+		time_out = @attendance.time_out.to_time.strftime('%H:%M:%S') unless @attendance.nil? || @attendance.time_out.nil?
+		all_info[:time_out] = time_out
+
+		if @request.nil? || @request.ut_time == 0 
+			ut_time = '00:00:00'.to_time
+		else
+			ut_time = @request.ut_time
+		end
+		all_info[:ut_time] = ut_time
+
+		regular_ot = @request.regular_ot
+		all_info[:regular_ot] = regular_ot
+
+		rest_or_special_ot = @request.rest_or_special_ot
+		all_info[:rest_or_special_ot] = rest_or_special_ot
+
+		special_on_rest_ot = @request.special_on_rest_ot
+		all_info[:special_on_rest_ot] = special_on_rest_ot
+
+		regular_holiday_ot = @request.regular_holiday_ot
+		all_info[:regular_holiday_ot] = regular_holiday_ot
+
+		regular_on_rest_ot = @request.regular_on_rest_ot
+		all_info[:regular_on_rest_ot] = regular_on_rest_ot
+
+
+		offset = @request.offset
+		all_info[:offset] = offset
+		
+		remarks = @request.remarks.strip
+		all_info[:remarks] = remarks
+
+		unless time_in.nil? || (time_in.to_time <= @@required_time_in) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
+			no_of_hours_late = Employee.format_time(((time_in.to_time - @@required_time_in)/1.hour).round(2))
+		else
+			no_of_hours_late = 0
+		end
+		all_info[:no_of_hours_late] = no_of_hours_late
+
+
+		no_of_hours_undertime = 0
+		unless time_out.nil? || offset.downcase == 'pm' || offset.length > 2
+			unless ut_time.strftime('%H:%M:%S') == '00:00:00'
+				no_of_hours_undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
+			else
+				if date.strftime('%A') == 'Friday'
+					no_of_hours_undertime = Employee.format_time(((@@required_time_out_F - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_F
+				elsif date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
+					no_of_hours_undertime = Employee.format_time(((@@required_time_out_MH - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_MH
+				end
+			end
+		end
+		unless (no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || (no_of_hours_undertime >= 2 && (date.strftime('%A') != 'Friday' && date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'))
+			all_info[:no_of_hours_undertime] = no_of_hours_undertime
+		else
+			all_info[:no_of_hours_undertime] = 0
+		end
+
+		vacation_leave = @request.vacation_leave
+		all_info[:vacation_leave] = vacation_leave
+		
+		vacation_leave_balance = @request.vacation_leave_balance 
+		all_info[:vacation_leave_balance] = vacation_leave_balance
+
+		token = @request.remarks.split(")::")
+		if token.length == 2
+			is_in_holiday = true 			
+		else
+			is_in_holiday = false
+		end
+		all_info[:is_in_holiday] = is_in_holiday
+
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || @request.offset.length > 2 || is_in_holiday
+			if time_in.nil? && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
+				is_absent = true
+			else
+				is_absent = false
+			end
+		else
+			is_absent = false
+		end
+		all_info[:is_absent] = is_absent
+
+		sick_leave = @request.sick_leave
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
+			sick_leave += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			sick_leave += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')  && (@request.offset.downcase != 'am')
+			sick_leave = 1 if is_absent
+		end
+		all_info[:sick_leave] = sick_leave
+		
+		sick_leave_balance = @request.sick_leave_balance
+		all_info[:sick_leave_balance] = sick_leave_balance
+
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
+			is_halfday = true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			is_halfday = true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+		else
+			is_halfday = false
+		end
+		all_info[:is_halfday] = is_halfday
+
+		all_info[:ob_departure] = @request.ob_departure
+		all_info[:ob_time_start] = @request.ob_time_start
+		all_info[:ob_time_end] = @request.ob_time_end
+		all_info[:ob_arrival] = @request.ob_arrival
+
+		ot_for_the_day = 0
+		ot_for_the_day += @request.regular_ot
+		ot_for_the_day += @request.rest_or_special_ot
+		ot_for_the_day += @request.special_on_rest_ot
+		ot_for_the_day += @request.regular_holiday_ot
+		ot_for_the_day += @request.regular_on_rest_ot
+		all_info[:ot_for_the_day] = ot_for_the_day
+
+		return all_info
+	end
+
+	def get_all_summary(date_start, date_end, cut_off_date)
+		all_summary = Hash.new
+
+		date = date_start
+		total_undertime = 0
+		total_late = 0
+		number_of_times_late = 0
+		total_ot_hours = 0
+		total_vl = 0
+		total_sl = 0
+		total_regular_ot = 0
+		total_rest_or_special_ot = 0
+		total_special_on_rest_ot = 0
+		total_regular_holiday_ot = 0
+		total_regular_on_rest_ot = 0
+
+		while date <= date_end
+			e = self.get_all_information(date)
+			total_undertime += e[:no_of_hours_undertime]
+			total_late += e[:no_of_hours_late]
+			number_of_times_late += 1 unless e[:no_of_hours_late] == 0
+			total_ot_hours += e[:ot_for_the_day]
+			
+			unless (cut_off_date.to_date.mon > date_start.to_date.mon && cut_off_date.to_date.mon <= date_end.to_date.mon) && date.to_date.mon >= cut_off_date.to_date.mon
+				total_vl += e[:vacation_leave]
+				total_sl += e[:sick_leave]
+			end
+
+			total_regular_ot += e[:regular_ot]
+			total_rest_or_special_ot += e[:rest_or_special_ot]
+			total_special_on_rest_ot += e[:special_on_rest_ot]
+			total_regular_holiday_ot += e[:regular_holiday_ot]
+			total_regular_on_rest_ot += e[:regular_on_rest_ot]
+
+			date += 1.day
+		end
+		all_summary[:total_undertime] = total_undertime
+		all_summary[:total_late] = total_late
+		all_summary[:number_of_times_late] = number_of_times_late
+		all_summary[:total_ot_hours] = total_ot_hours
+		all_summary[:total_vl] = total_vl
+		all_summary[:total_sl] = total_sl
+		all_summary[:total_regular_ot] = total_regular_ot
+		all_summary[:total_rest_or_special_ot] = total_rest_or_special_ot
+		all_summary[:total_special_on_rest_ot] = total_special_on_rest_ot
+		all_summary[:total_regular_holiday_ot] = total_regular_holiday_ot
+		all_summary[:total_regular_on_rest_ot] = total_regular_on_rest_ot
+
+		@request = Request.where(employee_id: self.id, date: date_start).first
+		unless @request.vacation_leave_balance.to_d > total_vl
+			surplus_vl = total_vl - @request.vacation_leave_balance.to_d 
+		else
+			surplus_vl = 0
+		end
+		all_summary[:surplus_vl] = surplus_vl
+
+		unless @request.sick_leave_balance.to_d > total_sl
+			surplus_sl = total_sl - @request.sick_leave_balance.to_d
+		else
+			surplus_sl = 0
+		end
+		all_summary[:surplus_sl] = surplus_sl
+
+		summary_total = surplus_vl + surplus_sl + total_late
+		all_summary[:summary_total] = summary_total
+
+		summary_total_with_ut = surplus_vl + surplus_sl + total_late + total_undertime
+		all_summary[:summary_total_with_ut] = summary_total_with_ut
+
+		summary_total_to_string = Employee.value_to_string(summary_total)
+		token = summary_total_to_string.split(".")
+		if token[2].length == 1
+			all_summary[:summary_total_to_string] = "#{summary_total_to_string}0" 
+		else
+			all_summary[:summary_total_to_string] = summary_total_to_string
+		end
+
+		summary_total_with_ut_to_string = Employee.value_to_string(summary_total_with_ut)
+		token = summary_total_with_ut_to_string.split(".")
+		if token[2].length == 1
+			all_summary[:summary_total_with_ut_to_string] = "#{summary_total_with_ut_to_string}0" 
+		else
+			all_summary[:summary_total_with_ut_to_string] = summary_total_with_ut_to_string
+		end
+
+		all_summary[:total_ot_hours_to_string] = Employee.value_to_string(total_ot_hours)
+
+		total_late_to_string = Employee.value_to_string(total_late)
+		token = total_late_to_string.split(".")
+		if token[2].length == 1
+			all_summary[:total_late_to_string] = "#{total_late_to_string}0" 
+		else
+			all_summary[:total_late_to_string] = total_late_to_string
+		end
+
+		total_undertime_to_string = Employee.value_to_string(total_undertime)
+		token = total_undertime_to_string.split(".")
+		if token[2].length == 1
+			all_summary[:total_undertime_to_string] = "#{total_undertime_to_string}0" 
+		else
+			all_summary[:total_undertime_to_string] = total_undertime_to_string
+		end
+
+		all_summary[:total_vl_to_string] = Employee.leave_to_string(total_vl)
+		all_summary[:total_sl_to_string] = Employee.leave_to_string(total_sl)
+
+		all_summary[:start_vacation_leave_balance] = Employee.leave_to_string(@request.vacation_leave_balance)
+		all_summary[:start_sick_leave_balance] = Employee.leave_to_string(@request.sick_leave_balance)
+
+		all_summary[:total_regular_ot_to_string] = Employee.value_to_string(total_regular_ot)
+		all_summary[:total_rest_or_special_ot_to_string_first_8] = Employee.value_to_string_first_8(total_rest_or_special_ot)
+		all_summary[:total_special_on_rest_ot_to_string_first_8] = Employee.value_to_string_first_8(total_special_on_rest_ot)
+		all_summary[:total_regular_holiday_ot_to_string_first_8] = Employee.value_to_string_first_8(total_regular_holiday_ot)
+		all_summary[:total_regular_on_rest_ot_to_string_first_8] = Employee.value_to_string_first_8(total_regular_on_rest_ot)
+
+		all_summary[:total_rest_or_special_ot_to_string_excess] = Employee.value_to_string_excess(total_rest_or_special_ot)
+		all_summary[:total_special_on_rest_ot_to_string_excess] = Employee.value_to_string_excess(total_special_on_rest_ot)
+		all_summary[:total_regular_holiday_ot_to_string_excess] = Employee.value_to_string_excess(total_regular_holiday_ot)
+		all_summary[:total_regular_on_rest_ot_to_string_excess] = Employee.value_to_string_excess(total_regular_on_rest_ot)
+		return all_summary
+	end
+
+	def self.value_to_string(value)
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
+
+	def self.leave_to_string(value)
+		value_days = (value.to_d).to_s.split('.').first
+		value_hours = (value.to_d).to_s.split('.').last
+
+		return "#{value_days}.#{value_hours}.0"
+	end
+
+	def self.value_to_string_first_8(value)
+		return "1.0.0" if value > 8
+		
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
+
+	def self.value_to_string_excess(value)
+		return "0.0.0" if value <= 8
+		
+		value_days = (((value.to_d)-8)/8).to_s.split('.').first
+		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
+		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 end
