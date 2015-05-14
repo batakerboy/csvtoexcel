@@ -43,9 +43,9 @@ class Request < ActiveRecord::Base
 				@request = Request.where(employee_id: employee_id, date: token[7]).first
 
 				unless @request.nil?
-					Request.where(employee_id: employee_id, date: token[7]).update_all(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], remarks: token[23])
+					Request.where(employee_id: employee_id, date: token[7]).update_all(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], is_holiday: token[23], remarks: token[24])
 				else
-					@request = Request.new(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], remarks: token[23])
+					@request = Request.new(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], is_holiday: token[23], remarks: token[24])
 					@request.save
 				end
 			end

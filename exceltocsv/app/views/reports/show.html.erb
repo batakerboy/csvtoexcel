@@ -128,10 +128,10 @@
 							<td><%#= employee.ut_time(@date).to_time.strftime('%H:%M:%S') unless employee.ut_time(@date).to_time.strftime('%H:%M:%S') == '00:00:00'%><%= e[:ut_time] unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'%></td>
 							<td><%#= employee.vacation_leave(@date)%><%= e[:vacation_leave]%></td>
 							<td><%#= employee.sick_leave(@date)%><%= e[:sick_leave]%></td>
-							<td><%#= employee.ob_departure(@date).strftime('%H:%M:%S') unless employee.ob_departure(@date).nil? || (employee.ob_departure(@date).is_a? Integer)%><%= e[:ob_departure] unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)%></td>
-							<td><%#= employee.ob_time_start(@date).strftime('%H:%M:%S') unless employee.ob_time_start(@date).nil? || (employee.ob_time_start(@date).is_a? Integer)%><%= e[:ob_time_start] unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)%></td>
-							<td><%#= employee.ob_time_end(@date).strftime('%H:%M:%S') unless employee.ob_time_end(@date).nil? || (employee.ob_time_end(@date).is_a? Integer)%><%= e[:ob_time_end] unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)%></td>
-							<td><%#= employee.ob_arrival(@date).strftime('%H:%M:%S') unless employee.ob_arrival(@date).nil? || (employee.ob_arrival(@date).is_a? Integer)%><%= e[:ob_arrival] unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)%></td>
+							<td><%#= employee.ob_departure(@date).strftime('%H:%M:%S') unless employee.ob_departure(@date).nil? || (employee.ob_departure(@date).is_a? Integer)%><%= e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)%></td>
+							<td><%#= employee.ob_time_start(@date).strftime('%H:%M:%S') unless employee.ob_time_start(@date).nil? || (employee.ob_time_start(@date).is_a? Integer)%><%= e[:ob_time_start].strftime('%H:%M:%S') unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)%></td>
+							<td><%#= employee.ob_time_end(@date).strftime('%H:%M:%S') unless employee.ob_time_end(@date).nil? || (employee.ob_time_end(@date).is_a? Integer)%><%= e[:ob_time_end].strftime('%H:%M:%S') unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)%></td>
+							<td><%#= employee.ob_arrival(@date).strftime('%H:%M:%S') unless employee.ob_arrival(@date).nil? || (employee.ob_arrival(@date).is_a? Integer)%><%= e[:ob_arrival].strftime('%H:%M:%S') unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)%></td>
 							<td><%#= employee.offset(@date)%><%= e[:offset]%></td>
 							<td><%#= employee.remarks(@date)%><%= e[:remarks]%></td>
 						</tr>
@@ -200,7 +200,7 @@
 		</div>
 		<div class = "row">
 			<div class = "col-md-3"><b>SL BALANCE</b></div>
-			<div class = "col-md-2"><%#= employee.sick_leave_balance_to_string(@report.date_start)%><%= e[:start_start_leave_balance]%></div>
+			<div class = "col-md-2"><%#= employee.sick_leave_balance_to_string(@report.date_start)%><%= e[:start_sick_leave_balance]%></div>
 		</div>
 		<div class = "row">
 			<div class = "col-md-3"><b>TOTAL</b></div>

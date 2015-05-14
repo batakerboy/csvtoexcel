@@ -651,12 +651,13 @@ class Employee < ActiveRecord::Base
 		vacation_leave_balance = @request.vacation_leave_balance 
 		all_info[:vacation_leave_balance] = vacation_leave_balance
 
-		token = @request.remarks.split(")::")
-		if token.length == 2
-			is_in_holiday = true 			
-		else
-			is_in_holiday = false
-		end
+		# token = @request.remarks.split(")::")
+		# if token.length == 2
+		# 	is_in_holiday = true 			
+		# else
+		# 	is_in_holiday = false
+		# end
+		is_in_holiday = @request.is_holiday
 		all_info[:is_in_holiday] = is_in_holiday
 
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || @request.offset.length > 2 || is_in_holiday
@@ -775,38 +776,38 @@ class Employee < ActiveRecord::Base
 		all_summary[:summary_total_with_ut] = summary_total_with_ut
 
 		summary_total_to_string = Employee.value_to_string(summary_total)
-		token = summary_total_to_string.split(".")
-		if token[2].length == 1
-			all_summary[:summary_total_to_string] = "#{summary_total_to_string}0" 
-		else
+		# token = summary_total_to_string.split(".")
+		# if token[2].length == 1
+			# all_summary[:summary_total_to_string] = "#{summary_total_to_string}0" 
+		# else
 			all_summary[:summary_total_to_string] = summary_total_to_string
-		end
+		# end
 
 		summary_total_with_ut_to_string = Employee.value_to_string(summary_total_with_ut)
-		token = summary_total_with_ut_to_string.split(".")
-		if token[2].length == 1
-			all_summary[:summary_total_with_ut_to_string] = "#{summary_total_with_ut_to_string}0" 
-		else
+		# token = summary_total_with_ut_to_string.split(".")
+		# if token[2].length == 1
+			# all_summary[:summary_total_with_ut_to_string] = "#{summary_total_with_ut_to_string}0" 
+		# else
 			all_summary[:summary_total_with_ut_to_string] = summary_total_with_ut_to_string
-		end
+		# end
 
 		all_summary[:total_ot_hours_to_string] = Employee.value_to_string(total_ot_hours)
 
 		total_late_to_string = Employee.value_to_string(total_late)
-		token = total_late_to_string.split(".")
-		if token[2].length == 1
-			all_summary[:total_late_to_string] = "#{total_late_to_string}0" 
-		else
+		# token = total_late_to_string.split(".")
+		# if token[2].length == 1
+			# all_summary[:total_late_to_string] = "#{total_late_to_string}0" 
+		# else
 			all_summary[:total_late_to_string] = total_late_to_string
-		end
+		# end
 
 		total_undertime_to_string = Employee.value_to_string(total_undertime)
-		token = total_undertime_to_string.split(".")
-		if token[2].length == 1
-			all_summary[:total_undertime_to_string] = "#{total_undertime_to_string}0" 
-		else
+		# token = total_undertime_to_string.split(".")
+		# if token[2].length == 1
+			# all_summary[:total_undertime_to_string] = "#{total_undertime_to_string}0" 
+		# else
 			all_summary[:total_undertime_to_string] = total_undertime_to_string
-		end
+		# end
 
 		all_summary[:total_vl_to_string] = Employee.leave_to_string(total_vl)
 		all_summary[:total_sl_to_string] = Employee.leave_to_string(total_sl)
@@ -832,14 +833,15 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 
 	def self.leave_to_string(value)
 		value_days = (value.to_d).to_s.split('.').first
-		value_hours = (value.to_d).to_s.split('.').last
+		value_hours = (((value.to_d).to_s.split('.').last).to_d) * 0.8
 
-		return "#{value_days}.#{value_hours}.0"
+		return "#{value_days}.#{value_hours}"
 	end
 
 	def self.value_to_string_first_8(value)
@@ -849,7 +851,8 @@ class Employee < ActiveRecord::Base
 		value_hours = ((value.to_d)%8).to_s.split('.').first
 		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 
 	def self.value_to_string_excess(value)
@@ -859,6 +862,7 @@ class Employee < ActiveRecord::Base
 		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
 		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
 
-		return "#{value_days}.#{value_hours}.#{value_mins}"
+		return "#{value_days}.#{value_hours}.#{value_mins}" unless value_mins == '3'
+		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 end

@@ -32,7 +32,7 @@
 	<table class = "table table-striped">
 		<div class = "row">
 			<div class = "col-md-6"><h1>Users of FBI Integration</h1></div>
-			<div class = "col-md-6"><%#= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right", data: {toggle: "modal", target: "#add"}%><%= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right"%></div>			
+			<div class = "col-md-6"><%#= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right", data: {toggle: "modal", target: "#add"}%><%= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right", id: "create_user"%></div>			
 		</div>
 		<thead>
 			<tr>
@@ -74,9 +74,12 @@
 	</table>
 </div>
 
-<!-- Modal for the addition of new user -->
-<!-- <div class = "modal fade" id = "add" role = "dialog">
-	<div class = "modal-dialog">
-		<div class = "modal-content"></div>
-	</div>
-</div> -->
+<script>
+	$("#create_user").click(function(event){
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= users_path%>';
+			}
+			);
+ 	});
+</script>
