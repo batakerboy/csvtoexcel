@@ -28,9 +28,16 @@ class Attendance < ActiveRecord::Base
 			 	check_token53 = token[53].squeeze(" ").strip
 			 	check_token33 = token[33].squeeze(" ").strip
 
-			 	if check_token62 != 'nil]'
-			 		next
-			 	elsif check_token53 != 'nil'
+			 	if check_token62 != 'nil]' && (token[25].split('/')).length != 3
+			 		# if (token[25].split('/')).length == 3
+			 		# 	@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
+			 		# 	@employee = Employee.where(biometrics_id: @@biometrics_id).first	
+
+			 		# 	next if @employee.nil?
+
+			 		# 	@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[25].tr('" ', ''))).first
+			 		# end
+			 	elsif check_token53 != 'nil' || (token[25].split('/')).length == 3
 			 		@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
 			 		@employee = Employee.where(biometrics_id: @@biometrics_id).first
 			 		
