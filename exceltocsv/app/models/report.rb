@@ -67,7 +67,7 @@ class Report < ActiveRecord::Base
 			# define your regular styles
 				styles = summarydtr_wb.styles
 				title = styles.add_style sz: 15, b: true, u: true
-				headers = styles.add_style sz: 11, b: true, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+				headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				summaryrownum = 0
 
@@ -141,7 +141,7 @@ class Report < ActiveRecord::Base
 						# define your regular styles
 							styles = employeedtr_wb.styles
 							title = styles.add_style sz: 15, b: true, u: true
-							headers = styles.add_style sz: 11, b: true, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							info = styles.add_style :bg_color => "29A3CC", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							warning = styles.add_style :bg_color => "FFCC66", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
