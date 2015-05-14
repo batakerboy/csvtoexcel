@@ -617,6 +617,7 @@ class Employee < ActiveRecord::Base
 		all_info[:offset] = offset
 		
 		remarks = @request.remarks.strip
+		# remarks = @request.remarks
 		all_info[:remarks] = remarks
 
 		unless time_in.nil? || (time_in.to_time <= @@required_time_in) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
@@ -651,16 +652,11 @@ class Employee < ActiveRecord::Base
 		vacation_leave_balance = @request.vacation_leave_balance 
 		all_info[:vacation_leave_balance] = vacation_leave_balance
 
-		# token = @request.remarks.split(")::")
-		# if token.length == 2
-		# 	is_in_holiday = true 			
-		# else
-		# 	is_in_holiday = false
-		# end
 		is_in_holiday = @request.is_holiday
 		all_info[:is_in_holiday] = is_in_holiday
 
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || @request.offset.length > 2 || is_in_holiday
+		# unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks != '' || @request.offset.length > 2 || is_in_holiday
 			if time_in.nil? && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 				is_absent = true
 			else
@@ -776,39 +772,19 @@ class Employee < ActiveRecord::Base
 		all_summary[:summary_total_with_ut] = summary_total_with_ut
 
 		summary_total_to_string = Employee.value_to_string(summary_total)
-		# token = summary_total_to_string.split(".")
-		# if token[2].length == 1
-			# all_summary[:summary_total_to_string] = "#{summary_total_to_string}0" 
-		# else
-			all_summary[:summary_total_to_string] = summary_total_to_string
-		# end
+		all_summary[:summary_total_to_string] = summary_total_to_string
 
 		summary_total_with_ut_to_string = Employee.value_to_string(summary_total_with_ut)
-		# token = summary_total_with_ut_to_string.split(".")
-		# if token[2].length == 1
-			# all_summary[:summary_total_with_ut_to_string] = "#{summary_total_with_ut_to_string}0" 
-		# else
-			all_summary[:summary_total_with_ut_to_string] = summary_total_with_ut_to_string
-		# end
-
+		all_summary[:summary_total_with_ut_to_string] = summary_total_with_ut_to_string
+		
 		all_summary[:total_ot_hours_to_string] = Employee.value_to_string(total_ot_hours)
 
 		total_late_to_string = Employee.value_to_string(total_late)
-		# token = total_late_to_string.split(".")
-		# if token[2].length == 1
-			# all_summary[:total_late_to_string] = "#{total_late_to_string}0" 
-		# else
-			all_summary[:total_late_to_string] = total_late_to_string
-		# end
-
+		all_summary[:total_late_to_string] = total_late_to_string
+		
 		total_undertime_to_string = Employee.value_to_string(total_undertime)
-		# token = total_undertime_to_string.split(".")
-		# if token[2].length == 1
-			# all_summary[:total_undertime_to_string] = "#{total_undertime_to_string}0" 
-		# else
-			all_summary[:total_undertime_to_string] = total_undertime_to_string
-		# end
-
+		all_summary[:total_undertime_to_string] = total_undertime_to_string
+		
 		all_summary[:total_vl_to_string] = Employee.leave_to_string(total_vl)
 		all_summary[:total_sl_to_string] = Employee.leave_to_string(total_sl)
 
@@ -839,7 +815,7 @@ class Employee < ActiveRecord::Base
 
 	def self.leave_to_string(value)
 		value_days = (value.to_d).to_s.split('.').first
-		value_hours = (((value.to_d).to_s.split('.').last).to_d) * 0.8
+		value_hours = ((((value.to_d).to_s.split('.').last).to_d) * 0.8)
 
 		return "#{value_days}.#{value_hours}"
 	end
