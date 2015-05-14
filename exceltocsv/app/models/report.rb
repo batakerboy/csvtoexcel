@@ -4,7 +4,8 @@ require 'pathname'
 require 'rubygems'
 require 'zip'
 require 'axlsx'
-
+@@report = []
+@@report << :panes
 class Report < ActiveRecord::Base
 	after_save :assign_name
 	# attr_accessor :id
@@ -69,6 +70,8 @@ class Report < ActiveRecord::Base
 				headers = styles.add_style sz: 11, b: true, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				summaryrownum = 0
+
+				
 				summarydtr_wb.add_worksheet(name: 'DTR SUMMARY') do  |summarydtr_ws|
 					summarydtr_ws.add_row ["iRipple, Inc. | DTR Summary Sheet for the period #{self.date_start.strftime('%B %d, %Y')} to #{self.date_end.strftime('%B %d, %Y')}"], style: title
 					summaryrownum += 1
@@ -117,6 +120,7 @@ class Report < ActiveRecord::Base
 				    summarydtr_ws.merge_cells 'G2:H2'
 				    summarydtr_ws.merge_cells 'I2:J2'
 				    summarydtr_ws.merge_cells 'AU2:DC2'
+				    
 
 
 				    # Employee.find_by_sql("SELECT * FROM employees ORDER BY last_name").each_with_index do |emp, i|
@@ -143,200 +147,208 @@ class Report < ActiveRecord::Base
 							warning = styles.add_style :bg_color => "FFCC66", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							danger = styles.add_style :bg_color => "DF5E5E", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							totalheader = styles.add_style sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :right, :vertical => :center, :wrap_text => true}
+							if @@report.include? :panes
+								employeedtr_wb.add_worksheet(name: 'EMPLOYEE DTR') do  |employeedtr_ws|
+									employeedtr_ws.add_row ['iRipple, Inc.'], style: title
+									employeedtr_ws.add_row ["Name: #{emp.last_name}, #{emp.first_name}"], style: title
+									employeedtr_ws.add_row ["Department: #{emp.department}"], style: title
+					   				employeedtr_ws.add_row ["DATE", "DAY", "TIME IN", "TIME OUT", \
+					   										"NO. OF HOURS LATE", "NO. OF HOURS UNDERTIME", "NO. OF OVERTIME HOURS", "VACATION LEAVE", "SICK LEAVE",
+					   										"APPROVED UNDERTIME", "OFFICIAL BUSINESS DEPARTURE", "OFFICIAL BUSINESS TIME START", "OFFICIAL BUSINESS TIME END", "OFFICIAL BUSINESS ARRIVAL", "OFFSET" , "REMARKS"], :height => 50, style: headers
+		    						employeedtr_ws.merge_cells 'A1:P1'
+					    			employeedtr_ws.merge_cells 'A2:P2'
+					    			employeedtr_ws.merge_cells 'A3:P3'
+									
+									date = self.date_start
+									rownum = 5
+									@@days_over_cutoffdate = 0
+									while date <= self.date_end
+										e = emp.get_all_information(date)
+										if e[:remarks] != ''
+											employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+																    date.strftime('%A'),
+																    e[:time_in],
+																    e[:time_out], 
+																    (e[:no_of_hours_late] if e[:no_of_hours_late] != 0),
+																    (e[:no_of_hours_undertime] if e[:no_of_hours_undertime] != 0),
+																    (e[:ot_for_the_day] if e[:ot_for_the_day] != 0),
+																    (e[:vacation_leave] if e[:vacation_leave] != 0),
+																    (e[:sick_leave] if e[:sick_leave] != 0),
+																    (e[:ut_time].to_time.strftime('%H:%M:%S') unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'),		
+																    (e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)),
+																    (e[:ob_time_start].strftime('%H:%M:%S') unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)),
+																    (e[:ob_time_end].strftime('%H:%M:%S') unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)),
+																    (e[:ob_arrival].strftime('%H:%M:%S') unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)),
+																    e[:offset],
+																    e[:remarks]], style: info
+										elsif e[:is_halfday]
+											employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+																    date.strftime('%A'),
+																    e[:time_in],
+																    e[:time_out], 
+																    (e[:no_of_hours_late] if e[:no_of_hours_late] != 0),
+																    (e[:no_of_hours_undertime] if e[:no_of_hours_undertime] != 0),
+																    (e[:ot_for_the_day] if e[:ot_for_the_day] != 0),
+																    (e[:vacation_leave] if e[:vacation_leave] != 0),
+																    (e[:sick_leave] if e[:sick_leave] != 0),
+																    (e[:ut_time].to_time.strftime('%H:%M:%S') unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'),		
+																    (e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)),
+																    (e[:ob_time_start].strftime('%H:%M:%S') unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)),
+																    (e[:ob_time_end].strftime('%H:%M:%S') unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)),
+																    (e[:ob_arrival].strftime('%H:%M:%S') unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)),
+																    e[:offset],
+																    e[:remarks]], style: warning
+									    elsif e[:is_absent]
+									    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+																    date.strftime('%A'),
+																    e[:time_in],
+																    e[:time_out], 
+																    (e[:no_of_hours_late] if e[:no_of_hours_late] != 0),
+																    (e[:no_of_hours_undertime] if e[:no_of_hours_undertime] != 0),
+																    (e[:ot_for_the_day] if e[:ot_for_the_day] != 0),
+																    (e[:vacation_leave] if e[:vacation_leave] != 0),
+																    (e[:sick_leave] if e[:sick_leave] != 0),
+																    (e[:ut_time].to_time.strftime('%H:%M:%S') unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'),		
+																    (e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)),
+																    (e[:ob_time_start].strftime('%H:%M:%S') unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)),
+																    (e[:ob_time_end].strftime('%H:%M:%S') unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)),
+																    (e[:ob_arrival].strftime('%H:%M:%S') unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)),
+																    e[:offset],
+																    e[:remarks]], style: danger
+									    else
+									    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
+																    date.strftime('%A'),
+																    e[:time_in],
+																    e[:time_out], 
+																    (e[:no_of_hours_late] if e[:no_of_hours_late] != 0),
+																    (e[:no_of_hours_undertime] if e[:no_of_hours_undertime] != 0),
+																    (e[:ot_for_the_day] if e[:ot_for_the_day] != 0),
+																    (e[:vacation_leave] if e[:vacation_leave] != 0),
+																    (e[:sick_leave] if e[:sick_leave] != 0),
+																    (e[:ut_time].to_time.strftime('%H:%M:%S') unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'),		
+																    (e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)),
+																    (e[:ob_time_start].strftime('%H:%M:%S') unless e[:ob_time_start].nil? || (e[:ob_time_start].is_a? Integer)),
+																    (e[:ob_time_end].strftime('%H:%M:%S') unless e[:ob_time_end].nil? || (e[:ob_time_end].is_a? Integer)),
+																    (e[:ob_arrival].strftime('%H:%M:%S') unless e[:ob_arrival].nil? || (e[:ob_arrival].is_a? Integer)),
+																    e[:offset],
+																    e[:remarks]], style: tabledata
+										end
 
-							employeedtr_wb.add_worksheet(name: 'EMPLOYEE DTR') do  |employeedtr_ws|
-								employeedtr_ws.add_row ['iRipple, Inc.'], style: title
-								employeedtr_ws.add_row ["Name: #{emp.last_name}, #{emp.first_name}"], style: title
-								employeedtr_ws.add_row ["Department: #{emp.department}"], style: title
-				   				employeedtr_ws.add_row ["DATE", "DAY", "TIME IN", "TIME OUT", \
-				   										"NO. OF HOURS LATE", "NO. OF HOURS UNDERTIME", "NO. OF OVERTIME HOURS", "VACATION LEAVE", "SICK LEAVE",
-				   										"APPROVED UNDERTIME", "OFFICIAL BUSINESS DEPARTURE", "OFFICIAL BUSINESS TIME START", "OFFICIAL BUSINESS TIME END", "OFFICIAL BUSINESS ARRIVAL", "OFFSET" , "REMARKS"], :height => 50, style: headers
-	    						employeedtr_ws.merge_cells 'A1:P1'
-				    			employeedtr_ws.merge_cells 'A2:P2'
-				    			employeedtr_ws.merge_cells 'A3:P3'
-								
-								date = self.date_start
-								rownum = 5
-								@@days_over_cutoffdate = 0
-								while date <= self.date_end
-									if emp.remarks(date) != ''
-										employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
-															    date.strftime('%A'),
-															    emp.time_in(date),
-															    emp.time_out(date), 
-															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
-															    (emp.no_of_hours_undertime(date) if emp.no_of_hours_undertime(date) != 0),
-															    (emp.ot_for_the_day(date) if emp.ot_for_the_day(date) != 0),
-															    (emp.vacation_leave(date) if emp.vacation_leave(date) != 0),
-															    (emp.sick_leave(date) if emp.sick_leave(date) != 0),
-															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),		
-															    (emp.ob_departure(date).strftime('%H:%M:%S') unless emp.ob_departure(date).nil? || (emp.ob_departure(date).is_a? Integer)),
-															    (emp.ob_time_start(date).strftime('%H:%M:%S') unless emp.ob_time_start(date).nil? || (emp.ob_time_start(date).is_a? Integer)),
-															    (emp.ob_time_end(date).strftime('%H:%M:%S') unless emp.ob_time_end(date).nil? || (emp.ob_time_end(date).is_a? Integer)),
-															    (emp.ob_arrival(date).strftime('%H:%M:%S') unless emp.ob_arrival(date).nil? || (emp.ob_arrival(date).is_a? Integer)),
-															    emp.offset(date),
-															    emp.remarks(date)], style: info
-									elsif emp.is_halfday?(date)
-										employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
-															    date.strftime('%A'),
-															    emp.time_in(date),
-															    emp.time_out(date), 
-															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
-															    (emp.no_of_hours_undertime(date) if emp.no_of_hours_undertime(date) != 0),
-															    (emp.ot_for_the_day(date) if emp.ot_for_the_day(date) != 0),
-															    (emp.vacation_leave(date) if emp.vacation_leave(date) != 0),
-															    (emp.sick_leave(date) if emp.sick_leave(date) != 0),
-															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),		
-															    (emp.ob_departure(date).strftime('%H:%M:%S') unless emp.ob_departure(date).nil? || (emp.ob_departure(date).is_a? Integer)),
-															    (emp.ob_time_start(date).strftime('%H:%M:%S') unless emp.ob_time_start(date).nil? || (emp.ob_time_start(date).is_a? Integer)),
-															    (emp.ob_time_end(date).strftime('%H:%M:%S') unless emp.ob_time_end(date).nil? || (emp.ob_time_end(date).is_a? Integer)),
-															    (emp.ob_arrival(date).strftime('%H:%M:%S') unless emp.ob_arrival(date).nil? || (emp.ob_arrival(date).is_a? Integer)),
-															    emp.offset(date),
-															    emp.remarks(date)], style: warning
-								    elsif emp.is_absent?(date)
-								    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
-															    date.strftime('%A'),
-															    emp.time_in(date),
-															    emp.time_out(date), 
-															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
-															    (emp.no_of_hours_undertime(date) if emp.no_of_hours_undertime(date) != 0),
-															    (emp.ot_for_the_day(date) if emp.ot_for_the_day(date) != 0),
-															    (emp.vacation_leave(date) if emp.vacation_leave(date) != 0),
-															    (emp.sick_leave(date) if emp.sick_leave(date) != 0),
-															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),		
-															    (emp.ob_departure(date).strftime('%H:%M:%S') unless emp.ob_departure(date).nil? || (emp.ob_departure(date).is_a? Integer)),
-															    (emp.ob_time_start(date).strftime('%H:%M:%S') unless emp.ob_time_start(date).nil? || (emp.ob_time_start(date).is_a? Integer)),
-															    (emp.ob_time_end(date).strftime('%H:%M:%S') unless emp.ob_time_end(date).nil? || (emp.ob_time_end(date).is_a? Integer)),
-															    (emp.ob_arrival(date).strftime('%H:%M:%S') unless emp.ob_arrival(date).nil? || (emp.ob_arrival(date).is_a? Integer)),
-															    emp.offset(date),
-															    emp.remarks(date)], style: danger
+										rownum += 1
+							        	date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
+							        	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+							        		if date.to_date >= @@cut_off_date.to_date
+							        			@@days_over_cutoffdate += 1
+							        		end
+							        	end
+							    	end
+							    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+								    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 								    else
-								    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
-															    date.strftime('%A'),
-															    emp.time_in(date),
-															    emp.time_out(date), 
-															    (emp.no_of_hours_late(date) if emp.no_of_hours_late(date) != 0),
-															    (emp.no_of_hours_undertime(date) if emp.no_of_hours_undertime(date) != 0),
-															    (emp.ot_for_the_day(date) if emp.ot_for_the_day(date) != 0),
-															    (emp.vacation_leave(date) if emp.vacation_leave(date) != 0),
-															    (emp.sick_leave(date) if emp.sick_leave(date) != 0),
-															    (emp.ut_time(date).to_time.strftime('%H:%M:%S') unless emp.ut_time(date).to_time.strftime('%H:%M:%S') == '00:00:00'),		
-															    (emp.ob_departure(date).strftime('%H:%M:%S') unless emp.ob_departure(date).nil? || (emp.ob_departure(date).is_a? Integer)),
-															    (emp.ob_time_start(date).strftime('%H:%M:%S') unless emp.ob_time_start(date).nil? || (emp.ob_time_start(date).is_a? Integer)),
-															    (emp.ob_time_end(date).strftime('%H:%M:%S') unless emp.ob_time_end(date).nil? || (emp.ob_time_end(date).is_a? Integer)),
-															    (emp.ob_arrival(date).strftime('%H:%M:%S') unless emp.ob_arrival(date).nil? || (emp.ob_arrival(date).is_a? Integer)),
-															    emp.offset(date),
-															    emp.remarks(date)], style: tabledata
+							    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	end
+							    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
+							    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
+							    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
+							    	employeedtr_ws.merge_cells "H#{rownum}:P#{rownum}"
+							    	rownum += 1
+							    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
+						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+						    		else
+						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	end
+							    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
+							    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
+							    	rownum += 1
+
+							    	employeedtr_ws.add_row 
+							    	rownum += 1
+
+							   		employeedtr_ws.add_row ["ACCUMULATED OT", " ", ("=FLOOR(G#{rownum-3}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							   							    "=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
+	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["LATES", " ", ("=FLOOR(E#{rownum-5}/8,1)&"<<'"."'<<"&FLOOR(MOD(E#{rownum-5},8),1)&"<<'"."'<<"&(MOD(E#{rownum-5},8)-FLOOR(MOD(E#{rownum-5},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
+	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["ACCUMULATED VL", " ", ("=FLOOR(H#{rownum-4},1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-5},1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["VL BALANCE", " ", "#{emp.vacation_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["SL BALANCE", " ", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=Q#{rownum-5}+IF(Q#{rownum-4}>Q#{rownum-2},Q#{rownum-4}-Q#{rownum-2},0)+IF(Q#{rownum-3}>Q#{rownum-1},Q#{rownum-3}-Q#{rownum-1},0)",
+							    							" ", 
+							    							"=S#{rownum-5}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
+							    							"=T#{rownum-5}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
+							    							"=U#{rownum-5}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	employeedtr_ws.add_row ["TOTAL", " ", "=FLOOR(Q#{rownum}/8,1)&"<<'"."'<<"&FLOOR(MOD(Q#{rownum},8),1)&"<<'"."'<<"&(MOD(Q#{rownum},8)-FLOOR(MOD(Q#{rownum},8),1))*60", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							"=U#{rownum-1}/60"], style: [totalheader, totalheader, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+							    	colnum = 16
+									while colnum <= 20
+										employeedtr_ws.column_info[colnum].hidden = true
+										colnum += 1
 									end
-
-									rownum += 1
-						        	date += 1.day #FOR USING DATE START AND DATE END AS BASIS FOR LOOP
-						        	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-						        		if date.to_date >= @@cut_off_date.to_date
-						        			@@days_over_cutoffdate += 1
-						        		end
-						        	end
-						    	end
-						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-							    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-							    else
-						    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-							    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-						    	end
-						    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-						    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-						    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
-						    	employeedtr_ws.merge_cells "H#{rownum}:P#{rownum}"
-						    	rownum += 1
-						    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-					    		else
-					    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-						    	end
-						    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
-						    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
-						    	rownum += 1
-
-						    	employeedtr_ws.add_row 
-						    	rownum += 1
-
-						   		employeedtr_ws.add_row ["ACCUMULATED OT", " ", ("=FLOOR(G#{rownum-3}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						   							    "=INT(LEFT(C#{rownum+1},2))", 
-						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
-						   							    "=INT(LEFT(R#{rownum},1))", 
-						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
-   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["LATES", " ", ("=FLOOR(E#{rownum-5}/8,1)&"<<'"."'<<"&FLOOR(MOD(E#{rownum-5},8),1)&"<<'"."'<<"&(MOD(E#{rownum-5},8)-FLOOR(MOD(E#{rownum-5},8),1))*60"), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=INT(LEFT(C#{rownum+1},2))", 
-						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
-						   							    "=INT(LEFT(R#{rownum},1))", 
-						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
-   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED VL", " ", ("=FLOOR(H#{rownum-4},1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=INT(LEFT(C#{rownum+1},2))", 
-						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
-						   							    "=INT(LEFT(R#{rownum},1))", 
-						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-5},1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=INT(LEFT(C#{rownum+1},2))", 
-						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
-						   							    "=INT(LEFT(R#{rownum},1))", 
-						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["VL BALANCE", " ", "#{emp.vacation_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=INT(LEFT(C#{rownum+1},2))", 
-						   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
-						   							    "=INT(LEFT(R#{rownum},1))", 
-						   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-						   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["SL BALANCE", " ", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=Q#{rownum-5}+IF(Q#{rownum-4}>Q#{rownum-2},Q#{rownum-4}-Q#{rownum-2},0)+IF(Q#{rownum-3}>Q#{rownum-1},Q#{rownum-3}-Q#{rownum-1},0)",
-						    							" ", 
-						    							"=S#{rownum-5}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
-						    							"=T#{rownum-5}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
-						    							"=U#{rownum-5}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	employeedtr_ws.add_row ["TOTAL", " ", "=FLOOR(Q#{rownum}/8,1)&"<<'"."'<<"&FLOOR(MOD(Q#{rownum},8),1)&"<<'"."'<<"&(MOD(Q#{rownum},8)-FLOOR(MOD(Q#{rownum},8),1))*60", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-						    							"=U#{rownum-1}/60"], style: [totalheader, totalheader, tabledata]
-						    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-						    	rownum += 1
-						    	colnum = 16
-								while colnum <= 20
-									employeedtr_ws.column_info[colnum].hidden = true
-									colnum += 1
+									employeedtr_ws.column_widths 11, 11, 9, 9,
+																 8.5, 13, 11.5, 11, 8, 
+																 13, 13.5, 13, 11, 11, 11, 26.5
+									
+								    employeedtr_ws.sheet_view.pane do |pane|
+								    	pane.state = :frozen_split
+								    	pane.y_split = 4
+								    	pane.x_split = 2
+								    end
 								end
-								employeedtr_ws.column_widths 11, 11, 9, 9,
-															 8.5, 13, 11.5, 11, 8, 
-															 13, 13.5, 13, 11, 11, 11, 26.5
 							end
 						end
 
 						employeedtr.serialize "#{dtr_peremployee_path}"	
-					
+						summary = emp.get_all_summary(self.date_start, self.date_end, @@cut_off_date)
 						summarydtr_ws.add_row [i+1,"#{emp.last_name},#{emp.first_name}", "#{emp.department}", # A B C
-				    					   	"#{emp.number_of_times_late(self.date_start, self.date_end)}", # D
-			    					   		"#{emp.total_late_to_string(self.date_start, self.date_end)}", # E
-				    					    "#{emp.total_undertime_to_string(self.date_start, self.date_end)}", # F
-				    					    "#{emp.total_sl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.sick_leave_balance_to_string(self.date_start)}", # G H
-				    					    "#{emp.total_vl_to_string(self.date_start, self.date_end, @@cut_off_date)}", "#{emp.vacation_leave_balance_to_string(self.date_start)}", # I J
+				    					   	summary[:number_of_times_late], # D
+			    					   		summary[:total_late_to_string], # E
+				    					    summary[:total_undertime_to_string], # F
+				    					    summary[:total_sl_to_string], summary[:start_sick_leave_balance], # G H
+				    					    summary[:total_vl_to_string], summary[:start_vacation_leave_balance], # I J
 				    					    "=INT(LEFT(E#{summaryrownum+1},2))", # K
 				    					    "=INT(LEFT(F#{summaryrownum+1},2))", # L
 				    					    "=INT(LEFT(I#{summaryrownum+1},2))", # M
@@ -373,11 +385,11 @@ class Report < ActiveRecord::Base
 				    					    "=AL#{summaryrownum+1}+AM#{summaryrownum+1}+IF(AN#{summaryrownum+1}>AP#{summaryrownum+1},AN#{summaryrownum+1}-AP#{summaryrownum+1},0)+IF(AO#{summaryrownum+1}>AQ#{summaryrownum+1},AO#{summaryrownum+1}-AQ#{summaryrownum+1},0)", # AR
 				    					    "=AR#{summaryrownum+1}/60", # AS
 				    					    "=FLOOR(AS#{summaryrownum+1}/8,1)&"<<'"."'<<"&FLOOR(MOD(AS#{summaryrownum+1},8),1)&"<<'"."'<<"&(MOD(AS#{summaryrownum+1},8)-FLOOR(MOD(AS#{summaryrownum+1},8),1))*60", # AT
-				    					    "#{emp.total_regular_ot_to_string(self.date_start, self.date_end)}",
-				    					    "#{emp.total_rest_or_special_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_rest_or_special_ot_to_string_excess(self.date_start, self.date_end)}", 
-				    					    "#{emp.total_special_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_special_on_rest_ot_to_string_excess(self.date_start, self.date_end)}", 
-				    					    "#{emp.total_regular_holiday_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_regular_holiday_ot_to_string_excess(self.date_start, self.date_end)}",
-				    					    "#{emp.total_regular_on_rest_ot_to_string_first_8(self.date_start, self.date_end)}", "#{emp.total_regular_on_rest_ot_to_string_excess(self.date_start, self.date_end)}",
+				    					    summary[:total_regular_ot_to_string],
+				    					    summary[:total_rest_or_special_ot_to_string_first_8], summary[:total_rest_or_special_ot_to_string_excess], 
+				    					    summary[:total_special_on_rest_ot_to_string_first_8], summary[:total_special_on_rest_ot_to_string_excess], 
+				    					    summary[:total_regular_holiday_ot_to_string_first_8], summary[:total_regular_holiday_ot_to_string_excess],
+				    					    summary[:total_regular_on_rest_ot_to_string_first_8], summary[:total_regular_on_rest_ot_to_string_excess],
 				    					    "=INT(LEFT(AU#{summaryrownum+1},1))", "=INT(LEFT(AV#{summaryrownum+1},1))", "=INT(LEFT(AW#{summaryrownum+1},1))", "=INT(LEFT(AX#{summaryrownum+1},1))", "=INT(LEFT(AY#{summaryrownum+1},1))", "=INT(LEFT(AZ#{summaryrownum+1},1))", "=INT(LEFT(BA#{summaryrownum+1},1))", "=INT(LEFT(BB#{summaryrownum+1},1))", "=INT(LEFT(BC#{summaryrownum+1},1))", "=SUM(BD#{summaryrownum+1}:BL#{summaryrownum+1})",
 				    					    "=RIGHT(AU#{summaryrownum+1},LEN(AU#{summaryrownum+1})-2)", "=RIGHT(AV#{summaryrownum+1},LEN(AV#{summaryrownum+1})-2)", "=RIGHT(AW#{summaryrownum+1},LEN(AW#{summaryrownum+1})-2)", "=RIGHT(AX#{summaryrownum+1},LEN(AX#{summaryrownum+1})-2)", "=RIGHT(AY#{summaryrownum+1},LEN(AY#{summaryrownum+1})-2)", "=RIGHT(AZ#{summaryrownum+1},LEN(AZ#{summaryrownum+1})-2)", "=RIGHT(BA#{summaryrownum+1},LEN(BA#{summaryrownum+1})-2)", "=RIGHT(BB#{summaryrownum+1},LEN(BB#{summaryrownum+1})-2)", "=RIGHT(BC#{summaryrownum+1},LEN(BC#{summaryrownum+1})-2)",
 				    					    "=INT(LEFT(BN#{summaryrownum+1},1))", "=INT(LEFT(BO#{summaryrownum+1},1))", "=INT(LEFT(BP#{summaryrownum+1},1))", "=INT(LEFT(BQ#{summaryrownum+1},1))", "=INT(LEFT(BR#{summaryrownum+1},1))", "=INT(LEFT(BS#{summaryrownum+1},1))", "=INT(LEFT(BT#{summaryrownum+1},1))", "=INT(LEFT(BU#{summaryrownum+1},1))", "=INT(LEFT(BV#{summaryrownum+1},1))", "=SUM(BW#{summaryrownum+1}:CE#{summaryrownum+1})",
@@ -406,6 +418,11 @@ class Report < ActiveRecord::Base
 													10.9, 10, 16.5, 10.5, 16.5, 10.9, 10.9, 10.9, 13.5,
 													nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
 													14, 9
+						summarydtr_ws.sheet_view.pane do |pane|
+					    	pane.state = :frozen_split
+					    	pane.y_split = 3
+					    	pane.x_split = 2
+					    end
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
 						# File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 					end

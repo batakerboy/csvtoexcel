@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'axlsx'
+gem 'axlsx', '2.0.1'
 gem 'rubyzip'
 gem 'zip-zip'
 gem 'bcrypt-ruby', :require => 'bcrypt' 
