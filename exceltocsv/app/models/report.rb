@@ -8,12 +8,7 @@ require 'axlsx'
 @@report << :panes
 class Report < ActiveRecord::Base
 	after_save :assign_name
-	# attr_accessor :id
 	@@cut_off_date = '2015-04-01'
-
-	# def id
-	# 	return self.id
-	# end
 
 	def assign_name
 		Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip") if self.name.nil?
