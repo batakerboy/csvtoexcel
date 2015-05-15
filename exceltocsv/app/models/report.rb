@@ -49,12 +49,9 @@ class Report < ActiveRecord::Base
 		directory =  Rails.root.join('public', 'reports', 'employee dtr')
 		Dir.mkdir(directory) unless File.exists?(directory)
 		
-		# Report.update(self.id, name: "DTR-#{self.id} for #{self.date_start.strftime('%B %e, %Y')} to #{self.date_end.strftime('%B %e, %Y')}.zip")
-
 	 	report_zip_path = Rails.root.join('public', 'reports', self.name)
 		
 		Zip::File.open(report_zip_path, Zip::File::CREATE) { |zipfile|
-			# dtr_summary_filename = "DTR Summary for #{self.date_start} - #{self.date_end} cut-off"
 			dtr_summary_filename = "DTRSUMMARY.xlsx"
 			dtr_summary_path = Rails.root.join('public', 'reports', dtr_summary_filename)
 
@@ -150,7 +147,11 @@ class Report < ActiveRecord::Base
 							if @@report.include? :panes
 								employeedtr_wb.add_worksheet(name: 'EMPLOYEE DTR') do  |employeedtr_ws|
 									employeedtr_ws.add_row ['iRipple, Inc.'], style: title
-									employeedtr_ws.add_row ["Name: #{emp.last_name}, #{emp.first_name}"], style: title
+									if emp.is_manager
+										employeedtr_ws.add_row ["Name: #{emp.last_name}, #{emp.first_name} - Manager"], style: title
+									else
+										employeedtr_ws.add_row ["Name: #{emp.last_name}, #{emp.first_name}"], style: title
+									end
 									employeedtr_ws.add_row ["Department: #{emp.department}"], style: title
 					   				employeedtr_ws.add_row ["DATE", "DAY", "TIME IN", "TIME OUT", \
 					   										"NO. OF HOURS LATE", "NO. OF HOURS UNDERTIME", "NO. OF OVERTIME HOURS", "VACATION LEAVE", "SICK LEAVE",
