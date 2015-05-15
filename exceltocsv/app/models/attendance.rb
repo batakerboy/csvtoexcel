@@ -37,6 +37,7 @@ class Attendance < ActiveRecord::Base
 
 			 		# 	@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date_biometrics(token[25].tr('" ', ''))).first
 			 		# end
+			 		next
 			 	elsif check_token53 != 'nil' || (token[25].split('/')).length == 3
 			 		@@biometrics_id = token[5].downcase.tr('":, abcdefghijklmnopqrstuvwxyz()', '')
 			 		@employee = Employee.where(biometrics_id: @@biometrics_id).first
@@ -130,6 +131,10 @@ class Attendance < ActiveRecord::Base
 						next if @employee.nil?
 						@attendance = Attendance.where(employee_id: @employee.id, attendance_date: date).first
 						
+						puts "=========================="
+						puts "token[1]: #{token[1]}"
+						puts "=========================="
+
 						if @attendance.nil?
 							@attendance = Attendance.new
 							@attendance.employee_id = @employee.id

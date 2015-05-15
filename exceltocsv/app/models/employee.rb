@@ -535,8 +535,15 @@ class Employee < ActiveRecord::Base
 
 	def self.format_time(to_convert)
 		time = (((to_convert)).to_s.split('.').first).to_d
-		time_min = ((((((to_convert)).round(2)).to_s.split('.').last).to_d)/100) * 60
+		mins = (to_convert.round(2)).to_s.split('.').last
 		
+		if mins.length == 1
+			time_min = (mins.to_d) * 6
+		else
+			time_min = (mins.to_d) * 0.6
+		end
+
+
 		if time_min >= 46
 			time += 1
 		elsif time_min >= 31
@@ -617,7 +624,7 @@ class Employee < ActiveRecord::Base
 		all_info[:offset] = offset
 		
 		remarks = @request.remarks.strip
-		# remarks = @request.remarks
+		
 		all_info[:remarks] = remarks
 
 		unless time_in.nil? || (time_in.to_time <= @@required_time_in) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
@@ -629,7 +636,6 @@ class Employee < ActiveRecord::Base
 			no_of_hours_late = 1
 		end
 		all_info[:no_of_hours_late] = no_of_hours_late
-
 
 		no_of_hours_undertime = 0
 		unless time_out.nil? || offset.downcase == 'pm' || offset.length > 2
@@ -701,6 +707,7 @@ class Employee < ActiveRecord::Base
 		ot_for_the_day += @request.regular_holiday_ot
 		ot_for_the_day += @request.regular_on_rest_ot
 		all_info[:ot_for_the_day] = ot_for_the_day
+
 
 		return all_info
 	end

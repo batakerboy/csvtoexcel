@@ -18,7 +18,6 @@ class ReportsController < ApplicationController
 
 	def download_zip
 		@report = Report.find(params[:report_id])
-	  	# File.delete(Rails.root.join('public', 'reports','reports.zip')) if File.exists?(Rails.root.join('public', 'reports','reports.zip'))
 	  	File.delete(Rails.root.join('public', 'reports','DTRSUMMARY.xlsx')) if File.exists?(Rails.root.join('public', 'reports','DTRSUMMARY.xlsx'))
 
 		zip = @report.create_zip unless (!@report.name.nil? && File.exists?(Rails.root.join('public', 'reports', @report.name)))
@@ -43,8 +42,6 @@ class ReportsController < ApplicationController
 	  	File.delete(iEMS_path) if File.exists?(iEMS_path)
 	  	File.delete(biometrics_path) if File.exists?(biometrics_path)
 	  	File.delete(falco_path) if File.exists?(falco_path)
-
-	  	# @report.name = "DTR-#{@report.id} for #{@report.date_start.strftime('%B %e, %Y')} to #{@report.date_end.strftime('%B %e, %Y')}.zip"
 
 	  	if @report.save
 	  		redirect_to report_path(@report), notice:'SUCCESS:Report Generated'
