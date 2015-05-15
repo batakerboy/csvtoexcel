@@ -32,7 +32,7 @@
 <br/><br/><br/>
 <div class = "container animated fadeInRight" id = "welcomeDiv">
 	<div class = "row">
-		<div class = "col-md-10">
+		<div class = "col-md-9">
 			<h1>DTR for <%= @report.date_start.strftime('%B %e, %Y')%> - <%= @report.date_end.strftime('%B %e, %Y')%></h1>
 
 			<table class = "table">
@@ -51,7 +51,7 @@
 				</tr>
 			</table>
 		</div>
-		<div class = "col-md-2">
+		<div class = "col-md-3">
 			<br/><br/><br/><br/><br/><br>
 
 			<%= form_tag report_path(@report), :method => "get" do %>

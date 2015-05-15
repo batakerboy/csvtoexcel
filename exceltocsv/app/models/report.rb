@@ -431,6 +431,17 @@ class Report < ActiveRecord::Base
 					end
 				end
 			end
+			summarydtr_wb.add_worksheet(:name => 'panes') do |sheet|
+			    sheet.add_row(['',  (0..99).map { |i| "column header #{i}" }].flatten )
+			    100.times.with_index { |index| sheet << ["row header", (0..index).to_a].flatten }
+			    sheet.sheet_view.pane do |pane|
+			      pane.top_left_cell = "B2"
+			      pane.state = :frozen_split
+			      pane.y_split = 1
+			      pane.x_split = 1
+			      pane.active_pane = :bottom_right
+			    end
+			  end
 			summarydtr.serialize "#{dtr_summary_path}"
 			zipfile.add('DTR_Summary.xlsx', dtr_summary_path)
 
