@@ -329,11 +329,11 @@ class Report < ActiveRecord::Base
 																 13, 13.5, 13, 11, 11, 11, 26.5
 									
 								    employeedtr_ws.sheet_view.pane do |pane|
-								    	pane.top_left_cell = "B2"
-								    	pane.state = :frozen
-								    	pane.y_split = 4
-								    	pane.x_split = 2
-								    	pane.active_pane = :bottom_right
+								    	pane.top_left_cell = "C5"
+									    pane.state = :frozen_split
+									    pane.y_split = 4
+									    pane.x_split = 2
+									    pane.active_pane = :bottom_right
 								    end
 								end
 							end
@@ -417,26 +417,17 @@ class Report < ActiveRecord::Base
 													nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
 													14, 9
 						summarydtr_ws.sheet_view.pane do |pane|
-					    	pane.state = :frozen_split
-					    	pane.y_split = 3
-					    	pane.x_split = 2
+					    	pane.top_left_cell = "D4"
+						    pane.state = :frozen_split
+						    pane.y_split = 3
+						    pane.x_split = 3
+						    pane.active_pane = :bottom_right
 					    end
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
 						# File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 					end
 				end
 			end
-			summarydtr_wb.add_worksheet(:name => 'panes') do |sheet|
-			    sheet.add_row(['',  (0..99).map { |i| "column header #{i}" }].flatten )
-			    100.times.with_index { |index| sheet << ["row header", (0..index).to_a].flatten }
-			    sheet.sheet_view.pane do |pane|
-			      pane.top_left_cell = "B2"
-			      pane.state = :frozen_split
-			      pane.y_split = 1
-			      pane.x_split = 1
-			      pane.active_pane = :bottom_right
-			    end
-			  end
 			summarydtr.serialize "#{dtr_summary_path}"
 			zipfile.add('DTR_Summary.xlsx', dtr_summary_path)
 
