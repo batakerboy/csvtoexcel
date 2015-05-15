@@ -40,7 +40,7 @@
 			iEMS
 		</h1>
 		
-		<br/><br/><br/><br/><br/><br/>
+		<br/><br/><br/><br/><br/><br/><br/><br/>
 		<div class = "row">
 			<div class = "col-md-3"></div>
 			<%= link_to 'Generate New report', '#', id: "generate_new_report_button", class: "btn btn-lg btn-success col-md-6"%>
@@ -55,20 +55,18 @@
 		
 		<br/>
 
-		<div class = "row">
+		<!-- <div class = "row">
 			<div class = "col-md-3"></div>
-			<%= form_tag delete_all_records_reports_path, method: :post do%>
-				<%= submit_tag 'Delete All Records', id: "delete_all", class: "btn btn-lg btn-danger col-md-6"%>
-			<%end%>
-		</div>
+			<%#= form_tag delete_all_records_reports_path, method: :post do%>
+				<%#= submit_tag 'Delete All Records', id: "delete_all", class: "btn btn-lg btn-danger col-md-6"%>
+			<%#end%>
+		</div> -->
 
 		<br/><br/><br/>
 </div>
 
 <script>
 	$("#generate_new_report_button").click(function(event){
-		// $("#welcomeDiv").removeClass("animated fadeInRight")
-		// Event.stop(event);
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
 				window.location = '<%= new_report_path(step: 1)%>';
@@ -76,16 +74,10 @@
 			);
  	});
  	$("#archives_button").click(function(event){
-		// $("#welcomeDiv").removeClass("animated fadeOutLeft")
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
 				window.location = '<%= reports_path%>';
 			}
 			);
  	});
-
- 	// var db = '<%= (Report.count == 0)%>' 
- 	// if (db) {
- 	// 	$("#delete_all").addClass(" disabled");
- 	// };
 </script>

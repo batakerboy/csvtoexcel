@@ -625,6 +625,9 @@ class Employee < ActiveRecord::Base
 		else
 			no_of_hours_late = 0
 		end
+		if no_of_hours_late > 1
+			no_of_hours_late = 1
+		end
 		all_info[:no_of_hours_late] = no_of_hours_late
 
 
