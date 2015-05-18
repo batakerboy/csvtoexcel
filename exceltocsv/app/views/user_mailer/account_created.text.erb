@@ -1,7 +1,18 @@
-Welcome to FBI Integration System, <%= @user.first_name%>!
+<%= Date.today.strftime('%B %e, %Y')%>
+FBI Integration System
+<%= @user.email%>
 
-An account for you has been created!
 
-Username: <%= @user.username%>
+Dear <%= @user.first_name%>,
 
-Password: <%= @password%>
+<h2>Welcome to the FBI Integration System!</h2>
+
+Through the FBI Integration System, you will be able to upload important files that are necessary for Daily Time Recording. These files will be downloaded/exported from the company's Biometrics and Falco access system and the iRipple Employee Management System (iEMS).
+
+To access the system, you will need the following information:
+	Username: <%= @user.username%>
+	Password: <%= @password%>
+
+It is highly recommended that you change your password as soon as you receive this email and log in the system. For security purposes, you are requested to keep this information private. Anyone with this information will be able to access your account. You may access your account using this <%= link_to 'link', "http://localhost:3000/#{login_path}"%>. 
+
+This is an automated message created by the FBI Integration System. Please do not reply to this email.

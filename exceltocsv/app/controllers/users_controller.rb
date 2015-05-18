@@ -35,16 +35,7 @@ class UsersController < ApplicationController
 	def create
 		@user = User.new(user_params)
 
-		# if params[:create_admin] == 'true'
-			@create_admin = params[:create_admin]
-		# else
-			# @create_admin = false
-		# end
-
-		puts "========================="
-		puts params[:create_admin]
-		puts @create_admin
-		puts "========================="
+		@create_admin = params[:create_admin]
 
 		if @user.save
 			# UserMailer.account_created(@user).deliver_later
@@ -58,11 +49,6 @@ class UsersController < ApplicationController
 		@user = User.find(params[:id])
 
 		@create_admin = params[:create_admin]
-
-		puts "========================="
-		puts params[:create_admin]
-		puts @create_admin
-		puts "========================="
 
 		if @user.update(user_params)
 			redirect_to users_path
@@ -80,13 +66,11 @@ class UsersController < ApplicationController
 	def deactivate
 		@user = User.find(params[:user_id])
 		@user.deactivate
-		# User.update(@user.id, is_active: false)
 		redirect_to users_path		
 	end
 
 	private
 	def user_params
-		# params.require(:user).permit(:first_name, :last_name, :department, :username, :password, :password_confirmation, :is_admin, :is_active)
 		params.require(:user).permit(:first_name, :last_name, :department, :username, :password, :password_confirmation, :email, :is_admin, :is_active)
 	end
 end

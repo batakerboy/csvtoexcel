@@ -1,15 +1,21 @@
-<div class = "container">
-	<h3>Welcome to FBI Integration System, <%= @user.first_name%>!</h3>
+<p>
+	<%= Date.today.strftime('%B %e, %Y')%><br/>
+	FBI Integration System<br/>
+	<%= @user.email%>
+</p>
 
-	<p>An account for you has been created!</p>
+<p>Dear <%= @user.first_name%>,</p>
 
-	<div class = "row">
-		<div class = "col-md-6">Username:</div>
-		<div class = "col-md-6"><%= @user.username%></div>
-	</div>
+<h2>Welcome to the FBI Integration System!</h2>
 
-	<div class = "row">
-		<div class = "col-md-6">Password:</div>
-		<div class = "col-md-6"><%= @password%></div>
-	</div>
-</div>
+<p>Through the FBI Integration System, you will be able to upload important files that are necessary for Daily Time Recording. These files will be downloaded/exported from the company's Biometrics and Falco access system and the iRipple Employee Management System (iEMS).</p>
+
+<p>
+To access the system, you will need the following information:<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<strong>Username:</strong> <%= @user.username%><br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;<strong>Password:</strong> <%= @password%>
+</p>
+
+<p>It is highly recommended that you change your password as soon as you receive this email and log in the system. For security purposes, <strong>you are requested to keep this information private</strong>. Anyone with this information will be able to access your account. You may access your account using this <%= link_to 'link', "http://localhost:3000/#{login_path}"%>.</p>
+
+<p>This is an automated message created by the FBI Integration System. Please do not reply to this email.</p>
