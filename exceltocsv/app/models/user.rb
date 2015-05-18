@@ -21,6 +21,7 @@ class User < ActiveRecord::Base
 	end
 	
 	def clear_password
+		UserMailer.account_created(self, self.password).deliver_later
 		self.password = nil
 	end
 

@@ -585,11 +585,17 @@ class Employee < ActiveRecord::Base
 		end
 	end
 
-	def get_all_information(date )
+	def get_all_information(date)
 		all_info = Hash.new
 
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
 		@request = Request.where(employee_id: self.id, date: date).first
+
+		puts "==================================="
+		puts "Employee: #{self.last_name}"
+		puts "ID: #{self.id}"
+		puts "Date: #{date}"
+		puts "==================================="
 
 		time_in = @attendance.time_in.to_time.strftime('%H:%M:%S') unless @attendance.nil?
 		all_info[:time_in] = time_in
