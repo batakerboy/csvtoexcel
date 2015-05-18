@@ -14,7 +14,8 @@ class WelcomeController < ApplicationController
 
   	if authorized_user
       session[:user_id] = authorized_user.id
-  	  flash[:notice] = "Wow Welcome again, you logged in as #{authorized_user.username}"
+  	  # flash[:notice] = "Wow Welcome again, you logged in as #{authorized_user.username}"
+      flash[:notice] = nil
       redirect_to index_path
   	else
   	  flash[:notice] = "Invalid Username or Password"

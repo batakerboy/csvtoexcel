@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-	before_filter :authenticate_user, :only => [:new, :create, :edit, :index, :update]
-	before_filter :check_if_admin, :only => [:new, :create, :edit, :index, :update]
+	before_filter :authenticate_user, :only => [:new, :create, :edit, :index, :update, :profile]
+	before_filter :check_if_admin, :only => [:new, :create, :edit, :index]
 	before_filter :check_if_active, :only => [:new, :create, :edit, :index, :update]
  	# before_filter :save_login_state, :only => [:new, :create]
 
@@ -10,10 +10,25 @@ class UsersController < ApplicationController
 
 	def new
 		@user = User.new
+
+		if params[:create_admin] == 'true'
+			@create_admin = true
+		else
+			@create_admin = false
+		end
+
+		
+		puts "======================"
+		puts @create_admin
+		puts "======================"
 	end
 
 	def edit
 		@user = User.find(params[:id])
+	end
+
+	def profile
+		@user = User.find(params[:user_id])
 	end
 
 	def create

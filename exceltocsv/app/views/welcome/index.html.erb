@@ -22,12 +22,17 @@
 				<%if @current_user.is_admin%>	
 					<li><%= link_to 'Users', '#', id: "users"%></li>
 				<%end%>
-				<%= link_to 'Log Out', "#", id: "logout", class: "btn btn-md btn-warning navbar-btn"%>
+				<li class = "dropdown">
+					<a href="#" class = "dropdown-toggle" data-toggle = "dropdown"><%= @current_user.first_name%> <%= @current_user.last_name%><b class = "caret"></b></a>
+					<ul class = "dropdown-menu">
+						<li><%= link_to 'Your Profile', "#", id: "profile"%></li>
+						<li><%= link_to 'Log Out', "#", id: "logout"%></li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 	</div>
 </div>
-
 
 <div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
 		<br/><br/><br/><br/><br/><br/>
@@ -41,19 +46,19 @@
 		</h1>
 		
 		<br/><br/><br/><br/><br/><br/><br/><br/>
-		<div class = "row">
+		<!-- <div class = "row">
 			<div class = "col-md-3"></div>
-			<%= link_to 'Generate New report', '#', id: "generate_new_report_button", class: "btn btn-lg btn-success col-md-6"%>
+			<%#= link_to 'Generate New report', '#', id: "generate_new_report_button", class: "btn btn-lg btn-success col-md-6"%>
 		</div>
 		
 		<br/>
 		
 		<div class = "row">
 			<div class = "col-md-3"></div>
-			<%= link_to 'Go to Archives', '#', class: "btn btn-lg btn-info col-md-6", id: 'archives_button'%>
+			<%#= link_to 'Go to Archives', '#', class: "btn btn-lg btn-info col-md-6", id: 'archives_button'%>
 		</div>
 		
-		<br/>
+		<br/> -->
 
 		<!-- <div class = "row">
 			<div class = "col-md-3"></div>
@@ -66,17 +71,25 @@
 </div>
 
 <script>
-	$("#generate_new_report_button").click(function(event){
+	// $("#generate_new_report_button").click(function(event){
+	// 	$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+	// 		function(){
+	// 			window.location = '<%#= new_report_path(step: 1)%>';
+	// 		}
+	// 		);
+ // 	});
+ // 	$("#archives_button").click(function(event){
+	// 	$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+	// 		function(){
+	// 			window.location = '<%#= reports_path%>';
+	// 		}
+	// 		);
+ // 	});
+
+ 	$("#profile").click(function(event){
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
-				window.location = '<%= new_report_path(step: 1)%>';
-			}
-			);
- 	});
- 	$("#archives_button").click(function(event){
-		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
-			function(){
-				window.location = '<%= reports_path%>';
+				window.location = '<%= user_profile_path(@current_user)%>';
 			}
 			);
  	});

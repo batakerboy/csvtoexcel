@@ -1,0 +1,65 @@
+<!-- <div class = "modal-header"> -->
+		<!-- <h3>Create New User</h3> -->
+	<!-- </div> -->
+	<%= form_for @user, html: {class: "form-horizontal"} do |f|%>
+		<!-- <div class = "modal-body"> -->
+			<div class = "form-group">
+				<%= label_tag :first_name, "First Name:", class: "col-md-2 control-label" %>
+				<div class = "col-md-10">
+					<%= f.text_field :first_name, class: "form-control"%>
+				</div>
+			</div>
+
+			<div class = "form-group">
+				<%= label_tag :last_name, "Last Name:", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<%= f.text_field :last_name, class: "form-control"%>
+				</div>
+			</div>
+
+			<div class = "form-group">
+				<%= label_tag :department, "Department:", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<%= f.text_field :department, class: "form-control"%>
+				</div>
+			</div>
+
+			<div class = "form-group">
+				<%= label_tag :username, "Username:", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<%= f.text_field :username, class: "form-control"%>
+				</div>
+			</div>
+
+			<div class = "form-group">
+				<%= label_tag :password, "Password:", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<%= f.password_field :password, class: "form-control"%>
+				</div>
+			</div>
+
+			<div class = "form-group">
+				<%= label_tag :password_confirmation, "Password Confirmation:", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<%= f.password_field :password_confirmation, class: "form-control"%>
+				</div>
+			</div>
+
+			<%= f.hidden_field :is_admin, value: true%>
+			<!-- <div class = "form-group">
+				<%#= label_tag :is_admin, "Is this new user an admin?", class: "col-md-2 control-label"%>
+				<div class = "col-md-10">
+					<#%= f.radio_button :is_admin, 'true'%>
+					<%#= label :is_admin_true, 'Yes?'%>
+					&nbsp;
+					<%#= f.radio_button :is_admin, 'false'%>
+					<%#= label :is_admin_false, 'No?'%>
+				</div>
+			</div> -->
+			<%= f.hidden_field :is_active, value: true%>
+		<!-- </div> -->
+		
+		<!-- <div class = "modal-footer"> -->
+			<%= f.submit 'Save', class: "btn btn-primary pull-right"%>
+		<!-- </div> -->
+	<%end%>

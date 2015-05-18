@@ -22,7 +22,13 @@
 				<%if @current_user.is_admin%>	
 					<li><%= link_to 'Users', '#', id: "users"%></li>
 				<%end%>
-				<%= link_to 'Log Out', "#", id: "logout", class: "btn btn-md btn-warning navbar-btn"%>	
+				<li class = "dropdown">
+					<a href="#" class = "dropdown-toggle" data-toggle = "dropdown"><%= @current_user.first_name%> <%= @current_user.last_name%><b class = "caret"></b></a>
+					<ul class = "dropdown-menu">
+						<li><%= link_to 'Your Profile', "#", id: "profile"%></li>
+						<li><%= link_to 'Log Out', "#", id: "logout"%></li>
+					</ul>
+				</li>	
 			</ul>
 		</div>
 	</div>
@@ -82,7 +88,7 @@
 					<%= hidden_field_tag 'step', 2%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 disabled", id: "biometrics_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "biometrics_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -107,7 +113,7 @@
 					<%= hidden_field_tag 'step', 3%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 disabled", id: "falco_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "falco_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -130,7 +136,7 @@
 					<%= hidden_field_tag 'step', 4%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 disabled", id: "iEMS_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "iEMS_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -166,7 +172,7 @@
     		</div>
     	</div>
     	<div class = "row">
-    		<div class = "col-md-12" align = "center"><h1><font color = "white">Generating Report...</font></h1></div>
+    		<div class = "col-md-12" align = "center"><h1><font color = "white">Generating Reports...</font></h1></div>
     	</div>
     </div>
 </div>
@@ -243,21 +249,26 @@
 
  	$("#biometrics_file_pick").change(function(){
  		if ($(this).val) {
- 			$("#biometrics_upload").removeClass("disabled")
+ 			$("#biometrics_upload").removeClass("hidden")
  		};
  	});
 
  	$("#falco_file_pick").change(function(){
  		if ($(this).val) {
- 			$("#falco_upload").removeClass("disabled")
+ 			$("#falco_upload").removeClass("hidden")
  		};
  	});
 
  	$("#iEMS_file_pick").change(function(){
  		if ($(this).val) {
- 			$("#iEMS_upload").removeClass("disabled")
+ 			$("#iEMS_upload").removeClass("hidden")
  		};
  	});
-
-
+ 	$("#profile").click(function(event){
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= user_profile_path(@current_user)%>';
+			}
+			);
+ 	});
 </script>

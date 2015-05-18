@@ -22,7 +22,13 @@
 				<%if @current_user.is_admin%>	
 					<li><%= link_to 'Users', '#', id: "users"%></li>
 				<%end%>
-				<%= link_to 'Log Out', "#", id: "logout", class: "btn btn-md btn-warning navbar-btn"%>
+				<li class = "dropdown">
+					<a href="#" class = "dropdown-toggle" data-toggle = "dropdown"><%= @current_user.first_name%> <%= @current_user.last_name%><b class = "caret"></b></a>
+					<ul class = "dropdown-menu">
+						<li><%= link_to 'Your Profile', "#", id: "profile"%></li>
+						<li><%= link_to 'Log Out', "#", id: "logout"%></li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -30,7 +36,11 @@
 
 <div class = "container animated fadeInRight" id = "welcomeDiv">
 	<h1>Edit User</h1>
-	<%= render 'form'%>
+	<%if @user.is_admin%>
+		<%= render 'admin_form'%>
+	<%else%>
+		<%= render 'user_form'%>
+	<%end%>
 </div>
 
  <% if @user.errors.any? %>

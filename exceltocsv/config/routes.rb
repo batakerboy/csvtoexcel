@@ -11,7 +11,6 @@ Rails.application.routes.draw do
     collection {
       post  :import
       post  :delete_all_records
-      # get :loading_animation
     }
       get   :download_zip 
   end
@@ -25,6 +24,7 @@ Rails.application.routes.draw do
   resources :users do
     get :activate
     get :deactivate
+    get :profile
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -45,16 +45,18 @@
 				</div>
 			</div>
 
-			<div class = "form-group">
-				<%= label_tag :is_admin, "Is this new user an admin?", class: "col-md-2 control-label"%>
+			<%= f.hidden_field :is_admin, value: false%>
+
+			<!-- <div class = "form-group">
+				<%#= label_tag :is_admin, "Is this new user an admin?", class: "col-md-2 control-label"%>
 				<div class = "col-md-10">
-					<%= f.radio_button :is_admin, 'true'%>
-					<%= label :is_admin_true, 'Yes?'%>
+					<%#= f.radio_button :is_admin, 'true'%>
+					<%#= label :is_admin_true, 'Yes?'%>
 					&nbsp;
-					<%= f.radio_button :is_admin, 'false'%>
-					<%= label :is_admin_false, 'No?'%>
+					<%#= f.radio_button :is_admin, 'false'%>
+					<%#= label :is_admin_false, 'No?'%>
 				</div>
-			</div>
+			</div> -->
 			<%= f.hidden_field :is_active, value: true%>
 		<!-- </div> -->
 		

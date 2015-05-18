@@ -22,17 +22,26 @@
 				<%if @current_user.is_admin%>	
 					<li class = "active"><%= link_to 'Users', '#', id: "users"%></li>
 				<%end%>
-				<%= link_to 'Log Out', "#", id: "logout", class: "btn btn-md btn-warning navbar-btn"%>
+				<li class = "dropdown">
+					<a href="#" class = "dropdown-toggle" data-toggle = "dropdown"><%= @current_user.first_name%> <%= @current_user.last_name%><b class = "caret"></b></a>
+					<ul class = "dropdown-menu">
+						<li><%= link_to 'Your Profile', "#", id: "profile"%></li>
+						<li><%= link_to 'Log Out', "#", id: "logout"%></li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 	</div>
 </div>
 
-<div class = "container animated fadeIn" id = "welcomeDiv">
+<div class = "container animated fadeInRight" id = "welcomeDiv">
 	<table class = "table table-striped">
 		<div class = "row">
 			<div class = "col-md-6"><h1>Users of FBI Integration</h1></div>
-			<div class = "col-md-6"><%#= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right", data: {toggle: "modal", target: "#add"}%><%= link_to 'Create New User', new_user_path, class: "btn btn-success pull-right", id: "create_user"%></div>			
+			<div class = "btn-group col-md-6" role = "group">
+				<%= link_to 'Create New Admin', new_user_path(create_admin: true), class: "btn btn-warning pull-right", id: "create_user"%>
+				<%= link_to 'Create New User', new_user_path(create_admin: false), class: "btn btn-success pull-right", id: "create_user"%>
+			</div>
 		</div>
 		<thead>
 			<tr>
@@ -45,7 +54,7 @@
 		</thead>
 		<tbody>
 			<%@users.each do |user|%>
-				<%#unless user.id == @current_user.id%>
+				<%unless user.id == @current_user.id%>
 					<tr>
 						<td><%= user.last_name%>, <%= user.first_name%></td>
 						<td><%= user.username%></td>
@@ -58,17 +67,17 @@
 						<td>
 							<div class = "btn-group" role = "group">
 								<%= link_to 'Edit', edit_user_path(user), class: "btn btn-info"%>
-								<%unless user.id == @current_user.id%>
+								<%#unless user.id == @current_user.id%>
 									<%if user.is_active%>
 										<%= link_to 'Deactivate', user_deactivate_path(user), id: "users_deactivate", class: "btn btn-danger"%>
 									<%else%>
 										<%= link_to 'Activate', user_activate_path(user), id: "users_activate", class: "btn btn-warning"%>
 									<%end%>
-								<%end%>
+								<%#end%>
 							</div>
 						</td>	
 					</tr>
-				<%#end%>
+				<%end%>
 			<%end%>
 		</tbody>
 	</table>
@@ -82,4 +91,16 @@
 			}
 			);
  	});
+ 	$("#profile").click(function(event){
+		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
+			function(){
+				window.location = '<%= user_profile_path(@current_user)%>';
+			}
+			);
+ 	});
+ 	// $("#users_deactivate").click(function(event){
+		// // $("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend'
+		// // 	);
+ 	// 	document.getElementById("users_deactivate").className = "animated fadeOutLeft"
+ 	// });
 </script>

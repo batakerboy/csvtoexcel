@@ -44,6 +44,7 @@ class ApplicationController < ActionController::Base
         return true
       else
         redirect_to logout_path
+        return false
       end
     else
       redirect_to logout_path

@@ -35,11 +35,10 @@
 </div>
 
 <div class = "container animated fadeInRight" id = "welcomeDiv">
-	<%if @create_admin%>
-		<h1>Create New Admin</h1>
+	<h1><%= @user.first_name%> <%= @user.last_name%></h1>
+	<%if @user.is_admin%>
 		<%= render 'admin_form'%>
 	<%else%>
-		<h1>Create New User</h1>
 		<%= render 'user_form'%>
 	<%end%>
 </div>
@@ -53,7 +52,7 @@
   <% end %>
 
   <script>
-  	$("#profile").click(function(event){
+ 	$("#profile").click(function(event){
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){
 				window.location = '<%= user_profile_path(@current_user)%>';
