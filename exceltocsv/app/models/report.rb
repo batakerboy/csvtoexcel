@@ -382,7 +382,7 @@ class Report < ActiveRecord::Base
 
 						employeedtr.serialize "#{dtr_peremployee_path}"	
 						summary = emp.get_all_summary(self.date_start, self.date_end, @@cut_off_date)
-						summarydtr_ws.add_row [i+1,"#{emp.last_name},#{emp.first_name}", "#{emp.department}", # A B C
+						summarydtr_ws.add_row [i+1,"#{emp.last_name}, #{emp.first_name}", "#{emp.department}", # A B C
 				    					   	summary[:number_of_times_late], # D
 			    					   		summary[:total_late_to_string], # E
 				    					    summary[:total_undertime_to_string], # F
@@ -460,37 +460,37 @@ class Report < ActiveRecord::Base
 				    					    "=SUM(BW#{summaryrownum+1}:CA#{summaryrownum+1})", # CB
 				    					    "=CB#{summaryrownum+1}/60", # CC
 				    					    "0", "=FLOOR(CC#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(CC#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(CC#{summaryrownum+1},8)-FLOOR(MOD(CC#{summaryrownum+1},8),1,1))*60"], style: tabledata
-						
 						summaryrownum += 1
-						summarydtr_ws.column_info[2].hidden = true
-						i = 10
-						while i <= 44
-							summarydtr_ws.column_info[i].hidden = true
-							i += 1
-				        end
-				        i = 51
-				        while i <= 80
-				        	summarydtr_ws.column_info[i].hidden = true
-				        	i += 1
-				        end
-						summarydtr_ws.column_widths 5.25, 27.25, 26.25, 
-													13.5, 9.25, 12.5,
-													9.5, 11, 9.5, 11,
-													nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
-													19.5,
-													10.9, 10, 10.5, 10.9, 10.9,
-													nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
-													14, 9
-						summarydtr_ws.sheet_view.pane do |pane|
-					    	pane.top_left_cell = "D4"
-						    pane.state = :frozen_split
-						    pane.y_split = 3
-						    pane.x_split = 3
-						    pane.active_pane = :bottom_right
-					    end
+						
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
 						# File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 					end
+					summarydtr_ws.column_info[2].hidden = true
+					i = 10
+					while i <= 44
+						summarydtr_ws.column_info[i].hidden = true
+						i += 1
+			        end
+			        i = 51
+			        while i <= 80
+			        	summarydtr_ws.column_info[i].hidden = true
+			        	i += 1
+			        end
+					summarydtr_ws.column_widths 5.25, 27.25, 26.25, 
+												13.5, 9.25, 12.5,
+												9.5, 11, 9.5, 11,
+												nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+												19.5,
+												10.9, 10, 10.5, 10.9, 10.9,
+												nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
+												14, 9
+					summarydtr_ws.sheet_view.pane do |pane|
+				    	pane.top_left_cell = "D4"
+					    pane.state = :frozen_split
+					    pane.y_split = 3
+					    pane.x_split = 3
+					    pane.active_pane = :bottom_right
+				    end
 				end
 			end
 			summarydtr.serialize "#{dtr_summary_path}"
