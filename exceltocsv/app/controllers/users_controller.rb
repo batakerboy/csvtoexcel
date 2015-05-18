@@ -16,11 +16,6 @@ class UsersController < ApplicationController
 		else
 			@create_admin = false
 		end
-
-		
-		puts "======================"
-		puts @create_admin
-		puts "======================"
 	end
 
 	def edit
@@ -34,6 +29,7 @@ class UsersController < ApplicationController
 	def create
 		@user = User.new(user_params)
 		if @user.save
+			UserMailer.account_created(@user).deliver_later
 			redirect_to users_path
 		else
 			render 'new'
@@ -65,6 +61,7 @@ class UsersController < ApplicationController
 
 	private
 	def user_params
-		params.require(:user).permit(:first_name, :last_name, :department, :username, :password, :password_confirmation, :is_admin, :is_active)
+		# params.require(:user).permit(:first_name, :last_name, :department, :username, :password, :password_confirmation, :is_admin, :is_active)
+		params.require(:user).permit(:first_name, :last_name, :department, :username, :password, :password_confirmation, :email, :is_admin, :is_active)
 	end
 end

@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
 	validates :department, presence: true
 	validates :password, :confirmation => true
 	validates_length_of :password, :in => 5..20, :on => :create
+	validates :email, presence: true
 	# validates :is_admin, presence: true
 	# validates :is_active, presence: true
 
@@ -39,17 +40,9 @@ class User < ActiveRecord::Base
 
 	def activate
 		User.update(self.id, is_active: true)
-		# self.is_active = true
-		# self.save
 	end
 
 	def deactivate
 		User.update(self.id, is_active: false)
-		# self.update_attribute(is_active false)
-		# puts "================="
-		# puts "HERE!!!"
-		# puts "================="
-		# self.is_active = false
-		# self.save
 	end
 end
