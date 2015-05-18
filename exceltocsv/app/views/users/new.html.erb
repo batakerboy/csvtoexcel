@@ -42,15 +42,29 @@
 		<h1>Create New User</h1>
 		<%= render 'user_form'%>
 	<%end%>
-</div>
 
- <% if @user.errors.any? %>
-    <ul>
-    <% for message_error in @user.errors.full_messages %>
-      <li><%= message_error %></li>
-    <% end %>
-    </ul>
-  <% end %>
+	<%if @user.errors.any?%>
+	<br/><br/><br/>
+		<div class = "row">
+			<div class = "col-md-12">
+				<%if @create_admin%>
+					<h2>Adding of new admin failed!</h2>
+				<%else%>
+	    			<h2>Adding of new user failed!</h2>
+				<%end%>
+			</div>
+		</div>
+	    <ul>
+	    	<div class = "row">
+			    <%@user.errors.full_messages.each do |message_error|%>
+			    	<div class = "col-md-6">
+			    		<li><%= message_error %></li>
+			    	</div>
+			    <%end%>
+	    	</div>
+	    </ul>
+	<%end%>
+</div>
 
   <script>
   	$("#profile").click(function(event){

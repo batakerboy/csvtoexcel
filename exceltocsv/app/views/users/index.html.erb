@@ -48,6 +48,7 @@
 				<th>Name</th>
 				<th>Username</th>
 				<th>Department</th>
+				<th>Type</th>
 				<th>Status</th>
 				<th>Actions</th>
 			</tr>
@@ -59,6 +60,11 @@
 						<td><%= user.last_name%>, <%= user.first_name%></td>
 						<td><%= user.username%></td>
 						<td><%= user.department%></td>
+						<%if user.is_admin%>
+							<td>Admin</td>
+						<%else%>
+							<td>User</td>
+						<%end%>
 						<%if user.is_active%>
 							<td><font color = "green">Active</font></td>
 						<%else%>
@@ -66,7 +72,11 @@
 						<%end%>
 						<td>
 							<div class = "btn-group" role = "group">
-								<%= link_to 'Edit', edit_user_path(user), class: "btn btn-info"%>
+								<%if user.is_admin%>
+									<%= link_to 'Edit', edit_user_path(user, create_admin: true), class: "btn btn-info"%>
+								<%else%>
+									<%= link_to 'Edit', edit_user_path(user), class: "btn btn-info"%>
+								<%end%>
 								<%#unless user.id == @current_user.id%>
 									<%if user.is_active%>
 										<%= link_to 'Deactivate', user_deactivate_path(user), id: "users_deactivate", class: "btn btn-danger"%>

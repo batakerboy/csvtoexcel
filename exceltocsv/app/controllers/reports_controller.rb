@@ -44,9 +44,9 @@ class ReportsController < ApplicationController
 	  	File.delete(falco_path) if File.exists?(falco_path)
 
 	  	if @report.save
-	  		redirect_to report_path(@report), notice:'SUCCESS:Report Generated'
+	  		redirect_to report_path(@report)
 	  	else
-	  		render 'index', notice:'FAILED:Generating of reports failed!'
+	  		render 'index'
 	  	end
 	end
 

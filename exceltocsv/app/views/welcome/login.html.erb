@@ -1,5 +1,3 @@
-<%# @page_title = "UserAuth | Login"%>
-
 <nav class = "navbar navbar-default navbar-static-top">
 	<div class = "container">
 		<a href="#" class = "navbar-brand">
@@ -26,17 +24,15 @@
 	</div>
 </nav>
 
+<div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
 <%unless notice.nil?%>
-	<div class = "container" style = "position: relative;">
+	<div style = "position: relative;">
 		<div class = "alert alert-danger alert-dismissable col-md-12"  style = "position: absolute;">
 			<button type = "button" class = "close" data-dismiss = "alert">&times;</button>
 			<%= notice%>
 		</div>
 	</div>
 <%end%>
-
-
-<div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
 	<br/><br/><br/><br/><br/><br/>
 	
 	<h1 style = "color: black; font-size: 500%">

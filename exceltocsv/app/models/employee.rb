@@ -649,8 +649,13 @@ class Employee < ActiveRecord::Base
 				end
 			end
 		end
-		unless ((no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || (no_of_hours_undertime >= 2 && (date.strftime('%A') != 'Friday' && date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'))) && self.is_manager
-			all_info[:no_of_hours_undertime] = no_of_hours_undertime
+		# unless ((no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || (no_of_hours_undertime >= 2 && (date.strftime('%A') != 'Friday' && date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'))) && self.is_manager
+		unless ((no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || no_of_hours_undertime > 2) || self.is_manager
+			# unless no_of_hours_undertime > 2
+				all_info[:no_of_hours_undertime] = no_of_hours_undertime
+			# else
+				# all_info[:no_of_hours_undertime] = 0
+			# end
 		else
 			all_info[:no_of_hours_undertime] = 0
 		end

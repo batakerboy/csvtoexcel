@@ -35,18 +35,29 @@
 </div>
 
 <div class = "container animated fadeInRight" id = "welcomeDiv">
-	<h1>Edit User</h1>
-	<%if @user.is_admin%>
+	<%if @create_admin%>
+		<h1>Edit Admin</h1>
 		<%= render 'admin_form'%>
 	<%else%>
+		<h1>Edit User</h1>
 		<%= render 'user_form'%>
 	<%end%>
-</div>
 
- <% if @user.errors.any? %>
-    <ul>
-    <% for message_error in @user.errors.full_messages %>
-      <li><%= message_error %></li>
-    <% end %>
-    </ul>
-  <% end %>
+	<%if @user.errors.any?%>
+	<br/><br/><br/>
+		<div class = "row">
+			<div class = "col-md-12">
+	    		<h2>Adding of new user failed!</h2>
+			</div>
+		</div>
+	    <ul>
+	    	<div class = "row">
+			    <%@user.errors.full_messages.each do |message_error|%>
+			    	<div class = "col-md-6">
+			    		<li><%= message_error %></li>
+			    	</div>
+			    <%end%>
+	    	</div>
+	    </ul>
+	<%end%>
+</div>
