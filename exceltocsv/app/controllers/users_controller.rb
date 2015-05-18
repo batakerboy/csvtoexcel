@@ -47,7 +47,7 @@ class UsersController < ApplicationController
 		puts "========================="
 
 		if @user.save
-			UserMailer.account_created(@user).deliver_later
+			# UserMailer.account_created(@user).deliver_later
 			redirect_to users_path
 		else
 			render 'new'

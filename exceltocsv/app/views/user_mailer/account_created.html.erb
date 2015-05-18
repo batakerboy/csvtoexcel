@@ -1,3 +1,15 @@
-<h1>Welcome to FBI Integration System, <%= @user.first_name%>!</h1>
+<div class = "container">
+	<h3>Welcome to FBI Integration System, <%= @user.first_name%>!</h3>
 
-<p>An account for you has been created!</p>
+	<p>An account for you has been created!</p>
+
+	<div class = "row">
+		<div class = "col-md-6">Username:</div>
+		<div class = "col-md-6"><%= @user.username%></div>
+	</div>
+
+	<div class = "row">
+		<div class = "col-md-6">Password:</div>
+		<div class = "col-md-6"><%= @password%></div>
+	</div>
+</div>
