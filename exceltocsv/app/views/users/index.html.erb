@@ -77,13 +77,11 @@
 								<%else%>
 									<%= link_to 'Edit', edit_user_path(user), class: "btn btn-info"%>
 								<%end%>
-								<%#unless user.id == @current_user.id%>
-									<%if user.is_active%>
-										<%= link_to 'Deactivate', user_deactivate_path(user), id: "users_deactivate", class: "btn btn-danger"%>
-									<%else%>
-										<%= link_to 'Activate', user_activate_path(user), id: "users_activate", class: "btn btn-warning"%>
-									<%end%>
-								<%#end%>
+								<%if user.is_active%>
+									<%= link_to 'Deactivate', user_deactivate_path(user), id: "users_deactivate", class: "btn btn-danger", style: "width:100px"%>
+								<%else%>
+									<%= link_to 'Activate', user_activate_path(user), id: "users_activate", class: "btn btn-warning", style: "width:100px"%>
+								<%end%>
 							</div>
 						</td>	
 					</tr>

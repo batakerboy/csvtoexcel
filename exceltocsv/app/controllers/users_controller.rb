@@ -38,7 +38,8 @@ class UsersController < ApplicationController
 		@create_admin = params[:create_admin]
 
 		if @user.save
-			# UserMailer.account_created(@user).deliver_later
+			# UserMailer.account_created(@user, params[:password]).deliver_later
+			# @user.clear_password
 			redirect_to users_path
 		else
 			render 'new'
