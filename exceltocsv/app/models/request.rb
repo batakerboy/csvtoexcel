@@ -4,6 +4,7 @@ class Request < ActiveRecord::Base
 	belongs_to :employee
 
 	def self.import(file)
+		array_of_ids = Array.new
 		employee_id = 0
 		if file.to_s.split('/').last == "iEMS.csv"
 			iEMS = File.open(file, 'r:ISO-8859-1')
@@ -31,11 +32,13 @@ class Request < ActiveRecord::Base
 					
 					employee_id = token[0]
 
+					array_of_ids.push(employee_id)
+
 					@employee = Employee.where(id: employee_id).first
 					unless @employee.nil?
-						Employee.where(id: employee_id).update_all(last_name: token[1], first_name: token[2], is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
+						Employee.where(id: employee_id).update_all(last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
 					else
-						@employee = Employee.new(id: employee_id, last_name: token[1], first_name: token[2], is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
+						@employee = Employee.new(id: employee_id, last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
 						@employee.save
 					end
 				end
@@ -50,5 +53,7 @@ class Request < ActiveRecord::Base
 				end
 			end
 		end
+
+		return array_of_ids
 	end
 end

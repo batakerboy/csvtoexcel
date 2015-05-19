@@ -87,38 +87,6 @@
 	$(".view_report_button").click(function(){
 		document.getElementById("loader-wrapper").className = "animated fadeIn"
 	});
-
-	
-	// $(".download_report_button").each(function(){
-	// 	$(this).click(function(){
-	// 		document.getElementById("loader-wrapper").className = "animated fadeIn"
-	// 		$.ajax({
-	//  			url: ("/reports/" + this.id + "/download_zip"),
-	// 	        type: "GET",
-	// 	        processData: false,
-	//  			// data: $('generate_report_form').serialize(),
-	//  			complete: function() {
-	// 				document.getElementById("loader-wrapper").className = "animated fadeOut"
-	// 				$('#body').addClass('loaded');
-	// 			}
-	//  		})	
-	// 	});
-	// });
-
-	// $(".download_report_button").each(click(function(a, b){
-	// 	document.getElementById("loader-wrapper").className = "animated fadeIn"
-	// 	alert(b);
- 		// $.ajax({
- 		// 	url: ("/reports/" + b.id + "/download_zip"),
-	  //       type: "GET",
-	  //       // processData: false,
- 		// 	// data: $('generate_report_form').serialize(),
- 		// 	complete: function() {
-			// 	document.getElementById("loader-wrapper").className = "animated fadeOut"
-			// 	$('#body').addClass('loaded');
-			// }
- 		// });
-	// }););
 	$("#profile").click(function(event){
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){

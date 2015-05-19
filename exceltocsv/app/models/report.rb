@@ -142,10 +142,11 @@ class Report < ActiveRecord::Base
 				    summarydtr_ws.merge_cells 'I2:J2'
 				    summarydtr_ws.merge_cells 'AU2:CE2'
 				    
-
-
-				    # Employee.find_by_sql("SELECT * FROM employees ORDER BY last_name").each_with_index do |emp, i|
-				    Employee.all.order(last_name: :asc).each_with_index do |emp, i|
+				    ids = self.employee_ids.tr('"[]','').split(",")
+					@employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
+				    
+				    # Employee.all.order(last_name: :asc).each_with_index do |emp, i|
+				    @employees.each_with_index do |emp, i|
 				    	employeedtr_filename = "#{emp.last_name},#{emp.first_name}.xlsx"
 				    	dtr_peremployee_path = Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename)
 
@@ -463,7 +464,6 @@ class Report < ActiveRecord::Base
 						summaryrownum += 1
 						
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
-						# File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 					end
 					summarydtr_ws.column_info[2].hidden = true
 					i = 10

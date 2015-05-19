@@ -37,7 +37,7 @@ class ReportsController < ApplicationController
 	  		raise "File not uploaded for Falco." unless File.exists?(falco_path)
 
 		  	token = File.open(biometrics_path, &:readline).split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
-		  	raise 'The file uploaded for Biometrics is wrong or has been tampered' if token.nil? || (token[0].tr('"', '') != 'Mustard Seed' || (token[62].nil? && token[53].nil?))
+		  	raise 'The file uploaded for Biometrics is wrong or has been tampered' if token.nil? || (token[0] != 'Mustard Seed' || (token[62].nil? && token[53].nil?))
 			
 			token = File.open(iEMS_path, &:readline).split(',')
 			raise 'The file uploaded for iEMS is wrong or has been tampered!' if token[0].tr('"', '') != 'FROM'
@@ -47,7 +47,7 @@ class ReportsController < ApplicationController
 		
 		  	raise 'The date range in at least one of the files are not the same with the others!' if !check_date_range
 
-			Request.import(iEMS_path) if File.exists?(iEMS_path)
+			@report.employee_ids = Request.import(iEMS_path) if File.exists?(iEMS_path)
 		  	Attendance.import(biometrics_path) if File.exists?(biometrics_path)
 			Attendance.import(falco_path) if File.exists?(falco_path)
 			
@@ -73,23 +73,6 @@ class ReportsController < ApplicationController
 		File.delete(iEMS_path) if File.exists?(iEMS_path)
 	  	File.delete(biometrics_path) if File.exists?(biometrics_path)
 	  	File.delete(falco_path) if File.exists?(falco_path)
-	  	# Request.import(iEMS_path) if File.exists?(iEMS_path)
-	  	# Attendance.import(biometrics_path) if File.exists?(biometrics_path)
-  		# Attendance.import(falco_path) if File.exists?(falco_path)
-
-  		# token = File.open(iEMS_path, &:readline).split(',')
-	  	# @report.date_start = token[1].to_date
-	  	# @report.date_end = token[3].to_date
-
-	  	# File.delete(iEMS_path) if File.exists?(iEMS_path)
-	  	# File.delete(biometrics_path) if File.exists?(biometrics_path)
-	  	# File.delete(falco_path) if File.exists?(falco_path)
-
-	  	# if @report.save
-	  	# 	redirect_to report_path(@report)
-	  	# else
-	  	# 	render 'index'
-	  	# end
 	end
 
 	def show
@@ -98,7 +81,9 @@ class ReportsController < ApplicationController
 		@cut_off_date = '2015-04-01'.to_date
 		@empid = params[:get]
 		if @empid.nil? || @empid['employee_id'] == "All"
-			@employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)	
+			# @employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
+			ids = @report.employee_ids.tr('"[]','').split(",")
+			@employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}	
 		else
 			@employees = Employee.where(id: @empid['employee_id'])
 		end

@@ -418,120 +418,120 @@ class Employee < ActiveRecord::Base
 		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 
-	# def total_regular_ot_to_string(date_start, date_end)
-	# 	value = total_regular_ot(date_start, date_end)
-	# 	value_days = ((value.to_d)/8).to_s.split('.').first
-	# 	value_hours = ((value.to_d)%8).to_s.split('.').first
-	# 	value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+	def total_regular_ot_to_string(date_start, date_end)
+		value = total_regular_ot(date_start, date_end)
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_rest_or_special_ot_to_string_first_8(date_start, date_end)
-	# 	value = total_rest_or_special_ot(date_start, date_end)
-	# 	return "1.0.0" if value > 8
+	def total_rest_or_special_ot_to_string_first_8(date_start, date_end)
+		value = total_rest_or_special_ot(date_start, date_end)
+		return "1.0.0" if value > 8
 		
-	# 	value_days = ((value.to_d)/8).to_s.split('.').first
-	# 	value_hours = ((value.to_d)%8).to_s.split('.').first
-	# 	value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_rest_or_special_ot_to_string_excess(date_start, date_end)
-	# 	value = total_rest_or_special_ot(date_start, date_end)
-	# 	return "0.0.0" if value <= 8
+	def total_rest_or_special_ot_to_string_excess(date_start, date_end)
+		value = total_rest_or_special_ot(date_start, date_end)
+		return "0.0.0" if value <= 8
 		
-	# 	value_days = (((value.to_d)-8)/8).to_s.split('.').first
-	# 	value_hours = (((value.to_d)-8)%8).to_s.split('.').first
-	# 	value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = (((value.to_d)-8)/8).to_s.split('.').first
+		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
+		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_special_on_rest_ot_to_string_first_8(date_start, date_end)
-	# 	value = total_special_on_rest_ot(date_start, date_end)
-	# 	return "1.0.0" if value > 8
+	def total_special_on_rest_ot_to_string_first_8(date_start, date_end)
+		value = total_special_on_rest_ot(date_start, date_end)
+		return "1.0.0" if value > 8
 		
-	# 	value_days = ((value.to_d)/8).to_s.split('.').first
-	# 	value_hours = ((value.to_d)%8).to_s.split('.').first
-	# 	value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_special_on_rest_ot_to_string_excess(date_start, date_end)
-	# 	value = total_special_on_rest_ot(date_start, date_end)
-	# 	return "0.0.0" if value <= 8
+	def total_special_on_rest_ot_to_string_excess(date_start, date_end)
+		value = total_special_on_rest_ot(date_start, date_end)
+		return "0.0.0" if value <= 8
 		
-	# 	value_days = (((value.to_d)-8)/8).to_s.split('.').first
-	# 	value_hours = (((value.to_d)-8)%8).to_s.split('.').first
-	# 	value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = (((value.to_d)-8)/8).to_s.split('.').first
+		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
+		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_regular_holiday_ot_to_string_first_8(date_start, date_end)
-	# 	value = total_regular_holiday_ot(date_start, date_end)
-	# 	return "1.0.0" if value > 8
+	def total_regular_holiday_ot_to_string_first_8(date_start, date_end)
+		value = total_regular_holiday_ot(date_start, date_end)
+		return "1.0.0" if value > 8
 		
-	# 	value_days = ((value.to_d)/8).to_s.split('.').first
-	# 	value_hours = ((value.to_d)%8).to_s.split('.').first
-	# 	value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_regular_holiday_ot_to_string_excess(date_start, date_end)
-	# 	value = total_regular_holiday_ot(date_start, date_end)
-	# 	return "0.0.0" if value <= 8
+	def total_regular_holiday_ot_to_string_excess(date_start, date_end)
+		value = total_regular_holiday_ot(date_start, date_end)
+		return "0.0.0" if value <= 8
 		
-	# 	value_days = (((value.to_d)-8)/8).to_s.split('.').first
-	# 	value_hours = (((value.to_d)-8)%8).to_s.split('.').first
-	# 	value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = (((value.to_d)-8)/8).to_s.split('.').first
+		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
+		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_regular_on_rest_ot_to_string_first_8(date_start, date_end)
-	# 	value = total_regular_on_rest_ot(date_start, date_end)
-	# 	return "1.0.0" if value > 8
+	def total_regular_on_rest_ot_to_string_first_8(date_start, date_end)
+		value = total_regular_on_rest_ot(date_start, date_end)
+		return "1.0.0" if value > 8
 		
-	# 	value_days = ((value.to_d)/8).to_s.split('.').first
-	# 	value_hours = ((value.to_d)%8).to_s.split('.').first
-	# 	value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = ((value.to_d)/8).to_s.split('.').first
+		value_hours = ((value.to_d)%8).to_s.split('.').first
+		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
-	# def total_regular_on_rest_ot_to_string_excess(date_start, date_end)
-	# 	value = total_regular_on_rest_ot(date_start, date_end)
-	# 	return "0.0.0" if value <= 8
+	def total_regular_on_rest_ot_to_string_excess(date_start, date_end)
+		value = total_regular_on_rest_ot(date_start, date_end)
+		return "0.0.0" if value <= 8
 		
-	# 	value_days = (((value.to_d)-8)/8).to_s.split('.').first
-	# 	value_hours = (((value.to_d)-8)%8).to_s.split('.').first
-	# 	value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-	# 	if value_mins == '3'
-	# 		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	# 	end
-	# 	return "#{value_days}.#{value_hours}.#{value_mins}"
-	# end
+		value_days = (((value.to_d)-8)/8).to_s.split('.').first
+		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
+		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
+		if value_mins == '3'
+			return "#{value_days}.#{value_hours}.#{value_mins}0"
+		end
+		return "#{value_days}.#{value_hours}.#{value_mins}"
+	end
 
 	def self.format_time(to_convert)
 		time = (((to_convert)).to_s.split('.').first).to_d
@@ -591,12 +591,6 @@ class Employee < ActiveRecord::Base
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
 		@request = Request.where(employee_id: self.id, date: date).first
 
-		puts "==================================="
-		puts "Employee: #{self.last_name}"
-		puts "ID: #{self.id}"
-		puts "Date: #{date}"
-		puts "==================================="
-
 		time_in = @attendance.time_in.to_time.strftime('%H:%M:%S') unless @attendance.nil?
 		all_info[:time_in] = time_in
 
@@ -655,13 +649,9 @@ class Employee < ActiveRecord::Base
 				end
 			end
 		end
-		# unless ((no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || (no_of_hours_undertime >= 2 && (date.strftime('%A') != 'Friday' && date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'))) && self.is_manager
+		
 		unless ((no_of_hours_undertime >= 1 && date.strftime('%A') == 'Friday') || no_of_hours_undertime > 2) || self.is_manager
-			# unless no_of_hours_undertime > 2
-				all_info[:no_of_hours_undertime] = no_of_hours_undertime
-			# else
-				# all_info[:no_of_hours_undertime] = 0
-			# end
+			all_info[:no_of_hours_undertime] = no_of_hours_undertime
 		else
 			all_info[:no_of_hours_undertime] = 0
 		end
@@ -676,7 +666,6 @@ class Employee < ActiveRecord::Base
 		all_info[:is_in_holiday] = is_in_holiday
 
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks.strip != '' || @request.offset.length > 2 || is_in_holiday
-		# unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.remarks != '' || @request.offset.length > 2 || is_in_holiday
 			if time_in.nil? && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')
 				is_absent = true
 			else
@@ -818,10 +807,6 @@ class Employee < ActiveRecord::Base
 		all_summary[:total_regular_holiday_ot_to_string] = Employee.value_to_string(total_regular_holiday_ot)
 		all_summary[:total_regular_on_rest_ot_to_string] = Employee.value_to_string(total_regular_on_rest_ot)
 
-		# all_summary[:total_rest_or_special_ot_to_string_excess] = Employee.value_to_string_excess(total_rest_or_special_ot)
-		# all_summary[:total_special_on_rest_ot_to_string_excess] = Employee.value_to_string_excess(total_special_on_rest_ot)
-		# all_summary[:total_regular_holiday_ot_to_string_excess] = Employee.value_to_string_excess(total_regular_holiday_ot)
-		# all_summary[:total_regular_on_rest_ot_to_string_excess] = Employee.value_to_string_excess(total_regular_on_rest_ot)
 		return all_summary
 	end
 
@@ -839,27 +824,5 @@ class Employee < ActiveRecord::Base
 		value_hours = ((((value.to_d).to_s.split('.').last).to_d) * 0.8)
 
 		return "#{value_days}.#{value_hours}"
-	end
-
-	def self.value_to_string_first_8(value)
-		return "1.0.0" if value > 8
-		
-		value_days = ((value.to_d)/8).to_s.split('.').first
-		value_hours = ((value.to_d)%8).to_s.split('.').first
-		value_mins = ((((value.to_d)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-
-		return "#{value_days}.#{value_hours}.#{value_mins}" unless (value_mins.length == 1 && value_mins != '0')
-		return "#{value_days}.#{value_hours}.#{value_mins}0"
-	end
-
-	def self.value_to_string_excess(value)
-		return "0.0.0" if value <= 8
-		
-		value_days = (((value.to_d)-8)/8).to_s.split('.').first
-		value_hours = (((value.to_d)-8)%8).to_s.split('.').first
-		value_mins = (((((value.to_d)-8)%8).to_s.split('.').last).to_d * 0.6).to_s.split('.').first
-
-		return "#{value_days}.#{value_hours}.#{value_mins}" unless (value_mins.length == 1 && value_mins != '0')
-		return "#{value_days}.#{value_hours}.#{value_mins}0"
 	end
 end

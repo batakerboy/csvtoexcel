@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150518034216) do
+ActiveRecord::Schema.define(version: 20150519064552) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -39,11 +39,12 @@ ActiveRecord::Schema.define(version: 20150518034216) do
   add_index "employees", ["falco_id"], name: "by_falco_id"
 
   create_table "reports", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.date     "date_start"
     t.date     "date_end"
     t.string   "name"
+    t.string   "employee_ids", default: "--- []\n"
   end
 
   create_table "requests", force: :cascade do |t|
