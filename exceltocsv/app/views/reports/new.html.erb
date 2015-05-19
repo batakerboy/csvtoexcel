@@ -35,6 +35,16 @@
 </div>
 
 <div class="hidden" id = "welcomeDiv">
+
+	<%unless notice.nil?%>
+		<div style = "position: relative;">
+			<div class = "alert alert-danger alert-dismissable col-md-12"  style = "position: absolute;">
+				<button type = "button" class = "close" data-dismiss = "alert">&times;</button>
+				<%= notice%>
+			</div>
+		</div>
+	<%end%>
+
 	<div class = "row" style = "margin-top:100px;" align = "center">
 		<div class = "col-md-4" style = "height: 400px; border-style: solid; border-bottom-style: none; border-width: 1px">
 			<div class = "col-md-12">

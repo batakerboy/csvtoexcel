@@ -13,7 +13,7 @@ class Request < ActiveRecord::Base
 				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
 				
 				next if token[5].length == 0 && token[6].length < 6
-				
+
 				unless employee_id == token[0]
 					unless token[5].length == 0
 						@employee = Employee.where(biometrics_id: token[5]).first
