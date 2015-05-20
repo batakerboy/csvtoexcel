@@ -727,6 +727,7 @@ class Employee < ActiveRecord::Base
 		total_special_on_rest_ot = 0
 		total_regular_holiday_ot = 0
 		total_regular_on_rest_ot = 0
+		total_absences = 0
 
 		while date <= date_end
 			e = self.get_all_information(date)
@@ -746,6 +747,8 @@ class Employee < ActiveRecord::Base
 			total_regular_holiday_ot += e[:regular_holiday_ot]
 			total_regular_on_rest_ot += e[:regular_on_rest_ot]
 
+			total_absences += 1 if e[:is_absent]
+
 			date += 1.day
 		end
 		all_summary[:total_undertime] = total_undertime
@@ -759,6 +762,7 @@ class Employee < ActiveRecord::Base
 		all_summary[:total_special_on_rest_ot] = total_special_on_rest_ot
 		all_summary[:total_regular_holiday_ot] = total_regular_holiday_ot
 		all_summary[:total_regular_on_rest_ot] = total_regular_on_rest_ot
+		all_summary[:total_absences] = total_absences
 
 		@request = Request.where(employee_id: self.id, date: date_start).first
 		unless @request.vacation_leave_balance.to_d > total_vl
