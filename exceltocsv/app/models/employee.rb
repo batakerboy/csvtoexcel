@@ -748,6 +748,7 @@ class Employee < ActiveRecord::Base
 			total_regular_on_rest_ot += e[:regular_on_rest_ot]
 
 			total_absences += 1 if e[:is_absent]
+			total_absences += 0.5 if e[:is_halfday]
 
 			date += 1.day
 		end
@@ -810,6 +811,8 @@ class Employee < ActiveRecord::Base
 		all_summary[:total_special_on_rest_ot_to_string] = Employee.value_to_string(total_special_on_rest_ot)
 		all_summary[:total_regular_holiday_ot_to_string] = Employee.value_to_string(total_regular_holiday_ot)
 		all_summary[:total_regular_on_rest_ot_to_string] = Employee.value_to_string(total_regular_on_rest_ot)
+
+		all_summary[:total_absences_to_string] = Employee.value_to_string(total_absences*8)
 
 		return all_summary
 	end
