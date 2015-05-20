@@ -80,10 +80,14 @@ class ReportsController < ApplicationController
 		@date = @report.date_start
 		@cut_off_date = '2015-04-01'.to_date
 		@empid = params[:get]
+
+		ids = @report.employee_ids.tr('"[]','').split(",")
+		@all_employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
 		if @empid.nil? || @empid['employee_id'] == "All"
 			# @employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
-			ids = @report.employee_ids.tr('"[]','').split(",")
-			@employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}	
+			# ids = @report.employee_ids.tr('"[]','').split(",")
+			# @employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
+			@employees = @all_employees	
 		else
 			@employees = Employee.where(id: @empid['employee_id'])
 		end
