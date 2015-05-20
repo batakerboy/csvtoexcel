@@ -780,10 +780,11 @@ class Employee < ActiveRecord::Base
 		end
 		all_summary[:surplus_sl] = surplus_sl
 
-		summary_total = surplus_vl*8 + surplus_sl*8 + total_late
+		summary_total = surplus_vl*8 + surplus_sl*8 + total_late + total_absences*8
 		all_summary[:summary_total] = summary_total
 
-		summary_total_with_ut = surplus_vl*8 + surplus_sl*8 + total_late + total_undertime
+		# summary_total_with_ut = surplus_vl*8 + surplus_sl*8 + total_late + total_undertime
+		summary_total_with_ut = summary_total + total_undertime
 		all_summary[:summary_total_with_ut] = summary_total_with_ut
 
 		summary_total_to_string = Employee.value_to_string(summary_total)
