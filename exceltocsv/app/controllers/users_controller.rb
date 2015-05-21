@@ -2,7 +2,6 @@ class UsersController < ApplicationController
 	before_filter :authenticate_user, :only => [:new, :create, :edit, :index, :update, :profile]
 	before_filter :check_if_admin, :only => [:new, :create, :edit, :index]
 	before_filter :check_if_active, :only => [:new, :create, :edit, :index, :update]
- 	# before_filter :save_login_state, :only => [:new, :create]
 
  	def index
  		@users = User.all.order(last_name: :asc, first_name: :asc, department: :asc)	
@@ -38,8 +37,6 @@ class UsersController < ApplicationController
 		@create_admin = params[:create_admin]
 
 		if @user.save
-			# UserMailer.account_created(@user, params[:password]).deliver_later
-			# @user.clear_password
 			redirect_to users_path
 		else
 			render 'new'
