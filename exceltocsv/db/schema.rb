@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150519064552) do
+ActiveRecord::Schema.define(version: 20150521065223) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -39,12 +39,12 @@ ActiveRecord::Schema.define(version: 20150519064552) do
   add_index "employees", ["falco_id"], name: "by_falco_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.date     "date_start"
     t.date     "date_end"
     t.string   "name",         limit: 255
-    t.string   "employee_ids", limit: 255, default: "--- []\n"
+    t.text     "employee_ids", limit: 65535
   end
 
   create_table "requests", force: :cascade do |t|
