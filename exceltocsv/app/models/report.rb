@@ -109,7 +109,13 @@ class Report < ActiveRecord::Base
 				    					   " ", # CB
 				    					   " ", # CC
 				    					   " ", # CD
-				    					   " "], style: headers # CE
+				    					   " ", # CE
+				    					   "Deduction", # CF
+				    					   " ", # CG
+				    					   " ", # CH
+				    					   " ", # CI
+				    					   " ", # CJ
+				    					   " "], style: headers # CK
 				    					   
 				    summaryrownum += 1
 				    summarydtr_ws.add_row ["NO.","NAME", "DEPARTMENT", 
@@ -129,24 +135,27 @@ class Report < ActiveRecord::Base
 				    					   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 				    					   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 				    					   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-				    					   "ALLOWANCE", "TOTAL"], :height => 70, style: headers
+				    					   "ALLOWANCE", "TOTAL",
+				    					   "Absences", "1st Column", "2nd Column", "3rd Column", "4th Column", "5th Column"], :height => 70, style: headers
 				    summaryrownum += 1
 				    # Otherwise you can specify a style for each column.
 				    # summarydtr_ws.add_row ['Q1-2011', '26740000000', '=B5/SUM(B4:B7)'], style: [pascal, money_pascal, percent_pascal]
 
 				    # You can merge cells!
-				    summarydtr_ws.merge_cells 'A1:CE1'
+				    summarydtr_ws.merge_cells 'A1:CK1'
 				    summarydtr_ws.merge_cells 'A2:C2'
 				    summarydtr_ws.merge_cells 'D2:F2'
 				    summarydtr_ws.merge_cells 'G2:H2'
 				    summarydtr_ws.merge_cells 'I2:J2'
 				    summarydtr_ws.merge_cells 'AU2:CE2'
+				    summarydtr_ws.merge_cells 'CF2:CK2'
 				    
 				    ids = self.employee_ids.tr('"[]','').split(",")
 					@employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
 				    
 				    # Employee.all.order(last_name: :asc).each_with_index do |emp, i|
 				    @employees.each_with_index do |emp, i|
+				    	@@total_absences = 0
 				    	employeedtr_filename = "#{emp.last_name},#{emp.first_name}.xlsx"
 				    	dtr_peremployee_path = Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename)
 
@@ -212,6 +221,7 @@ class Report < ActiveRecord::Base
 																    e[:offset],
 																    e[:remarks]], style: info
 										elsif e[:is_halfday]
+											@@total_absences += 0.5
 											employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
 																    date.strftime('%A'),
 																    e[:time_in],
@@ -229,6 +239,7 @@ class Report < ActiveRecord::Base
 																    e[:offset],
 																    e[:remarks]], style: warning
 									    elsif e[:is_absent]
+									    	@@total_absences += 1
 									    	employeedtr_ws.add_row [date.strftime('%m-%d-%Y'),
 																    date.strftime('%A'),
 																    e[:time_in],
@@ -297,11 +308,24 @@ class Report < ActiveRecord::Base
 							    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
 							    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
 							    	rownum += 1
+							    	employeedtr_ws.add_row ["TOTAL ABSENCES", " ", " ", " ", " ", " ", " ", " ", @@total_absences, " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.merge_cells "A#{rownum}:H#{rownum}"
+							    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
+							    	rownum += 1
 
 							    	employeedtr_ws.add_row 
 							    	rownum += 1
 
-							   		employeedtr_ws.add_row ["ACCUMULATED OT", " ", ("=FLOOR(G#{rownum-3}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-3},8),1)&"<<'"."'<<"&(MOD(G#{rownum-3},8)-FLOOR(MOD(G#{rownum-3},8),1))*60"), " ", "Legends:", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    	employeedtr_ws.add_row ["ACCUMULATED OT", " ", ("=FLOOR(G#{rownum-4}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-4},8),1)&"<<'"."'<<"&(MOD(G#{rownum-4},8)-FLOOR(MOD(G#{rownum-4},8),1))*60"), " ", "", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							   							    "=INT(LEFT(C#{rownum+1},2))", 
+							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
+							   							    "=INT(LEFT(R#{rownum},1))", 
+							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, title, title, title, title, title, title, title, title, title, title, title, title]
+	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
+							    	rownum += 1
+
+							   		employeedtr_ws.add_row ["TOTAL ABSENCES", " ", ("=FLOOR(I#{rownum-3},1,1)&"<<'"."'<<"&FLOOR(MOD(I#{rownum-3}*8,8),1,1)&"<<'"."'<<"&(MOD(I#{rownum-3}*8,8)-FLOOR(MOD(I#{rownum-3}*8,8),1,1))*60"), " ", "Legends:", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 							   							    "=INT(LEFT(C#{rownum+1},2))", 
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
@@ -311,7 +335,7 @@ class Report < ActiveRecord::Base
 	   							    employeedtr_ws.merge_cells "E#{rownum}:P#{rownum}"
 
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["LATES", " ", ("=FLOOR(E#{rownum-5}/8,1)&"<<'"."'<<"&FLOOR(MOD(E#{rownum-5},8),1)&"<<'"."'<<"&(MOD(E#{rownum-5},8)-FLOOR(MOD(E#{rownum-5},8),1))*60"), " ", " ", "Employee has request(s)/remark(s) for that day.\n*May incur late and/or undertime depending on his or her time-in and time-out.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    	employeedtr_ws.add_row ["LATES", " ", ("=FLOOR(E#{rownum-7}/8,1)&"<<'"."'<<"&FLOOR(MOD(E#{rownum-7},8),1)&"<<'"."'<<"&(MOD(E#{rownum-7},8)-FLOOR(MOD(E#{rownum-7},8),1))*60"), " ", " ", "Employee has request(s)/remark(s) for that day.\n*May incur late and/or undertime depending on his or her time-in and time-out.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 							    							"=INT(LEFT(C#{rownum+1},2))", 
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
@@ -321,7 +345,7 @@ class Report < ActiveRecord::Base
 	   							    employeedtr_ws.merge_cells "E#{rownum}:E#{rownum+1}"
 	   							    employeedtr_ws.merge_cells "F#{rownum}:P#{rownum+1}"
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["ACCUMULATED VL", " ", ("=FLOOR(H#{rownum-4},1)&"<<'"."'<<"&(H#{rownum-4}-FLOOR(H#{rownum-4},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    	employeedtr_ws.add_row ["ACCUMULATED VL", " ", ("=FLOOR(H#{rownum-6},1)&"<<'"."'<<"&(H#{rownum-6}-FLOOR(H#{rownum-6},1))*8&"<<'".0"'), " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 							    							"=INT(LEFT(C#{rownum+1},2))", 
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
@@ -329,7 +353,7 @@ class Report < ActiveRecord::Base
 							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, legendblue, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-5},1)&"<<'"."'<<"&(I#{rownum-5}-FLOOR(I#{rownum-5},1))*8&"<<'".0"'), " ", " ", "Employee is considered half-day because of his time-in or time-out.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-7},1)&"<<'"."'<<"&(I#{rownum-7}-FLOOR(I#{rownum-7},1))*8&"<<'".0"'), " ", " ", "Employee is considered half-day because of his time-in or time-out.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 							    							"=INT(LEFT(C#{rownum+1},2))", 
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
@@ -348,11 +372,11 @@ class Report < ActiveRecord::Base
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
 							    	employeedtr_ws.add_row ["SL BALANCE", " ", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", "Employee has no time-in and therefore, considered as absent.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-							    							"=Q#{rownum-5}+IF(Q#{rownum-4}>Q#{rownum-2},Q#{rownum-4}-Q#{rownum-2},0)+IF(Q#{rownum-3}>Q#{rownum-1},Q#{rownum-3}-Q#{rownum-1},0)",
+							    							"=Q#{rownum-5}+Q#{rownum-6}+IF(Q#{rownum-4}>Q#{rownum-2},Q#{rownum-4}-Q#{rownum-2},0)+IF(Q#{rownum-3}>Q#{rownum-1},Q#{rownum-3}-Q#{rownum-1},0)",
 							    							" ", 
-							    							"=S#{rownum-5}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
-							    							"=T#{rownum-5}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
-							    							"=U#{rownum-5}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							    							"=S#{rownum-5}+S#{rownum-6}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
+							    							"=T#{rownum-5}+T#{rownum-6}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
+							    							"=U#{rownum-5}+U#{rownum-6}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	employeedtr_ws.merge_cells "E#{rownum}:E#{rownum+1}"
 	   							    employeedtr_ws.merge_cells "F#{rownum}:P#{rownum+1}"
@@ -395,7 +419,7 @@ class Report < ActiveRecord::Base
 				    					    "=INT(LEFT(G#{summaryrownum+1},2))", # N
 				    					    "=INT(LEFT(J#{summaryrownum+1},2))", # O
 				    					    "=INT(LEFT(H#{summaryrownum+1},2))", # P
-				    					    "=K#{summaryrownum+1}+L#{summaryrownum+1}+IF(M#{summaryrownum+1}>O#{summaryrownum+1},M#{summaryrownum+1}-O#{summaryrownum+1},0)+IF(N#{summaryrownum+1}>P#{summaryrownum+1},N#{summaryrownum+1}-P#{summaryrownum+1},0)", # Q
+				    					    "=K#{summaryrownum+1}+L#{summaryrownum+1}+CG#{summaryrownum+1}+IF(M#{summaryrownum+1}>O#{summaryrownum+1},M#{summaryrownum+1}-O#{summaryrownum+1},0)+IF(N#{summaryrownum+1}>P#{summaryrownum+1},N#{summaryrownum+1}-P#{summaryrownum+1},0)", # Q
 				    					    "=IF(LEFT(RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-3),RIGHT(E#{summaryrownum+1},LEN(E#{summaryrownum+1})-2))", # R
 				    					    "=IF(LEFT(RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-3),RIGHT(F#{summaryrownum+1},LEN(F#{summaryrownum+1})-2))", # S
 				    					    "=IF(LEFT(RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-3),RIGHT(I#{summaryrownum+1},LEN(I#{summaryrownum+1})-2))", # T
@@ -408,21 +432,21 @@ class Report < ActiveRecord::Base
 				    					    "=INT(LEFT(U#{summaryrownum+1},1))", # AA
 				    					    "=INT(LEFT(V#{summaryrownum+1},1))", # AB
 				    					    "=INT(LEFT(W#{summaryrownum+1},1))", # AC
-				    					    "=R#{summaryrownum+1}+S#{summaryrownum+1}+IF(T#{summaryrownum+1}>V#{summaryrownum+1},T#{summaryrownum+1}-V#{summaryrownum+1},0)+IF(U#{summaryrownum+1}>W#{summaryrownum+1},U#{summaryrownum+1}-W#{summaryrownum+1},0)", # AD
+				    					    "=R#{summaryrownum+1}+S#{summaryrownum+1}+CH#{summaryrownum+1}+IF(T#{summaryrownum+1}>V#{summaryrownum+1},T#{summaryrownum+1}-V#{summaryrownum+1},0)+IF(U#{summaryrownum+1}>W#{summaryrownum+1},U#{summaryrownum+1}-W#{summaryrownum+1},0)", # AD
 				    					    "=RIGHT(R#{summaryrownum+1},LEN(R#{summaryrownum+1})-2)+0", # AE
 				    					    "=RIGHT(S#{summaryrownum+1},LEN(S#{summaryrownum+1})-2)+0", # AF
 				    					    "=RIGHT(T#{summaryrownum+1},LEN(T#{summaryrownum+1})-2)+0", # AG
 				    					    "=RIGHT(U#{summaryrownum+1},LEN(U#{summaryrownum+1})-2)+0", # AH
 				    					    "=RIGHT(V#{summaryrownum+1},LEN(V#{summaryrownum+1})-2)+0", # AI
 				    					    "=RIGHT(W#{summaryrownum+1},LEN(W#{summaryrownum+1})-2)+0", # AJ
-				    					    "=AE#{summaryrownum+1}+IF(AG#{summaryrownum+1}>AI#{summaryrownum+1},AG#{summaryrownum+1}-AI#{summaryrownum+1},0)+IF(AH#{summaryrownum+1}>AJ#{summaryrownum+1},AH#{summaryrownum+1}-AJ#{summaryrownum+1},0)", # AK
+				    					    "=AE#{summaryrownum+1}+AF#{summaryrownum+1}+CJ#{summaryrownum+1}+IF(AG#{summaryrownum+1}>AI#{summaryrownum+1},AG#{summaryrownum+1}-AI#{summaryrownum+1},0)+IF(AH#{summaryrownum+1}>AJ#{summaryrownum+1},AH#{summaryrownum+1}-AJ#{summaryrownum+1},0)", # AK
 				    					    "=K#{summaryrownum+1}*8*60+X#{summaryrownum+1}*60+AE#{summaryrownum+1}", # AL
 				    					    "=L#{summaryrownum+1}*8*60+Y#{summaryrownum+1}*60+AF#{summaryrownum+1}", # AM
 				    					    "=M#{summaryrownum+1}*8*60+Z#{summaryrownum+1}*60+AG#{summaryrownum+1}", # AN
 				    					    "=N#{summaryrownum+1}*8*60+AA#{summaryrownum+1}*60+AH#{summaryrownum+1}", # AO
 				    					    "=O#{summaryrownum+1}*8*60+AB#{summaryrownum+1}*60+AI#{summaryrownum+1}", # AP
 				    					    "=P#{summaryrownum+1}*8*60+AC#{summaryrownum+1}*60+AJ#{summaryrownum+1}", # AQ
-				    					    "=AL#{summaryrownum+1}+AM#{summaryrownum+1}+IF(AN#{summaryrownum+1}>AP#{summaryrownum+1},AN#{summaryrownum+1}-AP#{summaryrownum+1},0)+IF(AO#{summaryrownum+1}>AQ#{summaryrownum+1},AO#{summaryrownum+1}-AQ#{summaryrownum+1},0)", # AR
+				    					    "=AL#{summaryrownum+1}+AM#{summaryrownum+1}+CK#{summaryrownum+1}+IF(AN#{summaryrownum+1}>AP#{summaryrownum+1},AN#{summaryrownum+1}-AP#{summaryrownum+1},0)+IF(AO#{summaryrownum+1}>AQ#{summaryrownum+1},AO#{summaryrownum+1}-AQ#{summaryrownum+1},0)", # AR
 				    					    "=AR#{summaryrownum+1}/60", # AS
 				    					    "=FLOOR(AS#{summaryrownum+1}/8,1)&"<<'"."'<<"&FLOOR(MOD(AS#{summaryrownum+1},8),1)&"<<'"."'<<"&(MOD(AS#{summaryrownum+1},8)-FLOOR(MOD(AS#{summaryrownum+1},8),1))*60", # AT
 				    					    summary[:total_regular_ot_to_string], # AU
@@ -460,7 +484,13 @@ class Report < ActiveRecord::Base
 				    					    "=BD#{summaryrownum+1}*8*60+BO#{summaryrownum+1}*60+BU#{summaryrownum+1}", # CA
 				    					    "=SUM(BW#{summaryrownum+1}:CA#{summaryrownum+1})", # CB
 				    					    "=CB#{summaryrownum+1}/60", # CC
-				    					    "0", "=FLOOR(CC#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(CC#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(CC#{summaryrownum+1},8)-FLOOR(MOD(CC#{summaryrownum+1},8),1,1))*60"], style: tabledata
+				    					    "0", "=FLOOR(CC#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(CC#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(CC#{summaryrownum+1},8)-FLOOR(MOD(CC#{summaryrownum+1},8),1,1))*60",
+				    					    summary[:total_absences_to_string], #CF
+				    					    "=INT(LEFT(CF#{summaryrownum+1},2))", #CG
+				    					    "=IF(LEFT(RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-3),RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2))", #CH
+				    					    "=INT(LEFT(CH#{summaryrownum+1},1))", #CI
+				    					    "=RIGHT(CH#{summaryrownum+1},LEN(CH#{summaryrownum+1})-2)+0", #CJ
+				    					    "=CG#{summaryrownum+1}*8*60+CI#{summaryrownum+1}*60+CJ#{summaryrownum+1}"], style: tabledata #CK
 						summaryrownum += 1
 						
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
@@ -476,6 +506,11 @@ class Report < ActiveRecord::Base
 			        	summarydtr_ws.column_info[i].hidden = true
 			        	i += 1
 			        end
+			        i = 83
+			        while i <= 88
+			        	summarydtr_ws.column_info[i].hidden = true
+			        	i += 1
+			        end
 					summarydtr_ws.column_widths 5.25, 27.25, 26.25, 
 												13.5, 9.25, 12.5,
 												9.5, 11, 9.5, 11,
@@ -483,7 +518,7 @@ class Report < ActiveRecord::Base
 												19.5,
 												10.9, 10, 10.5, 10.9, 10.9,
 												nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 
-												14, 9
+												14, 9, 12.5, nil, nil, nil, nil, nil
 					summarydtr_ws.sheet_view.pane do |pane|
 				    	pane.top_left_cell = "D4"
 					    pane.state = :frozen_split
