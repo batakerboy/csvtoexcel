@@ -14,23 +14,17 @@ class WelcomeController < ApplicationController
 
   	if authorized_user
       session[:user_id] = authorized_user.id
-  	  # flash[:notice] = "Wow Welcome again, you logged in as #{authorized_user.username}"
       flash[:notice] = nil
       redirect_to index_path
   	else
   	  flash[:notice] = "Invalid Username or Password"
   	  flash[:color]= "invalid"
   	  render "login"
-  	  # redirect_to login_attempt_path	
   	end
   end
 
   def logout
     session[:user_id] = nil
     redirect_to :action => 'login'
-  end
-
-  def setting
-  	
   end
 end
