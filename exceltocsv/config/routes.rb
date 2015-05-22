@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get "logout", :to => "welcome#logout"
   post "login_attempt", to: "welcome#login_attempt"
   post "setting", :to => "welcome#setting"
+  get "download_manual", to: "welcome#download_manual"
 
   resources :reports do
     collection {
