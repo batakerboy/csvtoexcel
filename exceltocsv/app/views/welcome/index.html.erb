@@ -34,78 +34,31 @@
 	</div>
 </div>
 
-<div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
-	<div class = "row">
-		<div class = "col-md-2" align = "left"><%= image_tag "FBI logo.png", class: "img img-responsive", style: "max-width:150px"%></div>
-		<div class = "col-md-10" align = "left">
-			<div class = "row" style = "margin-top:1%; font-size: 250%">
-				<strong>
-					<!-- Falco 
-					<font color = "red">+</font> 
-					Biometrics
-					<font color = "red">+</font>
-					iEMS Integration -->
-					How To Use The System
-				</strong>
-			</div>
-			<div class = "row" style = "font-size: 180%;">
-				Daily Time Recording has never been this easier and faster.
-			</div>
-		</div>
-	</div>
-	<br/>
-	<%= image_tag "FBI2.png", class: "img img-responsive img-rounded"%>
-		<!-- <br/><br/><br/><br/><br/><br/>
-		
-		<h1 style = "color: black; font-size: 500%">
-			Falco 
-			<font color = "red">+</font> 
-			Biometrics
-			<font color = "red">+</font>
-			iEMS
-		</h1>
-		
-		<br/><br/><br/><br/><br/><br/><br/><br/> -->
-		<!-- <div class = "row">
-			<div class = "col-md-3"></div>
-			<%#= link_to 'Generate New report', '#', id: "generate_new_report_button", class: "btn btn-lg btn-success col-md-6"%>
-		</div>
-		
-		<br/>
-		
+<div class = "container animated fadeInRight" id = "welcomeDiv">
+	<div align = "center">
 		<div class = "row">
-			<div class = "col-md-3"></div>
-			<%#= link_to 'Go to Archives', '#', class: "btn btn-lg btn-info col-md-6", id: 'archives_button'%>
+			<div class = "col-md-2" align = "left"><%= image_tag "FBI logo.png", class: "img img-responsive", style: "max-width:150px"%></div>
+			<div class = "col-md-10" align = "left">
+				<div class = "row" style = "margin-top:1%; font-size: 250%">
+					<strong>
+						How To Use The System
+					</strong>
+				</div>
+				<div class = "row" style = "font-size: 180%;">
+					Daily Time Recording has never been this easier and faster.
+				</div>
+			</div>
 		</div>
-		
-		<br/> -->
+		<br/>
+		<%= image_tag "FBI2.png", class: "img img-responsive img-rounded"%>
+	</div>
 
-		<!-- <div class = "row">
-			<div class = "col-md-3"></div>
-			<%#= form_tag delete_all_records_reports_path, method: :post do%>
-				<%#= submit_tag 'Delete All Records', id: "delete_all", class: "btn btn-lg btn-danger col-md-6"%>
-			<%#end%>
-		</div> -->
+	<br/><br/><br/>
 
-		<br/><br/><br/>
+	<%= render 'manual'%>
 </div>
 
 <script>
-	// $("#generate_new_report_button").click(function(event){
-	// 	$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
-	// 		function(){
-	// 			window.location = '<%#= new_report_path(step: 1)%>';
-	// 		}
-	// 		);
- // 	});
- // 	$("#archives_button").click(function(event){
-	// 	$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
-	// 		function(){
-	// 			window.location = '<%#= reports_path%>';
-	// 		}
-	// 		);
- // 	});
-
  	$("#profile").click(function(event){
 		$("#welcomeDiv").addClass("animated fadeOutLeft").one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', 
 			function(){

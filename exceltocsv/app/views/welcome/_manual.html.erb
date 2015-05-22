@@ -1,0 +1,590 @@
+<div class = "container" style = "font-size: 150%">
+	<div class = "col-md-12">
+		<div class = "row">
+			<div class = "col-md-12"><b>General Information</b></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>A.&nbsp;System Overview</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The FBI Integrated System is an automated system that aims to efficiently perform the Daily Time Recording (DTR) of the company’s employees.</p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+		<%= image_tag "1.png", class: "img img-responsive img-rounded"%>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The FBI Integrated System combines the functions of the three systems currently used in the company, namely <strong>Falco-Ecom Access Control System</strong> (Falco), <strong>MustardSeed Time and Attendance Management System</strong> (Biometrics) and the <strong>iRipple Employee Management System</strong> (iEMS). These functions are crucial in preparing for the employees’ Daily Time Recording and determining their payroll.</p>
+				<br/>
+				<p align = "justify">The input files for the system are the downloaded or exported files from the three systems mentioned above. The <strong>Falco TXT</strong> file from the Falco-Ecom Access Control System, the <strong>Biometrics CSV</strong> file shall come from the MustardSeed Time and Management System, and the <strong>iEMS CSV</strong> file from the iRipple Employee Management System (iEMS).</p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>B.&nbsp;Organization of the Manual</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">To better understand the system, this manual is divided into three parts: input files, system access, and system use. These parts will show how the user can easily work on the generation of reports needed by the company’s Human Resources (HR) and Accounting department.</p>
+				<br/>
+				<p align = "justify">The Input Files section specifies and describes the data and information needed by the FBI Integration system and what files will be processed to produce the expected reports. The System Access section shows how the users, specifically the system admins, can access the system. The System Use section details and describes the different scenarios that the users or admins may encounter when generating the needed reports.</p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+
+
+
+		<div class = "row">
+			<div class = "col-md-12"><b>Input Files</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">As previously mentioned, there will be three input files that will be prepared for the FBI Integration: the Falco TXT, Biometrics CSV, and iEMS CSV.</p>
+				<br/>
+				<p align = "justify">The Falco TXT file from the Falco-Ecom Access Control System will contain all records of each employee’s time in and time out per day for the current cut off period. The system is installed in the company’s 22nd floor office and most of the time, employees assigned to work there use it for time in and time out.</p>
+				<br/>
+				<p align = "justify">Specifically, it contains the following information: Date, Time, Card No., Employee Name, Unit No., Controller, Code, and Transaction. The Falco TXT file is a no filter file, meaning it is a collection of the attendance records of all the employees (Image 1 and 2). In contrast, a Falco filter file contains the attendance records of specific employees per day for the cut off period (Image 3).</p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+		<%= image_tag "falco_image_1.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 1. Falco no filter file</i></div>
+		<br/><br/>
+		<%= image_tag "falco_image_2.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 2. Falco no filter file</i></div>
+		<br/><br/>
+		<%= image_tag "falco_image_3.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 3. Falco no filter file</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">On the other hand, employees assigned to work in the company’s 23rd floor office use the MustardSeed Time and Attendance Management System for time in and time out. The system prepares the Biometrics CSV file which is downloaded for DTR. </p>
+				<br/>
+				<p align = "justify">The Biometrics CSV contains the following information: Employee Name, Date, Time In and Time Out (Image 4). </p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+		<%= image_tag "biometrics_image_4.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 4. Biometrics CSV file</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">To get the employees’ request records and find out why and where they were, in case they were not able to time in and out of the two systems, the iEMS CSV file should be downloaded for attendance checking.</p>
+				<br/>
+				<p align = "justify">The iEMS CSV file shall come from the iRipple Employee Management System (iEMS). It will be downloaded from the iEMS and used as input file for the generation of reports in the FBI Integrated System.</p>
+				<br/>
+				<p align = "justify">The iEMS CSV file contains the following information: Employee Number, Last Name, First Name, Manager, Department, Biometrics ID, Falco ID, Date/s, OT Regular Days, OT Rest Day/Holiday, OT Special Holiday on Rest Day, OT Regular Holiday on Rest Day, Undertime, Vacation Leave, VL Balance, Sick Leave, SL Balance, OB Departure, OB Time Start, OB Time End, OB Arrival, Offset, Holiday, and Remarks(s) (Image 5).</p>
+			</div>
+			<div class = "col-md-1"></div>
+		</div>
+		<br/>
+		<%= image_tag "iEMS_image_5.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 5. iEMS CSV file</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">To generate correct data for the system output, it is expected that all three input files shall have the same date range for the cut off period (e.g. April 25 – May 8, 2015 cut off). Two files will be produced after all input files are processed in the FBI Integrated System. These are the <strong>DTR Summary Sheet</strong> in .xls format, a summary of all the employees’ requests and attendance records, and the <strong>Employees folder</strong> which contains each employee’s attendance records for the current cut off.</p>
+			</div>
+		</div>
+		<br/>
+
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-12"><b>System Access</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">A default admin or a created user can access the system using his username and password. Only he can add new admins and users of the integrated system.</p>
+				<br/>
+				<p align = "justify">The admin may sign in using the text fields for <strong>Username</strong> and <strong>Password</strong>. The admin inputs his username and password and clicks “Log In” button (Image 6). If the log in is successful, the admin is redirected to the <strong>Admin Home</strong> page and the system displays the <strong>User Manual</strong> that may be downloaded in .pdf format (Image 7). </p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "2.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 6. Admin Log In Page</i></div>
+		<br/><br/>
+		<%= image_tag "3.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 7. Admin Home Page</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">On the other hand, the user may sign in using the text fields for <strong>Username</strong> and <strong>Password</strong>. The user inputs his username and password and clicks “Log In” button (Image 8). If the log in is successful, the user is redirected to the <strong>Home</strong> page and the system displays the <strong>User Manual</strong> that may be downloaded in .pdf format (Image 9). </p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "4.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 8. User Log In Page</i></div>
+		<br/><br/>
+		<%= image_tag "5.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 9. User Home Page</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">If the admin or user inputs an incorrect username and/or password for log in, an error message is displayed by the system, <strong>“Invalid Username or Password.”</strong> and prompts the user to log in correct username and password (Image 10).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "6.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 10. Log In Error Message</i></div>
+		<br/><br/>
+
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-12"><b>System Use</b></div>
+		</div>
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>A.&nbsp;Home</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">Once the admin or user successfully logs in the system, he is redirected to the <strong>Home</strong> page. The Home page displays the User Manual which includes the step by step instructions on how to use the FBI Integrated System (Image 11)</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "7.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 11. Home Page With User Manual</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>B.&nbsp;New Report</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">To generate reports in the FBI Integrated System, the admin or user needs to click on the <strong>New Report</strong> tab in the navigation bar. He will then be redirected to the <strong>New Report</strong> page where he is asked to upload the required input files. The three steps are also displayed to guide him while uploading (Image 12).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "8.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 12. New Report Page and Browse for Biometrics CSV</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">To begin the reports generation, admin or user needs to follow the step by step process of uploading the input files. He begins by uploading the Biometrics CSV file which contains the attendance records of employees in the 23rd floor office. He then should click the “Browse for Biometrics CSV” button and a new window opens and asks user to choose the Biometrics CSV file to be uploaded (Image 13).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "9.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 13. Biometrics CSV file upload</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The “Upload” button then appears below the “Browse for Biometrics CSV” button and prompts admin or user to upload the file by clicking it (Image 14).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "10.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 14. Upload Biometrics CSV</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After clicking “Upload” button, a “Biometrics CSV has been uploaded” message appears and Step 1 is completed. “Browse for Falco TXT” button then appears in Step 2 (Image 15).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "11.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 15. Browse for Falco TXT</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user then clicks the “Browse for Falco TXT” button and selects a Falco TXT file to be uploaded. This file contains the attendance records of employees in the 22nd floor office. A new window opens and asks user to choose the Falco TXT file to be uploaded (Image 16).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "12.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 16. Falco TXT upload</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The “Upload” button then appears below the “Browse for Falco TXT” button and prompts admin or user to upload the file by clicking it (Image 17).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "12-2.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 17. Upload Falco TXT</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After clicking “Upload” button, a “Falco TXT has been uploaded” message appears and Step 2 is completed. “Browse for iEMS CSV” button then appears in Step 3 (Image 18).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "13.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 18. Browse for iEMS CSV</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user then clicks the “Browse for iEMS” button and selects an iEMS CSV file to be uploaded. This file contains the all employee requests such as undertime, overtime, offset, leaves, and official business. A new window opens and asks user to choose the iEMS CSV file to be uploaded (Image 19).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "14.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 19. iEMS CSV upload</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The “Upload” button then appears below the “Browse for iEMS CSV” button and prompts admin or user to upload the file by clicking it (Image 20).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "15.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 20. Upload iEMS CSV</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After clicking “Upload” button, a “iEMS CSV has been uploaded” message appears and Step 3 is completed. “Generate Reports” button then appears below (Image 21).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "16.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 21. Generate Reports</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user clicks the “Generate Reports” button and he is redirected to the “Generating Reports” loading page if all input files are uploaded properly (Image 22).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "17.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 22. Generating Reports Loading Page</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">If one of the files are wrongly uploaded (e.g. Falco TXT file uploaded instead of Biometrics CSV file in Step 1) or if the date range for the uploaded files are not the same, an error message is displayed by the system and prompts the user to upload the three files again (Image 23)</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "18.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 23. Generate Reports Error Message</i></div>
+		<br/><br/>
+
+
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>C.&nbsp;Archives</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After the completion of the reports generation, the admin or user is redirected to the <strong>Archives</strong> page and the system displays the DTR information of all employees for the current cut off period. The legends, employee attendance records, and the request information are also displayed by the system. The “Download Report” button then appears in the navigation bar for report downloads (Image 24).</p>
+				<p align = "justify">The admin or user may also select all employees or a specific employee to check the attendance records and requests information.</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "19.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 24. DTR Page for cut off period</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user clicks the “Download Report” button and he is prompted to save the output file (Image 25). The output file is a zip file which contains the Employee folder with each employee’s attendance record and the DTR Summary Sheet.</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "21.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 25. Download Report</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user clicks the Archives tab in the navigation bar to check the list of DTR Reports generated by the FBI Integrated System. The system displays the DTR Report name and DTR cut off period. He has the option to either view the report by clicking the “View Report” button or download the report by clicking the “Download Report” button (Image 26).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "22.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 26. Archives page: DTR Reports</i></div>
+		<br/><br/>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user clicks the “View Report” button and the he is redirected to the “Retrieving Reports” loading page (Image 27). After report retrieval, the admin or user is redirected to the DTR page for the cut off period specified (Image 24).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "23.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 27. Retrieving Reports Loading Page</i></div>
+		<br/><br/>
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>D.&nbsp;Users</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The only difference between the user and admin system access is the <strong>Users</strong> tab. Only the admin has this view because only he can create new admins or users who will generate reports using the system. The user cannot see the Users tab in his view (Image 28).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "5.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 28. User's view</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin clicks the <strong>Users</strong> tab in the navigation bar to create new users. He is then redirected to the <strong>Users of FBI Integration</strong> page where he can check created users (Image 29).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "24.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 29. Users of FBI Integration Page</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin clicks the “Create New User” button to create a new admin or user who can access the system. He is then redirected to the <strong>Create New User</strong> page and should fill out all required fields in the form (Image 30 and 31).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "26.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 30. Create New User Page</i></div>
+		<br/><br/>
+		<%= image_tag "27.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 31. Create New User Form</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After filling out the form, the admin click “Save” button. If all required fields are filled out, he is redirected to the <strong>Users of FBI Integration</strong> page and the newly added user is added in the list (Image 32).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "28.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 32. Users of FBI Integration Updated List</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">If the admin filled out a field in the wrong format or did not fill out a required field, an error message appears and asks him to input in the correct format or fill out a missing field (Image 33).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "29.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 33. Create New User Error Message</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin clicks the “Create New Admin” button to create a new admin or user who can access the system. He is then redirected to the <strong>Create New Admin</strong> page and should fill out all required fields in the form (Image 34 and 35).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "30.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 34. Create New Admin Page</i></div>
+		<br/><br/>
+		<%= image_tag "31.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 35. Create New Admin Form</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After filling out the form, the admin click “Save” button. If all required fields are filled out, he is redirected to the <strong>Users of FBI Integration</strong> page and the newly added admin is added in the list (Image 36).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "32.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 36. Users of FBI Integration updated list</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">If the admin filled out a field in the wrong format or did not fill out a required field, an error message appears and asks him to input in the correct format or fill out a missing field (Image 37).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "33.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 37. Create New Admin Error Message</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin may also edit the information of the user or admin he created by clicking the “Edit” button in the Users of FBI Integration page (Image 36). He will then be redirected to the Create New User/Admin page and all fields are filled out with the registered information. The admin may edit the information in the form and click “Save” button to update the list (Image 31 or 35).</p>
+				<br/>
+				<p align = "justify">The admin can also activate or deactivate existing users or admins to grant or restrict system access. By clicking “Activate” button, the selected user/admin’s status is changed from “Inactive” to “Active”. Clicking “Deactivate” button will change the selected user/admin’s status from “Active” to “Inactive” (Image 38).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "34.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 38. Activate/Deactivate Users and Admins</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">Once a new user or admin is created, a notification will be sent to that user’s or admin’s email and asks him to change password and access the account (Image 39).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "35.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 39. Email notification</i></div>
+		<br/><br/>
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>E.&nbsp;User Profile</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user may also check or update his personal account by clicking his name in the navigation bar and selecting “Your Profile” in the dropdown options (Image 40).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "36.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 40. User Profile</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After clicking “Your Profile”, he is redirected to the <strong>User Account</strong> page where he can view or update his account information (Image 41).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "37.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 41. User Account page</i></div>
+		<br/><br/>
+
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-1"></div>
+			<div class = "col-md-10"><b>F.&nbsp;Log Out</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin can log out in the system by clicking “Log Out” in the User Profile dropdown (Image 42). He will then be redirected to the <strong>Log In</strong> page (Image 43).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "38.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 42. Log Out</i></div>
+		<br/><br/>
+		<%= image_tag "1.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 43. Log In Page</i></div>
+		<br/><br/>
+
+
+
+
+
+		<div class = "row">
+			<div class = "col-md-12"><b>System Use</b></div>
+		</div>
+		<br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">As previously mentioned, the output of the FBI Integrated System is a zip file which is saved in the directory specified by the user or admin (Image 44). To access the output files, he must extract the ZIP file and specify a file location where a ZIP folder will be created. After extracting the ZIP file, a new folder is created (Image 45).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "39.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 44. Generated Zip File</i></div>
+		<br/><br/>
+		<%= image_tag "40.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 45. Extracted folder from ZIP file</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">If the admin or user opens the folder created from the extracted ZIP file, he will see an “Employee” folder and a “DTR Summary Sheet” in XLSX format (Image 46).</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "41.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 46. Employee folder and DTR Summary Sheet</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">After opening the “Employee” folder, the attendance records of all the employees are displayed in XLSX format (Image 47). The admin or user may open a file to check an employee’s attendance record.</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "42.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 47. Employees' Attendance Records</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">Each employee record has the following information: Employee Name, Department, Date, Day, Time In, Time Out, No. of Hours Late, No. of Hours Undertime, No. of Overtime Hours, Vacation Leave, Sick Leave, Approved Undertime, Official Business Departure, Official Business Time Start, Official Business Time End, Official Business Arrival, Offset, and Remarks.</p>
+				<br/>
+				<p align = "justify">Accumulated OT, Total Absences, Accumulated VL and SL, VL and SL Balance and Legends are also included in the file (Image 48). The attendance records of all employees will then be given to the HR department.</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "43.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 48. Employees Attendance Record</i></div>
+		<br/><br/>
+		<div class = "row">
+			<div class = "col-md-2"></div>
+			<div class = "col-md-9">
+				<p align = "justify">The admin or user can also check the generated DTR Summary Sheet in XLSX format (Image 49). The file includes a compilation of all employees’ attendance records. It holds the following information: Name, Tardiness Frequency, No. of Tardiness Hours, Undertime Hours, SL Credits, SL Balance, VL Credits, VL Balance, Total Deductions, OT Regular Day, OT Rest Day or Special Public, OT Special Public Holiday on Rest Day, OT Regular Holiday, OT Regular Holiday on Rest Day, OT Allowance, and Total OT (Image 50). This file will then be given to the Accounting Department for payroll.</p>
+			</div>
+		</div>
+		<br/>
+		<%= image_tag "45.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 49. DTR Summary XLSX file</i></div>
+		<br/><br/>
+		<%= image_tag "44.png", class: "img img-responsive img-rounded"%>
+		<div class = "col-md-12" align = "center" style = "font-size: 80%"><i>Image 45. DTR Summary Sheet</i></div>
+		<br/><br/>
+	</div>
+</div>

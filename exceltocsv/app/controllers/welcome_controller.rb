@@ -4,6 +4,8 @@ class WelcomeController < ApplicationController
   before_filter :check_if_active, :only => [:index, :setting]
 
   def index
+    # send_file(Rails.root.join('public', 'manual.pdf'), filename: "FBI_manual.pdf", disposition: 'inline', type: "application/pdf")
+    # @pdf_path = "https://docs.google.com/gview?url={#{Rails.root.join('public', 'manual.pdf')}}&embedded=true"
   end
 
   def login
