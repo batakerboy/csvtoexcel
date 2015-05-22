@@ -60,7 +60,7 @@ class Report < ActiveRecord::Base
 				styles = summarydtr_wb.styles
 				title = styles.add_style sz: 15, b: true, u: true
 				headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-				tabledata = styles.add_style sz: 11, border: {:style => :thick, :color => '00000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+				tabledata_total_total = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				bottom_border = styles.add_style border: {:style => :thick, :color => '00000000', :edges => [:top] }
 				summaryrownum = 0
 
@@ -493,7 +493,7 @@ class Report < ActiveRecord::Base
 				    					    "=INT(LEFT(CH#{summaryrownum+1},1))", #CI
 				    					    "=RIGHT(CH#{summaryrownum+1},LEN(CH#{summaryrownum+1})-2)+0", #CJ
 				    					    "=CG#{summaryrownum+1}*8*60+CI#{summaryrownum+1}*60+CJ#{summaryrownum+1}"], #CK
-				    					    style: tabledata
+				    					    style: tabledata_total_total
 						summaryrownum += 1
 						
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
