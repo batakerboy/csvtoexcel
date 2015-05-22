@@ -60,7 +60,8 @@ class Report < ActiveRecord::Base
 				styles = summarydtr_wb.styles
 				title = styles.add_style sz: 15, b: true, u: true
 				headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-				tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+				tabledata_total_total = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+				bottom_border = styles.add_style border: {:style => :thick, :color => '00000000', :edges => [:top] }
 				summaryrownum = 0
 
 				
@@ -172,16 +173,20 @@ class Report < ActiveRecord::Base
 						# define your regular styles
 							styles = employeedtr_wb.styles
 							title = styles.add_style sz: 15, b: true, u: true
+							titlelegend = styles.add_style sz: 15, b: true, u: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }
 							headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							tabledata = styles.add_style sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							info = styles.add_style :bg_color => "29A3CC", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							warning = styles.add_style :bg_color => "FFCC66", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							danger = styles.add_style :bg_color => "DF5E5E", sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
-							legendblue = styles.add_style :bg_color => "29A3CC"
-							legendorange = styles.add_style :bg_color => "FFCC66"
-							legendred = styles.add_style :bg_color => "DF5E5E"
-							legenddescription = styles.add_style sz: 11, b: true, u: true
-							totalheader = styles.add_style sz: 11, border: {:style => :thin, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :right, :vertical => :center, :wrap_text => true}
+							tabledata = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							bottomborder = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:top] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							bottomleftrightborder = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							info = styles.add_style :bg_color => "66A3FF", sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							warning = styles.add_style :bg_color => "FFCC66", sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							danger = styles.add_style :bg_color => "DF5E5E", sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
+							legendblue = styles.add_style :bg_color => "66A3FF", border: {:style => :thick, :color => '000000', :edges => [:left] }
+							legendorange = styles.add_style :bg_color => "FFCC66", border: {:style => :thick, :color => '000000', :edges => [:left] }
+							legendred = styles.add_style :bg_color => "DF5E5E", border: {:style => :thick, :color => '000000', :edges => [:left] }
+							legenddescription = styles.add_style sz: 11, b: true, u: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right] }
+							totalheader = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :right, :vertical => :center, :wrap_text => true}
+							tabledata_total = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right, :top, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							if @@report.include? :panes
 								employeedtr_wb.add_worksheet(name: 'EMPLOYEE DTR') do  |employeedtr_ws|
 									employeedtr_ws.add_row ['iRipple, Inc.'], style: title
@@ -284,36 +289,33 @@ class Report < ActiveRecord::Base
 							        	end
 							    	end
 							    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-								    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+								    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder]
+								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 								    else
-							    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
-								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    		employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder]
+								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-1})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    	end
 							    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-							    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
+
 							    	rownum += 1
 							    	employeedtr_ws.merge_cells "A#{rownum}:D#{rownum}"
-							    	employeedtr_ws.merge_cells "F#{rownum}:P#{rownum}"
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.add_row ["TOTAL OVERTIME HOURS", " ", " ", " ", " ", " ", "=SUM(G5:G#{rownum-3})", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    	employeedtr_ws.merge_cells "A#{rownum}:F#{rownum}"
-							    	employeedtr_ws.merge_cells "H#{rownum}:P#{rownum}"
 							    	rownum += 1
 							    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
-						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-(3+@@days_over_cutoffdate)})", "=SUM(I5:I#{rownum-(3+@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 						    		else
-						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+						    			employeedtr_ws.add_row ["TOTAL LEAVES ACCUMULATED", " ", " ", " ", " ", " ", " ","=SUM(H5:H#{rownum-4})", "=SUM(I5:I#{rownum-4})", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    	end
 							    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
-							    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["TOTAL ABSENCES", " ", " ", " ", " ", " ", " ", " ", @@total_absences, " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.add_row ["TOTAL ABSENCES", " ", " ", " ", " ", " ", " ", " ", @@total_absences, " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    	employeedtr_ws.merge_cells "A#{rownum}:H#{rownum}"
-							    	employeedtr_ws.merge_cells "J#{rownum}:P#{rownum}"
 							    	rownum += 1
 
-							    	employeedtr_ws.add_row 
+							    	employeedtr_ws.add_row [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							    							" ", " ", " ", " ", " ", " "], style: bottomborder
 							    	rownum += 1
 
 							    	employeedtr_ws.add_row ["ACCUMULATED OT", " ", ("=FLOOR(G#{rownum-4}/8,1)&"<<'"."'<<"&FLOOR(MOD(G#{rownum-4},8),1)&"<<'"."'<<"&(MOD(G#{rownum-4},8)-FLOOR(MOD(G#{rownum-4},8),1))*60"), " ", "", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -321,7 +323,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, title, title, title, title, title, title, title, title, title, title, title, title]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
 	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
 
@@ -330,7 +332,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, title, title, title, title, title, title, title, title, title, title, title, title]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend, titlelegend]
 	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 	   							    employeedtr_ws.merge_cells "E#{rownum}:P#{rownum}"
 
@@ -340,7 +342,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, legendblue, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, legendblue, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 	   							    employeedtr_ws.merge_cells "E#{rownum}:E#{rownum+1}"
 	   							    employeedtr_ws.merge_cells "F#{rownum}:P#{rownum+1}"
@@ -350,7 +352,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, legendblue, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, legendblue, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
 							    	employeedtr_ws.add_row ["ACCUMULATED SL", " ", ("=FLOOR(I#{rownum-7},1)&"<<'"."'<<"&(I#{rownum-7}-FLOOR(I#{rownum-7},1))*8&"<<'".0"'), " ", " ", "Employee is considered half-day because of his time-in or time-out.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -358,7 +360,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, legendorange, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, legendorange, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	employeedtr_ws.merge_cells "E#{rownum}:E#{rownum+1}"
 	   							    employeedtr_ws.merge_cells "F#{rownum}:P#{rownum+1}"
@@ -368,7 +370,7 @@ class Report < ActiveRecord::Base
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
 							   							    "=RIGHT(R#{rownum},LEN(R#{rownum})-2)+0", 
-							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata, nil, legendorange, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							   							    "=Q#{rownum}*8*60+S#{rownum}*60+T#{rownum}"], style: [totalheader, totalheader, tabledata_total, nil, legendorange, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
 							    	employeedtr_ws.add_row ["SL BALANCE", " ", "#{emp.sick_leave_balance_to_string(self.date_start)}", " ", " ", "Employee has no time-in and therefore, considered as absent.", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
@@ -376,15 +378,15 @@ class Report < ActiveRecord::Base
 							    							" ", 
 							    							"=S#{rownum-5}+S#{rownum-6}+IF(S#{rownum-4}>S#{rownum-2},S#{rownum-4}-S#{rownum-2},0)+IF(S#{rownum-3}>S#{rownum-1},S#{rownum-3}-S#{rownum-1},0)",
 							    							"=T#{rownum-5}+T#{rownum-6}+IF(T#{rownum-4}>T#{rownum-2},T#{rownum-4}-T#{rownum-2},0)+IF(T#{rownum-3}>T#{rownum-1},T#{rownum-3}-T#{rownum-1},0)", 
-							    							"=U#{rownum-5}+U#{rownum-6}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							    							"=U#{rownum-5}+U#{rownum-6}+IF(U#{rownum-4}>U#{rownum-2},U#{rownum-4}-U#{rownum-2},0)+IF(U#{rownum-3}>U#{rownum-1},U#{rownum-3}-U#{rownum-1},0)"], style: [totalheader, totalheader, tabledata_total, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	employeedtr_ws.merge_cells "E#{rownum}:E#{rownum+1}"
 	   							    employeedtr_ws.merge_cells "F#{rownum}:P#{rownum+1}"
 							    	rownum += 1
 							    	employeedtr_ws.add_row ["TOTAL", " ", "=FLOOR(Q#{rownum}/8,1)&"<<'"."'<<"&FLOOR(MOD(Q#{rownum},8),1)&"<<'"."'<<"&(MOD(Q#{rownum},8)-FLOOR(MOD(Q#{rownum},8),1))*60", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-							    							"=U#{rownum-1}/60"], style: [totalheader, totalheader, tabledata, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
+							    							"=U#{rownum-1}/60"], style: [totalheader, totalheader, tabledata_total, nil, legendred, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription, legenddescription]
 							    	employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
-							    	rownum += 1
+							    	employeedtr_ws.add_row [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [nil, nil, nil, nil, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder, bottomborder]
 							    	colnum = 16
 									while colnum <= 20
 										employeedtr_ws.column_info[colnum].hidden = true
@@ -490,11 +492,23 @@ class Report < ActiveRecord::Base
 				    					    "=IF(LEFT(RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-3),RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2))", #CH
 				    					    "=INT(LEFT(CH#{summaryrownum+1},1))", #CI
 				    					    "=RIGHT(CH#{summaryrownum+1},LEN(CH#{summaryrownum+1})-2)+0", #CJ
-				    					    "=CG#{summaryrownum+1}*8*60+CI#{summaryrownum+1}*60+CJ#{summaryrownum+1}"], style: tabledata #CK
+				    					    "=CG#{summaryrownum+1}*8*60+CI#{summaryrownum+1}*60+CJ#{summaryrownum+1}"], #CK
+				    					    style: tabledata_total_total
 						summaryrownum += 1
 						
 						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
 					end
+					summarydtr_ws.add_row [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+										   " ", " ", " ", " ", " ", " ", " ", " ", " "], style: bottom_border #border of bottom cell
+
+
 					summarydtr_ws.column_info[2].hidden = true
 					i = 10
 					while i <= 44
