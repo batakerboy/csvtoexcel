@@ -506,7 +506,9 @@ class Report < ActiveRecord::Base
 										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
-										   " ", " ", " ", " ", " ", " ", " ", " ", " "], style: bottom_border
+										   " ", " ", " ", " ", " ", " ", " ", " ", " "], style: bottom_border #border of bottom cell
+
+
 					summarydtr_ws.column_info[2].hidden = true
 					i = 10
 					while i <= 44
