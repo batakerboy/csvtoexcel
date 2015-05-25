@@ -1,20 +1,5 @@
 <nav class = "navbar navbar-default navbar-static-top">
 	<div class = "container">
-		<!-- <a href="#" class = "navbar-brand">
-			<div class = "row">
-				<div class = "col-md-2">
-					<%= image_tag "FBI logo.png", style: "max-width:50px; margin-top: -7px;"%>
-				</div>
-				<div class = "col-md-10">
-					Falco 
-					<font color = "red">+</font> 
-					Biometrics
-					<font color = "red">+</font>
-					iEMS <strong>Integration</strong>
-				</div>
-			</div>
-		</a> -->
-
 		<button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
 			<span class = "icon-bar"></span>
 			<span class = "icon-bar"></span>
@@ -33,77 +18,59 @@
 
 <div class = "container animated fadeInRight" id = "welcomeDiv" align = "center">
 	<%unless notice.nil?%>
-		<!-- <div style = "position: relative;"> -->
-			<!-- <div class = "alert alert-danger alert-dismissable col-md-12"  style = "position: absolute;"> -->
-			<div class = "alert alert-danger alert-dismissable col-md-12">
-				<button type = "button" class = "close" data-dismiss = "alert">&times;</button>
-				<%= notice%>
-			</div>
-		<!-- </div> -->
+		<div class = "alert alert-danger alert-dismissable col-md-12">
+			<button type = "button" class = "close" data-dismiss = "alert">&times;</button>
+			<%= notice%>
+		</div>
 	<%end%>
 	<div class = "row">
-		<div class = "col-md-2" align = "left"><%= image_tag "FBI logo.png", class: "img img-responsive", style: "max-width:150px"%></div>
-		<div class = "col-md-10" align = "left">
-			<div class = "row" style = "margin-top:1%; font-size: 250%">
+		<div class = "col-md-1" align = "left"><%= image_tag "FBI logo.png", class: "img img-responsive", style: "max-width:100px"%></div>
+		<div class = "col-md-11" align = "left">
+			<div class = "row" style = "margin-top:1%; font-size: 150%; margin-left:1%">
 				<strong>
-					<!-- Falco 
-					<font color = "red">+</font> 
-					Biometrics
-					<font color = "red">+</font>
-					iEMS Integration -->
 					Reports Generation Simplified!
 				</strong>
 			</div>
-			<div class = "row" style = "font-size: 180%;">
+			<div class = "row" style = "font-size: 120%; margin-left:1%">
 				Daily Time Recording has never been this easier and faster.
 			</div>
 		</div>
 	</div>
 	<br/>
-	<!-- <br/><br/><br/><br/><br/><br/> -->
-	
-	<!-- <h1 style = "color: black; font-size: 500%">
-		Falco 
-		<font color = "red">+</font> 
-		Biometrics
-		<font color = "red">+</font>
-		iEMS
-	</h1> -->
-	<!-- <img src="/app/assets/images/office3.jpg"> -->
 	<%= image_tag "FBI.png", class: "img img-responsive img-rounded"%>
 	<br/>
-	<div class = "row" align = "center">
-		<div class = "col-md-4" style = "height: 400px;">
+	<div class = "row" align = "center" style = "font-size:80%">
+		<div class = "col-md-4" style = "height: 300px;">
 			<div class = "col-md-12">
-				<div class = "row"><%= image_tag "requests.png", class: "img img-responsive img-rounded", style: "max-height: 280px"%></div>
 				<div class = "row"><h3>Request Management</h3></div>
 				<div class = "row">
 					<p align = "justify">FBI Integrated System allows you to upload input files from the company’s iRipple Management System (iEMS) for the current cutoff period. The system will process all employee requests such as Leaves, Undertime, Overtime, Offset, and Official Business to determine the number of hours the employee worked for in a given day.</p>
 				</div>
+				<div class = "row"><%= image_tag "requests.png", class: "img img-responsive img-rounded", style: "max-height: 200px"%></div>
 			</div>	
 		</div>
 
-		<div class = "col-md-4" style = "height: 400px;">
+		<div class = "col-md-4" style = "height: 300px;">
 			<div class = "col-md-12">
-				<div class = "row"><%= image_tag "attendance.png", class: "img img-responsive img-rounded", style: "max-height: 280px"%></div>
 				<div class = "row"><h3>Attendance Checking</h3></div>
 				<div class = "row">
 					<p align = "justify">FBI Integrated System facilitates the checking of each employee’s time in and time out for the day. It allows you to upload input files from the company’s MustardSeed Time and Attendance Management System (Biometrics) and Falco-Ecom Access Control System to determine the first time in and last time out of the employee for the day.</p>
 				</div>
+				<div class = "row"><%= image_tag "attendance.png", class: "img img-responsive img-rounded", style: "max-height: 200px"%></div>
 			</div>
 		</div>
 
-		<div class = "col-md-4" style = "height: 400px;">
+		<div class = "col-md-4" style = "height: 300px;">
 			<div class = "col-md-12">
-				<div class = "row"><%= image_tag "reports.png", class: "img img-responsive img-rounded", style: "max-height: 280px"%></div>
 				<div class = "row"><h3>Reports Generation</h3></div>
 				<div class = "row">
 					<p align = "justify">FBI Integrated System automates the generation of each employee’s Attendance Record and DTR Summary Sheet. These files will be outputted by the system after all input files from Falco, Biometrics, and iEMS are processed. These output files will then be used for the payroll of each employee.</p>		
 				</div>
+				<div class = "row"><%= image_tag "reports.png", class: "img img-responsive img-rounded", style: "max-height: 200px"%></div>
 			</div>
 		</div>
 	</div>
-	<br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/>
 </div>
 
 <script>

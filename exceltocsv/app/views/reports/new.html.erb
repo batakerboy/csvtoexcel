@@ -87,7 +87,7 @@
 	<div class = "row" align = "center">
 		<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
 			<div class = "hidden" id = "biometrics">
-				<%= form_tag import_reports_path, id: "import_form", multipart: true do%>
+				<%= form_tag import_reports_path, html: {class: "import-form"}, multipart: true do%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
 						<span class="btn btn-default btn-file col-md-8">
@@ -98,7 +98,7 @@
 					<%= hidden_field_tag 'step', 2%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "biometrics_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden input-upload", id: "biometrics_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -111,7 +111,7 @@
 
 		<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
 			<div class = "hidden" id = "falco">
-				<%= form_tag import_reports_path, multipart: true do%>
+				<%= form_tag import_reports_path, html: {class: "import-form"}, multipart: true do%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
 						<span class="btn btn-default btn-file col-md-8">
@@ -123,7 +123,7 @@
 					<%= hidden_field_tag 'step', 3%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "falco_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden input-upload", id: "falco_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -135,7 +135,7 @@
 
 		<div class = "col-md-4" style = "height: 100px; border-style: solid; border-top-style: none; border-width: 1px">
 			<div class = "hidden" id = "iEMS">
-				<%= form_tag import_reports_path, multipart: true do%>
+				<%= form_tag import_reports_path, html: {class: "import-form"}, multipart: true do%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
 						<span class="btn btn-default btn-file col-md-8">
@@ -146,7 +146,7 @@
 					<%= hidden_field_tag 'step', 4%>
 					<div class = "row">
 						<div class = "col-md-2"></div>
-						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden", id: "iEMS_upload"%>
+						<%= submit_tag 'Upload', class: "btn btn-warning col-md-8 hidden input-upload", id: "iEMS_upload"%>
 					</div>
 				<%end%>
 			</div>
@@ -183,6 +183,27 @@
     	</div>
     	<div class = "row">
     		<div class = "col-md-12" align = "center"><h1><font color = "white">Generating Reports...</font></h1></div>
+    	</div>
+    </div>
+</div>
+
+<div id="loader-wrapper" class = "upload hidden">
+    <div id="loader"></div>
+
+    <div class = "loader-section">
+    	<div class = "row">
+    		<div class = "col-md-12">
+    			<font color = "white" style = "font-size: 200%">
+				Falco 
+				<font color = "red">+</font> 
+				Biometrics
+				<font color = "red">+</font>
+				iEMS <strong>Integration</strong>
+			</font>
+    		</div>
+    	</div>
+    	<div class = "row">
+    		<div class = "col-md-12" align = "center"><h1><font color = "white">Uploading Input File...</font></h1></div>
     	</div>
     </div>
 </div>
@@ -252,6 +273,23 @@
  			data: $('generate_report_form').serialize(),
  			success: function() {
 				document.getElementById("loader-wrapper").className = "animated fadeOut"
+				$('#body').addClass('loaded');
+			}
+ 		});
+ 	});
+
+ 	$(".input-upload").click(function(){
+ 		$(".upload").removeClass("hidden");
+ 		$(".upload").addClass("animated fadeIn");
+
+ 		$.ajax({
+ 			url: "/reports/import",
+	        type: "POST",
+	        processData: false,
+ 			data: $('.import-form').serialize(),
+ 			success: function() {
+				// document.getElementById("loader-wrapper").className = "animated fadeOut"
+				$(".upload").addClass("animated fadeOut");
 				$('#body').addClass('loaded');
 			}
  		});
