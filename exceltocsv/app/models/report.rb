@@ -327,7 +327,7 @@ class Report < ActiveRecord::Base
 	   							    employeedtr_ws.merge_cells "A#{rownum}:B#{rownum}"
 							    	rownum += 1
 
-							   		employeedtr_ws.add_row ["TOTAL ABSENCES", " ", ("=FLOOR(I#{rownum-3},1,1)&"<<'"."'<<"&FLOOR(MOD(I#{rownum-3}*8,8),1,1)&"<<'"."'<<"&(MOD(I#{rownum-3}*8,8)-FLOOR(MOD(I#{rownum-3}*8,8),1,1))*60"), " ", "Legends:", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
+							   		employeedtr_ws.add_row ["TOTAL ABSENCES", " ", ("=FLOOR(I#{rownum-3},1)&"<<'"."'<<"&FLOOR(MOD(I#{rownum-3}*8,8),1)&"<<'"."'<<"&(MOD(I#{rownum-3}*8,8)-FLOOR(MOD(I#{rownum-3}*8,8),1))*60"), " ", "Legends:", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 							   							    "=INT(LEFT(C#{rownum+1},2))", 
 							   							    "=IF(LEFT(RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2),1)="<<'"."'<<",RIGHT(C#{rownum+1},LEN(C#{rownum+1})-3),RIGHT(C#{rownum+1},LEN(C#{rownum+1})-2))", 
 							   							    "=INT(LEFT(R#{rownum},1))", 
@@ -486,7 +486,7 @@ class Report < ActiveRecord::Base
 				    					    "=BD#{summaryrownum+1}*8*60+BO#{summaryrownum+1}*60+BU#{summaryrownum+1}", # CA
 				    					    "=SUM(BW#{summaryrownum+1}:CA#{summaryrownum+1})", # CB
 				    					    "=CB#{summaryrownum+1}/60", # CC
-				    					    "0", "=FLOOR(CC#{summaryrownum+1}/8,1,1)&"<<'"."'<<"&FLOOR(MOD(CC#{summaryrownum+1},8),1,1)&"<<'"."'<<"&(MOD(CC#{summaryrownum+1},8)-FLOOR(MOD(CC#{summaryrownum+1},8),1,1))*60",
+				    					    "0", "=FLOOR(CC#{summaryrownum+1}/8,1)&"<<'"."'<<"&FLOOR(MOD(CC#{summaryrownum+1},8),1)&"<<'"."'<<"&(MOD(CC#{summaryrownum+1},8)-FLOOR(MOD(CC#{summaryrownum+1},8),1))*60",
 				    					    summary[:total_absences_to_string], #CF
 				    					    "=INT(LEFT(CF#{summaryrownum+1},2))", #CG
 				    					    "=IF(LEFT(RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2),1)="<<'"."'<<",RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-3),RIGHT(CF#{summaryrownum+1},LEN(CF#{summaryrownum+1})-2))", #CH
