@@ -58,7 +58,7 @@ class Report < ActiveRecord::Base
 			summarydtr.workbook do |summarydtr_wb|
 			# define your regular styles
 				styles = summarydtr_wb.styles
-				title = styles.add_style sz: 15, b: true, u: true
+				title = styles.add_style sz: 15, b: true
 				headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '00000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				tabledata_total_total = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 				bottom_border = styles.add_style border: {:style => :thick, :color => '00000000', :edges => [:top] }
@@ -172,8 +172,8 @@ class Report < ActiveRecord::Base
 						employeedtr.workbook do |employeedtr_wb|
 						# define your regular styles
 							styles = employeedtr_wb.styles
-							title = styles.add_style sz: 15, b: true, u: true
-							titlelegend = styles.add_style sz: 15, b: true, u: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }
+							title = styles.add_style sz: 15, b: true
+							titlelegend = styles.add_style sz: 15, b: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }
 							headers = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							tabledata = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							bottomborder = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:top] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
@@ -184,7 +184,7 @@ class Report < ActiveRecord::Base
 							legendblue = styles.add_style :bg_color => "66A3FF", border: {:style => :thick, :color => '000000', :edges => [:left] }
 							legendorange = styles.add_style :bg_color => "FFCC66", border: {:style => :thick, :color => '000000', :edges => [:left] }
 							legendred = styles.add_style :bg_color => "DF5E5E", border: {:style => :thick, :color => '000000', :edges => [:left] }
-							legenddescription = styles.add_style sz: 11, b: true, u: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right] }
+							legenddescription = styles.add_style sz: 11, b: true, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right] }
 							totalheader = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:top, :left, :right, :bottom] }, alignment: { :horizontal => :right, :vertical => :center, :wrap_text => true}
 							tabledata_total = styles.add_style sz: 11, border: {:style => :thick, :color => '000000', :edges => [:left, :right, :top, :bottom] }, alignment: { :horizontal => :center, :vertical => :center, :wrap_text => true}
 							if @@report.include? :panes
