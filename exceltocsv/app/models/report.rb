@@ -41,7 +41,7 @@ class Report < ActiveRecord::Base
 		directory =  Rails.root.join('public', 'reports')
 		Dir.mkdir(directory) unless File.exists?(directory)
 
-		directory =  Rails.root.join('public', 'reports', 'employee dtr')
+		directory =  Rails.root.join('public', 'reports', 'employee_dtr')
 		Dir.mkdir(directory) unless File.exists?(directory)
 		
 	 	report_zip_path = Rails.root.join('public', 'reports', self.name)
@@ -158,7 +158,7 @@ class Report < ActiveRecord::Base
 				    @employees.each_with_index do |emp, i|
 				    	@@total_absences = 0
 				    	employeedtr_filename = "#{emp.last_name},#{emp.first_name}.xlsx"
-				    	dtr_peremployee_path = Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename)
+				    	dtr_peremployee_path = Rails.root.join('public', 'reports', 'employee_dtr', employeedtr_filename)
 
 						File.delete(dtr_peremployee_path) if File.exists?(dtr_peremployee_path)
 
@@ -496,7 +496,7 @@ class Report < ActiveRecord::Base
 				    					    style: tabledata_total_total
 						summaryrownum += 1
 						
-						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee dtr', employeedtr_filename))
+						zipfile.add("Employee/#{employeedtr_filename}", Rails.root.join('public', 'reports', 'employee_dtr', employeedtr_filename))
 					end
 					summarydtr_ws.add_row [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ",
 										   " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",

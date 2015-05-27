@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+gem 'thin'
 gem 'mysql2'
 gem 'axlsx', '2.0.1'
 gem 'rubyzip'
