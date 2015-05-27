@@ -122,7 +122,7 @@
 							<td><%= e[:no_of_hours_late]%></td>
 							<td><%= e[:no_of_hours_undertime]%></td>
 							<td><%= e[:ot_for_the_day]%></td>
-							<td><%= e[:ut_time] unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'%></td>
+							<td><%= e[:ut_time].strftime('%H:%M:%S') unless e[:ut_time].to_time.strftime('%H:%M:%S') == '00:00:00'%></td>
 							<td><%= e[:vacation_leave]%></td>
 							<td><%= e[:sick_leave]%></td>
 							<td><%= e[:ob_departure].strftime('%H:%M:%S') unless e[:ob_departure].nil? || (e[:ob_departure].is_a? Integer)%></td>
