@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521065223) do
+ActiveRecord::Schema.define(version: 20150528044719) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -50,11 +50,11 @@ ActiveRecord::Schema.define(version: 20150521065223) do
   create_table "requests", force: :cascade do |t|
     t.date     "date"
     t.time     "ut_time"
-    t.decimal  "vacation_leave",                       precision: 10
-    t.decimal  "sick_leave",                           precision: 10
+    t.decimal  "vacation_leave",                       precision: 10, scale: 2
+    t.decimal  "sick_leave",                           precision: 10, scale: 2
     t.text     "remarks",                limit: 65535
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
     t.string   "employee_id",            limit: 255
     t.time     "ob_departure"
     t.time     "ob_time_start"
@@ -62,11 +62,11 @@ ActiveRecord::Schema.define(version: 20150521065223) do
     t.time     "ob_arrival"
     t.string   "vacation_leave_balance", limit: 255
     t.string   "sick_leave_balance",     limit: 255
-    t.decimal  "regular_ot",                           precision: 10
-    t.decimal  "rest_or_special_ot",                   precision: 10
-    t.decimal  "special_on_rest_ot",                   precision: 10
-    t.decimal  "regular_holiday_ot",                   precision: 10
-    t.decimal  "regular_on_rest_ot",                   precision: 10
+    t.decimal  "regular_ot",                           precision: 10, scale: 2
+    t.decimal  "rest_or_special_ot",                   precision: 10, scale: 2
+    t.decimal  "special_on_rest_ot",                   precision: 10, scale: 2
+    t.decimal  "regular_holiday_ot",                   precision: 10, scale: 2
+    t.decimal  "regular_on_rest_ot",                   precision: 10, scale: 2
     t.string   "offset",                 limit: 255
     t.boolean  "is_holiday",             limit: 1
   end

@@ -660,12 +660,49 @@ class Employee < ActiveRecord::Base
 		sick_leave_balance = @request.sick_leave_balance
 		all_info[:sick_leave_balance] = sick_leave_balance
 
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
-			is_halfday = true if (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-			is_halfday = true if (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2 || is_absent
+			if (!@request.ut_time.nil? && @request.ut_time.to_time.strftime('%H:%M:%S') != '00:00:00') && @request.ut_time <= @@half_day_time_out
+				is_halfday = true if (!time_out.nil? && (time_out.to_time <= @request.ut_time.to_time))
+				puts "========================"
+				puts "1"
+				puts "========================"
+			elsif (!@request.ob_arrival.nil? && @request.ob_arrival != '')
+				is_halfday = true if (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+				puts "========================"
+				puts "2: #{date}"
+				puts (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out)
+				puts @request.ob_arrival.strftime('%H:%M:%S').to_time
+				puts @@half_day_time_out
+				puts "========================"
+			elsif (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+				is_halfday = true
+				puts "========================"
+				puts "3"
+				puts "========================"
+			# else
+				# is_halfday = false			
+			end
+			# is_halfday = true if (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			if (!@request.ob_departure.nil? && @request.ob_departure != '') && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && (!time_in.nil? && time_in.to_time >= @@half_day_time_in )
+				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && time_in.nil?
+				puts "========================"
+				puts "4"
+				puts "========================"
+			elsif (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+				is_halfday = true
+				puts "========================"
+				puts "5"
+				puts "========================"
+			# else
+				# is_halfday = false
+			end
+			# is_halfday = true if (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 		else
 			is_halfday = false
 		end
+		# is_halfday = false if is_absent
+		
 		all_info[:is_halfday] = is_halfday
 
 		all_info[:ob_departure] = @request.ob_departure
