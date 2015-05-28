@@ -19,19 +19,19 @@ class Report < ActiveRecord::Base
 		Dir.mkdir(directory) unless File.exists?(directory)
 		
 		unless biometrics.nil?
-			name = biometrics['report'].original_filename
+			# name = biometrics['report'].original_filename
 			path = File.join(directory, 'biometrics.csv')
 			File.open(path, "wb") { |f| f.write(biometrics['report'].read)}
 		end
 
 		unless falco.nil?
-			name = falco['report'].original_filename
+			# name = falco['report'].original_filename
 			path = File.join(directory, 'falco.txt')
 			File.open(path, 'wb') { |f| f.write(falco['report'].read)}
 		end
 
 		unless iEMS.nil?
-			name = iEMS['report'].original_filename
+			# name = iEMS['report'].original_filename
 			path = File.join(directory, 'iEMS.csv')
 			File.open(path, 'wb') { |f| f.write(iEMS['report'].read)}
 		end

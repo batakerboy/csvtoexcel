@@ -84,9 +84,6 @@ class ReportsController < ApplicationController
 		ids = @report.employee_ids.tr('"[]','').split(",")
 		@all_employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
 		if @empid.nil? || @empid['employee_id'] == "All"
-			# @employees = Employee.all.order(last_name: :asc, first_name: :asc, department: :asc)
-			# ids = @report.employee_ids.tr('"[]','').split(",")
-			# @employees = Employee.find(ids).sort_by{|i| [i.last_name, i.first_name, i.department]}
 			@employees = @all_employees	
 		else
 			@employees = Employee.where(id: @empid['employee_id'])
@@ -95,8 +92,46 @@ class ReportsController < ApplicationController
 	end
 
   	def import
-  		post = Report.save(params[:biometrics], params[:falco], params[:iEMS])	
-   		redirect_to new_report_path(step: params[:step]) 
+  		begin
+  			# @path = new_report_path(step: 1)
+
+  			unless params[:biometrics].nil?
+  				token = File.open(params[:biometrics]['report'].path, &:readline).split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
+  				if token.nil? || (token[0] != 'Mustard Seed' || (token[62].nil? && token[53].nil?))
+  					@path = new_report_path(step: 1)
+  					raise 'The file uploaded for Biometrics is wrong or has been tampered' 
+  				end
+  			end
+
+  			unless params[:iEMS].nil?
+  				token = File.open(params[:iEMS]['report'].path, &:readline).split(',')
+  				if token[0].tr('"', '') != 'FROM'
+  					@path = new_report_path(step: 3)
+					raise 'The file uploaded for iEMS is wrong or has been tampered!' 
+  				end
+  			end
+
+  			unless params[:falco].nil?
+			  	token = File.open(params[:falco]['report'].path, &:readline).gsub(/\s+/m, ' ').split(" ")
+			  	if token.length != 0
+			  		@path = new_report_path(step: 2)
+			  		raise 'The file uploaded for Falco is wrong or has been tampered' 
+			  	end
+  			end
+
+	  		post = Report.save(params[:biometrics], params[:falco], params[:iEMS])	
+	   		redirect_to new_report_path(step: params[:step]) 
+
+  			rescue Exception => e
+			puts "========================"
+			puts e.message
+			puts "========================"
+			puts token
+			puts "========================"
+			redirect_to @path, notice: e.message
+  			
+  		end
+  		
 	end
 
 	def delete_all_records
