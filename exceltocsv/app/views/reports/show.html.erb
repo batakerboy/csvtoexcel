@@ -104,14 +104,13 @@
 			<tbody>
 				<%while @date <= @report.date_end%>
 					<%e = employee.get_all_information(@date)%>
-					<%if e[:remarks] != ''%>
-						<tr class = "info">
 					
+					<%if e[:is_halfday]%>
+						<tr class = "warning">
+					<%elsif e[:remarks] != ''%>
+						<tr class = "info">
 					<%elsif e[:is_absent]%>
 						<tr class = "danger">
-					
-					<%elsif e[:is_halfday]%>
-						<tr class = "warning">
 					<%else%>
 						<tr>
 					<%end%>
