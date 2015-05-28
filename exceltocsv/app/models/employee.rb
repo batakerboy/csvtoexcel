@@ -557,34 +557,6 @@ class Employee < ActiveRecord::Base
 		return time	
 	end
 
-	def self.import(file=nil)
-		if !file.nil?
-			csvFile = CSV.open(file.path, 'r:ISO-8859-1')
-			csvFile.each_with_index do |row|
-				token = row.to_s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).flatten.compact
-				id = token[0].tr('[]" ', '')
-				last_name = token[1].tr('[]"', '')
-				first_name = token[2].tr('[]"', '')
-				department = token[3].tr('[]"', '')
-				biometrics_id = token[4].tr('[] "', '')
-				falco_id = token[5].tr('[] "', '')
-				@employee = Employee.where(id: id).first
-				if !@employee.nil?
-					Employee.where(id: id).update_all(last_name: last_name, first_name: first_name, department: department, biometrics_id: biometrics_id, falco_id: falco_id)
-				else
-					@employee = Employee.new
-					@employee.id = id
-					@employee.last_name = last_name
-					@employee.first_name = first_name
-					@employee.department = department
-					@employee.biometrics_id = biometrics_id
-					@employee.falco_id = falco_id
-					@employee.save
-				end
-			end
-		end
-	end
-
 	def get_all_information(date)
 		@@required_time_in = '08:30:00'.to_time
 		@@required_time_out_MH = '18:30:00'.to_time
@@ -714,12 +686,6 @@ class Employee < ActiveRecord::Base
 	end
 
 	def get_all_summary(date_start, date_end, cut_off_date)
-		@@required_time_in = '08:30:00'.to_time
-		@@required_time_out_MH = '18:30:00'.to_time
-		@@required_time_out_F = '17:30:00'.to_time
-		@@half_day_time_in = '10:00:00'.to_time
-		@@half_day_time_out = '16:30:00'.to_time
-	
 		all_summary = Hash.new
 
 		date = date_start
