@@ -288,6 +288,7 @@ class Report < ActiveRecord::Base
 							        		end
 							        	end
 							    	end
+							    	e = emp.get_all_summary(self.date_start, self.date_end, @@cut_off_date)
 							    	if ((@@cut_off_date.to_date >= self.date_start.to_date) && (@@cut_off_date.to_date <= self.date_end.to_date))
 								    	employeedtr_ws.add_row ["NUMBER OF TIMES TARDY", " ", " ", " ", "=COUNT(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder, bottomleftrightborder]
 								    	employeedtr_ws.add_row ["TOTAL TARDINESS", " ", " ", " ", "=SUM(E5:E#{rownum-(@@days_over_cutoffdate)})", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
@@ -310,7 +311,7 @@ class Report < ActiveRecord::Base
 							    	end
 							    	employeedtr_ws.merge_cells "A#{rownum}:G#{rownum}"
 							    	rownum += 1
-							    	employeedtr_ws.add_row ["TOTAL ABSENCES", " ", " ", " ", " ", " ", " ", " ", @@total_absences, " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
+							    	employeedtr_ws.add_row ["TOTAL ABSENCES", " ", " ", " ", " ", " ", " ", " ", e[:total_absences], " ", " ", " ", " ", " ", " ", " "], style: [totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, totalheader, tabledata_total, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata, tabledata]
 							    	employeedtr_ws.merge_cells "A#{rownum}:H#{rownum}"
 							    	rownum += 1
 
