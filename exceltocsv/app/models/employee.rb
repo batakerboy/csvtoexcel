@@ -677,19 +677,14 @@ class Employee < ActiveRecord::Base
 		all_info[:is_absent] = is_absent
 
 		sick_leave = @request.sick_leave
-		# unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
-		# 	sick_leave += 0.5 if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-		# 	sick_leave += 0.5 if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday')  && (@request.offset.downcase != 'am')
-		# 	sick_leave = 1 if is_absent
-		# end
 		all_info[:sick_leave] = sick_leave
 		
 		sick_leave_balance = @request.sick_leave_balance
 		all_info[:sick_leave_balance] = sick_leave_balance
 
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2
-			is_halfday = true if (!time_out.nil? && time_out.to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-			is_halfday = true if (!time_in.nil? && time_in.to_time >= @@half_day_time_in) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+			is_halfday = true if (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			is_halfday = true if (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 		else
 			is_halfday = false
 		end
