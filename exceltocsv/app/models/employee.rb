@@ -586,6 +586,12 @@ class Employee < ActiveRecord::Base
 	end
 
 	def get_all_information(date)
+		@@required_time_in = '08:30:00'.to_time
+		@@required_time_out_MH = '18:30:00'.to_time
+		@@required_time_out_F = '17:30:00'.to_time
+		@@half_day_time_in = '10:00:00'.to_time
+		@@half_day_time_out = '16:30:00'.to_time
+
 		all_info = Hash.new
 
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
@@ -708,6 +714,12 @@ class Employee < ActiveRecord::Base
 	end
 
 	def get_all_summary(date_start, date_end, cut_off_date)
+		@@required_time_in = '08:30:00'.to_time
+		@@required_time_out_MH = '18:30:00'.to_time
+		@@required_time_out_F = '17:30:00'.to_time
+		@@half_day_time_in = '10:00:00'.to_time
+		@@half_day_time_out = '16:30:00'.to_time
+	
 		all_summary = Hash.new
 
 		date = date_start
