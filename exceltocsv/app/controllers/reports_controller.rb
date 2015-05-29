@@ -67,11 +67,7 @@ class ReportsController < ApplicationController
 			puts "========================"
 			puts token
 			puts "========================"
-			unless @path.nil?
-				redirect_to @path, notice: e.message
-			else
-				redirect_to new_report_path(step: 1), notice: e.message
-			end
+			redirect_to new_report_path(step: 1), notice: e.message
 	  	end
 
 		File.delete(iEMS_path) if File.exists?(iEMS_path)
