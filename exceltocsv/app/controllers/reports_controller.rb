@@ -123,12 +123,16 @@ class ReportsController < ApplicationController
 	   		redirect_to new_report_path(step: params[:step]) 
 
   			rescue Exception => e
-			puts "========================"
-			puts e.message
-			puts "========================"
-			puts token
-			puts "========================"
-			redirect_to @path, notice: e.message
+				puts "========================"
+				puts e.message
+				puts "========================"
+				puts token
+				puts "========================"
+				unless @path.nil?
+					redirect_to @path, notice: e.message
+				else
+					redirect_to new_report_path(step: 1), notice: e.message
+				end
   			
   		end
   		
