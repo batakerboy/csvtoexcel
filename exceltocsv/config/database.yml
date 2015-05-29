@@ -7,3 +7,11 @@ development:
   username: root
   password: conquer121
   host: localhost
+
+staging:
+  adapter: mysql2
+  encoding: utf8
+  database: fbi_staging
+  username: root
+  password: root
+  host: localhost
