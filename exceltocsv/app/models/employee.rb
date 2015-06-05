@@ -5,8 +5,8 @@ class Employee < ActiveRecord::Base
 	has_many :attendances
 	has_many :requests
 	# self.required_time_in.to_time = '08:30:00'.to_time
-	# self.required_time_out.to_time = '18:30:00'.to_time
-	# (self.required_time_out.to_time - 1.hour) = '17:30:00'.to_time
+	# self.required_time_out.strftime('%H:%M:%S').to_time = '18:30:00'.to_time
+	# (self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour) = '17:30:00'.to_time
 	@@half_day_time_in = '10:01:00'.to_time
 	@@half_day_time_out = '16:31:00'.to_time
 
@@ -151,9 +151,9 @@ class Employee < ActiveRecord::Base
 				undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
 			else
 				if date.strftime('%A') == 'Friday'
-					undertime = Employee.format_time((((self.required_time_out.to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.to_time - 1.hour)
+					undertime = Employee.format_time((((self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour)
 				elsif date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
-					undertime = Employee.format_time(((self.required_time_out.to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.to_time
+					undertime = Employee.format_time(((self.required_time_out.strftime('%H:%M:%S').to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.strftime('%H:%M:%S').to_time
 				end
 			end
 		end
@@ -165,7 +165,7 @@ class Employee < ActiveRecord::Base
 	def no_of_hours_late(date)
 		time_in = self.time_in(date)
 		offset = self.offset(date).downcase
-		return Employee.format_time(((time_in.to_time - self.required_time_in.to_time)/1.hour).round(2)) unless time_in.nil? || (time_in.to_time <= self.required_time_in.to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
+		return Employee.format_time(((time_in.to_time - self.required_time_in.strftime('%H:%M:%S').to_time)/1.hour).round(2)) unless time_in.nil? || (time_in.to_time <= self.required_time_in.strftime('%H:%M:%S').to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
 		return 0 
 	end
 
@@ -559,10 +559,10 @@ class Employee < ActiveRecord::Base
 
 	def get_all_information(date)
 		# self.required_time_in.to_time = '08:30:00'.to_time
-		# self.required_time_out.to_time = '18:30:00'.to_time
-		# (self.required_time_out.to_time - 1.hour) = '17:30:00'.to_time
+		# self.required_time_out.strftime('%H:%M:%S').to_time = '18:30:00'.to_time
+		# (self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour) = '17:30:00'.to_time
 		@@half_day_time_in = '10:01:00'.to_time
-		@@half_day_time_out = '16:30:00'.to_time
+		@@half_day_time_out = '16:31:00'.to_time
 
 		all_info = Hash.new
 
@@ -605,14 +605,15 @@ class Employee < ActiveRecord::Base
 		
 		all_info[:remarks] = remarks
 
-		unless time_in.nil? || (time_in.to_time <= self.required_time_in.to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
-			no_of_hours_late = Employee.format_time(((time_in.to_time - self.required_time_in.to_time)/1.hour).round(2))
+		unless time_in.nil? || (time_in.to_time <= self.required_time_in.strftime('%H:%M:%S').to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
+			no_of_hours_late = Employee.format_time(((time_in.to_time - self.required_time_in.strftime('%H:%M:%S').to_time)/1.hour).round(2))
 		else
 			no_of_hours_late = 0
 		end
 		if no_of_hours_late > 1
 			no_of_hours_late = 1
 		end
+		
 		all_info[:no_of_hours_late] = no_of_hours_late
 
 		no_of_hours_undertime = 0
@@ -621,9 +622,9 @@ class Employee < ActiveRecord::Base
 				no_of_hours_undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
 			else
 				if date.strftime('%A') == 'Friday'
-					no_of_hours_undertime = Employee.format_time((((self.required_time_out.to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.to_time - 1.hour)
+					no_of_hours_undertime = Employee.format_time((((self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.strftime('%H:%M:%S').to_time - 1.hour)
 				elsif date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
-					no_of_hours_undertime = Employee.format_time(((self.required_time_out.to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.to_time
+					no_of_hours_undertime = Employee.format_time(((self.required_time_out.strftime('%H:%M:%S').to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.strftime('%H:%M:%S').to_time
 				end
 			end
 		end
@@ -663,45 +664,21 @@ class Employee < ActiveRecord::Base
 		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2 || is_absent
 			if (!@request.ut_time.nil? && @request.ut_time.to_time.strftime('%H:%M:%S') != '00:00:00') && @request.ut_time <= @@half_day_time_out
 				is_halfday = true if (!time_out.nil? && (time_out.to_time <= @request.ut_time.to_time))
-				puts "========================"
-				puts "1"
-				puts "========================"
 			elsif (!@request.ob_arrival.nil? && @request.ob_arrival != '')
 				is_halfday = true if (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-				puts "========================"
-				puts "2: #{date}"
-				puts (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out)
-				puts @request.ob_arrival.strftime('%H:%M:%S').to_time
-				puts @@half_day_time_out
-				puts "========================"
 			elsif (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-				is_halfday = true
-				puts "========================"
-				puts "3"
-				puts "========================"
-			# else
-				# is_halfday = false			
+				is_halfday = true			
 			end
-			# is_halfday = true if (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+
 			if (!@request.ob_departure.nil? && @request.ob_departure != '') && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && (!time_in.nil? && time_in.to_time >= @@half_day_time_in )
 				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && time_in.nil?
-				puts "========================"
-				puts "4"
-				puts "========================"
 			elsif (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 				is_halfday = true
-				puts "========================"
-				puts "5"
-				puts "========================"
-			# else
-				# is_halfday = false
 			end
-			# is_halfday = true if (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
 		else
 			is_halfday = false
 		end
-		# is_halfday = false if is_absent
 		
 		all_info[:is_halfday] = is_halfday
 
@@ -717,7 +694,6 @@ class Employee < ActiveRecord::Base
 		ot_for_the_day += @request.regular_holiday_ot
 		ot_for_the_day += @request.regular_on_rest_ot
 		all_info[:ot_for_the_day] = ot_for_the_day
-
 
 		return all_info
 	end
@@ -793,7 +769,6 @@ class Employee < ActiveRecord::Base
 		summary_total = surplus_vl*8 + surplus_sl*8 + total_late + total_absences*8
 		all_summary[:summary_total] = summary_total
 
-		# summary_total_with_ut = surplus_vl*8 + surplus_sl*8 + total_late + total_undertime
 		summary_total_with_ut = summary_total + total_undertime
 		all_summary[:summary_total_with_ut] = summary_total_with_ut
 
