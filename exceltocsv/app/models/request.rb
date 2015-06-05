@@ -36,9 +36,9 @@ class Request < ActiveRecord::Base
 
 					@employee = Employee.where(id: employee_id).first
 					unless @employee.nil?
-						Employee.where(id: employee_id).update_all(last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
+						Employee.where(id: employee_id).update_all(last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6], required_time_in: token[24], required_time_out: token[25])
 					else
-						@employee = Employee.new(id: employee_id, last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6])
+						@employee = Employee.new(id: employee_id, last_name: token[1].tr('"', ''), first_name: token[2].tr('"', ''), is_manager: token[3], department: token[4], biometrics_id: token[5], falco_id: token[6], required_time_in: token[24], required_time_out: token[25])
 						@employee.save
 					end
 				end
@@ -46,9 +46,9 @@ class Request < ActiveRecord::Base
 				@request = Request.where(employee_id: employee_id, date: token[7]).first
 
 				unless @request.nil?
-					Request.where(employee_id: employee_id, date: token[7]).update_all(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: (token[18] unless token[18].nil? || token[18] == ''), ob_time_start: (token[19] unless token[19].nil? || token[19] == ''), ob_time_end: (token[20] unless token[20].nil? || token[20] == ''), ob_arrival: (token[21] unless token[21].nil? || token[21] == ''), offset: token[22], is_holiday: token[23], remarks: token[24])
+					Request.where(employee_id: employee_id, date: token[7]).update_all(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: (token[18] unless token[18].nil? || token[18] == ''), ob_time_start: (token[19] unless token[19].nil? || token[19] == ''), ob_time_end: (token[20] unless token[20].nil? || token[20] == ''), ob_arrival: (token[21] unless token[21].nil? || token[21] == ''), offset: token[22], is_holiday: token[23], remarks: token[26])
 				else
-					@request = Request.new(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], is_holiday: token[23], remarks: token[24])
+					@request = Request.new(employee_id: employee_id, date: token[7], regular_ot: token[8], rest_or_special_ot: token[9], special_on_rest_ot: token[10], regular_holiday_ot: token[11], regular_on_rest_ot: token[12], ut_time: token[13], vacation_leave: token[14], vacation_leave_balance: token[15], sick_leave: token[16], sick_leave_balance: token[17], ob_departure: token[18], ob_time_start: token[19], ob_time_end: token[20], ob_arrival: token[21], offset: token[22], is_holiday: token[23], remarks: token[26])
 					@request.save
 				end
 			end

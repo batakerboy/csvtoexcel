@@ -4,11 +4,11 @@ require 'pathname'
 class Employee < ActiveRecord::Base
 	has_many :attendances
 	has_many :requests
-	@@required_time_in = '08:30:00'.to_time
-	@@required_time_out_MH = '18:30:00'.to_time
-	@@required_time_out_F = '17:30:00'.to_time
-	@@half_day_time_in = '10:00:00'.to_time
-	@@half_day_time_out = '16:30:00'.to_time
+	# self.required_time_in.to_time = '08:30:00'.to_time
+	# self.required_time_out.to_time = '18:30:00'.to_time
+	# (self.required_time_out.to_time - 1.hour) = '17:30:00'.to_time
+	@@half_day_time_in = '10:01:00'.to_time
+	@@half_day_time_out = '16:31:00'.to_time
 
 	def time_in(date)
 		@attendance = Attendance.where(employee_id: self.id, attendance_date: date).first
@@ -151,9 +151,9 @@ class Employee < ActiveRecord::Base
 				undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
 			else
 				if date.strftime('%A') == 'Friday'
-					undertime = Employee.format_time(((@@required_time_out_F - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_F
+					undertime = Employee.format_time((((self.required_time_out.to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.to_time - 1.hour)
 				elsif date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
-					undertime = Employee.format_time(((@@required_time_out_MH - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_MH
+					undertime = Employee.format_time(((self.required_time_out.to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.to_time
 				end
 			end
 		end
@@ -165,7 +165,7 @@ class Employee < ActiveRecord::Base
 	def no_of_hours_late(date)
 		time_in = self.time_in(date)
 		offset = self.offset(date).downcase
-		return Employee.format_time(((time_in.to_time - @@required_time_in)/1.hour).round(2)) unless time_in.nil? || (time_in.to_time <= @@required_time_in) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
+		return Employee.format_time(((time_in.to_time - self.required_time_in.to_time)/1.hour).round(2)) unless time_in.nil? || (time_in.to_time <= self.required_time_in.to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
 		return 0 
 	end
 
@@ -558,10 +558,10 @@ class Employee < ActiveRecord::Base
 	end
 
 	def get_all_information(date)
-		@@required_time_in = '08:30:00'.to_time
-		@@required_time_out_MH = '18:30:00'.to_time
-		@@required_time_out_F = '17:30:00'.to_time
-		@@half_day_time_in = '10:00:00'.to_time
+		# self.required_time_in.to_time = '08:30:00'.to_time
+		# self.required_time_out.to_time = '18:30:00'.to_time
+		# (self.required_time_out.to_time - 1.hour) = '17:30:00'.to_time
+		@@half_day_time_in = '10:01:00'.to_time
 		@@half_day_time_out = '16:30:00'.to_time
 
 		all_info = Hash.new
@@ -605,8 +605,8 @@ class Employee < ActiveRecord::Base
 		
 		all_info[:remarks] = remarks
 
-		unless time_in.nil? || (time_in.to_time <= @@required_time_in) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
-			no_of_hours_late = Employee.format_time(((time_in.to_time - @@required_time_in)/1.hour).round(2))
+		unless time_in.nil? || (time_in.to_time <= self.required_time_in.to_time) || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday' || self.is_manager || offset == 'am' || offset.length > 2 || time_in.to_time >= @@half_day_time_in
+			no_of_hours_late = Employee.format_time(((time_in.to_time - self.required_time_in.to_time)/1.hour).round(2))
 		else
 			no_of_hours_late = 0
 		end
@@ -621,9 +621,9 @@ class Employee < ActiveRecord::Base
 				no_of_hours_undertime = Employee.format_time(ut_time.to_time - time_out.to_time) if time_out.to_time < ut_time.to_time 
 			else
 				if date.strftime('%A') == 'Friday'
-					no_of_hours_undertime = Employee.format_time(((@@required_time_out_F - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_F
+					no_of_hours_undertime = Employee.format_time((((self.required_time_out.to_time - 1.hour) - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= (self.required_time_out.to_time - 1.hour)
 				elsif date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday'
-					no_of_hours_undertime = Employee.format_time(((@@required_time_out_MH - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= @@required_time_out_MH
+					no_of_hours_undertime = Employee.format_time(((self.required_time_out.to_time - time_out.to_time)/1.hour).round(2)) unless time_out.to_time >= self.required_time_out.to_time
 				end
 			end
 		end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150528044719) do
+ActiveRecord::Schema.define(version: 20150605023231) do
 
   create_table "attendances", force: :cascade do |t|
     t.date     "attendance_date"
@@ -25,14 +25,16 @@ ActiveRecord::Schema.define(version: 20150528044719) do
   add_index "attendances", ["employee_id", "attendance_date"], name: "by_employee_and_date_attendance", using: :btree
 
   create_table "employees", force: :cascade do |t|
-    t.string   "last_name",     limit: 255
-    t.string   "first_name",    limit: 255
-    t.string   "department",    limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.string   "biometrics_id", limit: 255
-    t.string   "falco_id",      limit: 255
-    t.boolean  "is_manager",    limit: 1
+    t.string   "last_name",         limit: 255
+    t.string   "first_name",        limit: 255
+    t.string   "department",        limit: 255
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.string   "biometrics_id",     limit: 255
+    t.string   "falco_id",          limit: 255
+    t.boolean  "is_manager",        limit: 1
+    t.time     "required_time_in"
+    t.time     "required_time_out"
   end
 
   add_index "employees", ["biometrics_id"], name: "by_biometrics_id", using: :btree
