@@ -2,8 +2,16 @@ development:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: db_name_here
+  database: fbi_db
   pool: 5
   username: root
   password: conquer121
+  host: localhost
+
+staging:
+  adapter: mysql2
+  encoding: utf8
+  database: fbi_staging
+  username: root
+  password: root
   host: localhost

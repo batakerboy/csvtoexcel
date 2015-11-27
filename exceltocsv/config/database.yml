@@ -5,7 +5,7 @@ development:
   database: fbi_db
   pool: 5
   username: root
-  password: conquer121
+  password: password
   host: localhost
 
 staging:

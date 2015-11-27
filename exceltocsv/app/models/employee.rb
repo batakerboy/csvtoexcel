@@ -583,20 +583,24 @@ class Employee < ActiveRecord::Base
 		all_info[:ut_time] = ut_time
 
 		regular_ot = @request.regular_ot
+		regular_ot = regular_ot - 4 if date.strftime('%A') == 'Saturday' && regular_ot >= 4
 		all_info[:regular_ot] = regular_ot
 
 		rest_or_special_ot = @request.rest_or_special_ot
+		rest_or_special_ot = rest_or_special_ot - 4 if date.strftime('%A') == 'Saturday' && rest_or_special_ot >= 4
 		all_info[:rest_or_special_ot] = rest_or_special_ot
 
 		special_on_rest_ot = @request.special_on_rest_ot
+		special_on_rest_ot = special_on_rest_ot - 4 if date.strftime('%A') == 'Saturday' && special_on_rest_ot >= 4
 		all_info[:special_on_rest_ot] = special_on_rest_ot
 
 		regular_holiday_ot = @request.regular_holiday_ot
+		regular_holiday_ot = regular_holiday_ot - 4 if date.strftime('%A') == 'Saturday' && regular_holiday_ot >= 4
 		all_info[:regular_holiday_ot] = regular_holiday_ot
 
 		regular_on_rest_ot = @request.regular_on_rest_ot
+		regular_on_rest_ot = regular_on_rest_ot - 4 if date.strftime('%A') == 'Saturday' && regular_on_rest_ot >= 4
 		all_info[:regular_on_rest_ot] = regular_on_rest_ot
-
 
 		offset = @request.offset
 		all_info[:offset] = offset
@@ -635,7 +639,12 @@ class Employee < ActiveRecord::Base
 			all_info[:no_of_hours_undertime] = 0
 		end
 
-		vacation_leave = @request.vacation_leave
+		unless date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday'
+			vacation_leave = @request.vacation_leave
+		else
+			vacation_leave = 0
+		end
+
 		all_info[:vacation_leave] = vacation_leave
 		
 		vacation_leave_balance = @request.vacation_leave_balance 
@@ -655,25 +664,65 @@ class Employee < ActiveRecord::Base
 		end
 		all_info[:is_absent] = is_absent
 
-		sick_leave = @request.sick_leave
+		unless date.strftime('%A') == 'Saturday' || date.strftime('%A') == 'Sunday'
+			sick_leave = @request.sick_leave
+		else
+			sick_leave = 0
+		end
+
 		all_info[:sick_leave] = sick_leave
 		
 		sick_leave_balance = @request.sick_leave_balance
 		all_info[:sick_leave_balance] = sick_leave_balance
 
-		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2 || is_absent
-			if (!@request.ut_time.nil? && @request.ut_time.to_time.strftime('%H:%M:%S') != '00:00:00') && @request.ut_time <= @@half_day_time_out
-				is_halfday = true if (!time_out.nil? && (time_out.to_time <= @request.ut_time.to_time))
-			elsif (!@request.ob_arrival.nil? && @request.ob_arrival != '')
-				is_halfday = true if (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-			elsif (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
-				is_halfday = true			
+		unless @request.sick_leave != 0 || @request.vacation_leave != 0 || @request.offset.length > 2 || is_absent || is_in_holiday || date.strftime('%A') == 'Saturday' || date.strftime('%A') == 
+				'Sunday'
+			# if (!@request.ut_time.nil? && @request.ut_time.to_time.strftime('%H:%M:%S') != '00:00:00') && @request.ut_time <= @@half_day_time_out
+			# 	is_halfday = true if (!time_out.nil? && (time_out.to_time <= @request.ut_time.to_time))
+			# elsif (!@request.ob_arrival.nil? && @request.ob_arrival != '')
+			# 	is_halfday = true if (@request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			# elsif (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'pm')
+			# 	is_halfday = true			
+			# end
+
+			# if (!@request.ob_departure.nil? && @request.ob_departure != '') && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+			# 	is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && (!time_in.nil? && time_in.to_time >= @@half_day_time_in )
+			# 	is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && time_in.nil?
+			# elsif (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+			# 	is_halfday = true
+			# end
+
+			morning_halfday = false
+			morning_halfday = true if (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && @request.offset.downcase != 'am'
+			if morning_halfday && !@request.ob_departure.nil? && @request.ob_departure != '' && @request.offset.downcase != 'am'
+				if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && (!time_in.nil? && time_in.to_time >= @@half_day_time_in )
+					morning_halfday = true 
+				elsif @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && time_in.nil?
+					morning_halfday = true
+				else
+					morning_halfday = false
+				end 
 			end
 
-			if (!@request.ob_departure.nil? && @request.ob_departure != '') && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
-				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && (!time_in.nil? && time_in.to_time >= @@half_day_time_in )
-				is_halfday = true if @request.ob_departure.strftime('%H:%M:%S').to_time >= @@half_day_time_in && time_in.nil?
-			elsif (!time_in.nil? && (time_in.to_time >= @@half_day_time_in)) && (date.strftime('%A') != 'Saturday' && date.strftime('%A') != 'Sunday') && (@request.offset.downcase != 'am')
+			afternoon_halfday = false
+			afternoon_halfday = true if (!time_out.nil? && (time_out.to_time <= @@half_day_time_out)) && @request.offset.downcase != 'pm'
+			if afternoon_halfday && !@request.ut_time.nil? && @request.ut_time.to_time.strftime('%H:%M:%S') != '00:00:00'
+				if @request.ut_time <= @@half_day_time_out && (!time_out.nil? && (time_out.to_time <= @request.ut_time.to_time))
+					afternoon_halfday = true
+				else
+					afternoon_halfday = false
+				end
+			end
+
+			if afternoon_halfday && !@request.ob_arrival.nil? && @request.ob_arrival != ''
+				if @request.ob_arrival.strftime('%H:%M:%S').to_time <= @@half_day_time_out
+					afternoon_halfday = true
+				else
+					afternoon_halfday = false
+				end
+			end
+
+			if morning_halfday || afternoon_halfday
 				is_halfday = true
 			end
 		else
